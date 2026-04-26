@@ -1,0 +1,626 @@
+================================================================================
+  NEW ISSUES FOUND IN RISC-V EXTENSIONS LANDSCAPE CODEBASE
+  (Issues NOT present in existing_issues.txt)
+  Generated: 2026-04-26
+================================================================================
+
+
+ISSUE #1: Monolithic 3600-Line Component — No Code Splitting or Modularization
+================================================================================
+File: src/risc_v_visualizer.jsx (3594 lines)
+
+Description:
+The entire application (compressed instruction mappings, encoding math,
+profile definitions, instruction lists, search logic, encoder validator,
+sidebar panel, encoding diagram, extension grid, and all rendering) lives
+in a single 3594-line file. This violates single-responsibility and makes
+the codebase unmaintainable, untestable, and un-reviewable.
+
+Impact: HIGH — Every contributor must parse a 3600-line file. Webpack cannot
+tree-shake or code-split any part of the app. Unit testing individual
+features (e.g., encoding math, search, validator) is impossible without
+importing the entire component.
+
+Fix (estimated 200+ lines of structural changes):
+- Extract `EncodingDiagram` into `src/components/EncodingDiagram.jsx`
+- Extract `ExtensionBlock` into `src/components/ExtensionBlock.jsx`
+- Extract encoding math utilities (encodingToMatchMask, matchMaskToEncoding,
+  patternsOverlap, isSubsetPattern, overlapExampleWord, parseHexToBigInt,
+  toHex32, normalizeHexString, normalizeEncodingString) into
+  `src/utils/encoding.js`
+- Extract `COMPRESSED_INSTRUCTION_MAPPINGS`, `COMPRESSED_INSTRUCTION_LOOKUP`,
+  `COMPRESSED_BY_STANDARD` into `src/data/compressed_mappings.js`
+- Extract profile definitions into `src/data/profiles.js`
+- Extract `extensionInstructions` into `src/data/extension_instructions.js`
+- Extract encoder validator logic into `src/components/EncoderValidator.jsx`
+- Extract sidebar detail panel into `src/components/DetailsSidebar.jsx`
+- Keep `RISCVExplorer` as a thin layout shell that composes these pieces
+
+
+ISSUE #2: No Dev Server — Development Requires Full Production Build
+================================================================================
+Files: webpack.config.js, package.json
+
+Description:
+The webpack config is hardcoded to `mode: 'production'`. There is no
+`webpack-dev-server` dependency and no `dev` script. To see any change,
+developers must run `npm run build` (full production build with minification)
+then manually start a static file server. This dramatically slows the
+development feedback loop.
+
+Impact: MEDIUM — Every code change requires a full Webpack production
+build + manual server restart. No hot-module-replacement, no live reload,
+no source maps.
+
+Fix (estimated 40-50 lines):
+- Add `webpack-dev-server` to devDependencies
+- Add a `webpack.dev.js` config (or add mode switching via env vars):
+  * mode: 'development'
+  * devtool: 'eval-source-map'
+  * devServer with port, hot, open, historyApiFallback
+- Add `"dev": "webpack serve --config webpack.dev.js"` script to package.json
+- Alternatively, modify webpack.config.js to check NODE_ENV and set mode,
+  devtool, and devServer conditionally
+
+
+ISSUE #3: No Test Infrastructure — Zero Unit, Integration, or E2E Tests
+================================================================================
+Files: package.json (test script is `echo "Error: no test specified" && exit 1`)
+
+Description:
+The project has zero tests. The `test` script in package.json explicitly
+exits with error. Critical logic like encoding math (BigInt operations),
+match/mask validation, encoding-to-match-mask conversion, overlap detection,
+subset detection, and search indexing has no test coverage.
+
+Impact: HIGH — Any change to encoding logic, search behavior, or data sync
+could silently break instruction validation. The encoder validator performs
+security-critical overlap detection that should be thoroughly tested.
+
+Fix (estimated 100+ lines):
+- Install jest + @testing-library/react + babel-jest
+- Add jest config to package.json or jest.config.js
+- Create `src/__tests__/encoding.test.js`:
+  * Test encodingToMatchMask with valid 32-char patterns
+  * Test matchMaskToEncoding roundtrip
+  * Test patternsOverlap with known overlapping and non-overlapping pairs
+  * Test isSubsetPattern with subset and non-subset cases
+  * Test overlapExampleWord produces a word matching both patterns
+  * Test parseHexToBigInt with valid/invalid/edge-case inputs
+  * Test toHex32 normalization
+- Create `src/__tests__/search.test.js`:
+  * Test instructionMatchesQuery with mnemonic, hex, encoding matches
+  * Test normalizeMnemonicKey
+- Create `src/__tests__/sync.test.js`:
+  * Test mnemonicToInstrDictKey conversions
+  * Test findMatchingBrace with nested braces and strings
+- Update package.json test script
+
+
+ISSUE #4: Missing SEO Metadata — No Meta Description, Open Graph, or Favicon
+================================================================================
+File: public/index.html
+
+Description:
+The HTML template has a bare-minimum `<head>` with only charset, viewport,
+and title. It is missing: meta description, Open Graph tags (og:title,
+og:description, og:image, og:url), Twitter Card meta, canonical URL, favicon,
+apple-touch-icon, theme-color meta, and structured data. For a publicly
+deployed educational tool, this means poor search engine indexing and
+unfriendly social media sharing.
+
+Impact: MEDIUM — Poor SEO visibility for a niche but valuable reference tool.
+Shared links on social media show no preview image or description.
+
+Fix (estimated 35-45 lines):
+- Add <meta name="description" content="...">
+- Add <meta name="keywords" content="RISC-V, ISA, extensions, ...">
+- Add <link rel="canonical" href="...">
+- Add Open Graph tags (og:title, og:description, og:image, og:url, og:type)
+- Add Twitter Card meta (twitter:card, twitter:title, twitter:description)
+- Add <meta name="theme-color" content="#0f172a">
+- Add <link rel="icon" ...> and <link rel="apple-touch-icon" ...>
+- Add structured data (JSON-LD) for a SoftwareApplication
+- Generate and reference a favicon
+
+
+ISSUE #5: Hardcoded Bundle Script Path — Breaks GitHub Pages Subdirectory Deploy
+================================================================================
+File: public/index.html (line 10)
+
+Description:
+The HTML template has `<script src="/bundle.js">`. This is an absolute path
+from the domain root. When deployed to GitHub Pages at the subdirectory
+`https://rpsene.github.io/riscv-extensions-landscape/`, the browser requests
+`https://rpsene.github.io/bundle.js` which 404s. HtmlWebpackPlugin should be
+injecting the script tag, but the template has a hardcoded one that conflicts.
+
+The `homepage` field in package.json is set to the GitHub Pages subdirectory
+URL, but webpack's `output.publicPath` is not configured to match.
+
+Impact: HIGH — The deployed site on GitHub Pages may fail to load the
+JavaScript bundle entirely (blank page).
+
+Fix (estimated 30-35 lines):
+- Remove the hardcoded `<script src="/bundle.js">` from index.html
+- HtmlWebpackPlugin already injects the script automatically
+- Add `output.publicPath` to webpack.config.js:
+  * For production: set to the GitHub Pages subdirectory path or use
+    the `homepage` field from package.json
+  * Or use `output.publicPath: 'auto'` for relative paths
+- Optionally add `output.clean: true` to clear dist/ on rebuild
+- Test with `npm run build` and verify the generated index.html has
+  the correct script path
+
+
+ISSUE #6: No Accessibility (a11y) Support — Missing ARIA, Keyboard Nav, Focus
+================================================================================
+File: src/risc_v_visualizer.jsx
+
+Description:
+The entire UI lacks accessibility support:
+- Extension tiles are `<div onClick>` with no role="button", tabIndex, or
+  onKeyDown handlers. Screen readers cannot identify them as interactive.
+- The encoding diagram bits are `<div>` elements with no semantic meaning.
+- The encoder validator modal has no focus trapping, no aria-modal, no
+  role="dialog", and no Escape-key-to-close handler.
+- Profile/Volume filter buttons have no aria-pressed state.
+- The sidebar has no aria-live region for dynamic content updates.
+- The search input has no associated label element.
+- Color alone is used to convey meaning (highlighted vs dimmed) without
+  text alternatives.
+
+Impact: HIGH — The tool is completely inaccessible to keyboard-only users
+and screen reader users. Fails WCAG 2.1 Level A compliance.
+
+Fix (estimated 80-100 lines):
+- Add role="button", tabIndex={0}, onKeyDown for extension tiles
+- Add aria-pressed to profile/volume toggle buttons
+- Add role="dialog", aria-modal="true", aria-labelledby to encoder
+  validator modal
+- Add focus trapping to modal (trap Tab within modal bounds)
+- Add Escape key handler to close modal
+- Add <label> or aria-label to search input
+- Add aria-live="polite" to sidebar detail panel
+- Add visually-hidden text for color-only indicators
+- Add skip-to-content link
+
+
+ISSUE #7: Memory Leak — Event Listeners Not Cleaned Up on Unmount
+================================================================================
+File: src/risc_v_visualizer.jsx, EncodingDiagram component (lines 403-426)
+
+Description:
+The `EncodingDiagram` component adds a `resize` listener on `window` and a
+`scroll` listener on the scroll container. While the cleanup function removes
+both, there is a race condition: `requestAnimationFrame` callbacks may fire
+after the component unmounts because `cancelAnimationFrame` is called in the
+cleanup but the `rafRef` could have been set to null prematurely if the
+cleanup runs between the RAF scheduling and firing.
+
+Additionally, the `window.setTimeout` calls for copy status feedback
+(lines 3118, 3487) are never cleaned up. If the component unmounts before
+the timeout fires, it will attempt to call `setCopyStatus` or
+`setEncoderValidatorCopyStatus` on an unmounted component.
+
+Impact: MEDIUM — Potential "setState on unmounted component" warnings and
+minor memory leaks in React strict mode / fast navigation scenarios.
+
+Fix (estimated 35-40 lines):
+- Store timeout IDs in refs and clear them on unmount
+- Add a mounted ref flag to guard setTimeout callbacks:
+  ```
+  const mountedRef = useRef(true);
+  useEffect(() => { return () => { mountedRef.current = false; }; }, []);
+  ```
+- Guard all setTimeout setState calls: `if (mountedRef.current) set...()`
+- Ensure RAF cleanup is race-free by checking rafRef.current in cleanup
+
+
+ISSUE #8: Duplicate Extension ID "Zclsd" in Both z_compress and z_system Groups
+================================================================================
+File: src/risc_v_visualizer.jsx (lines 634 and 776)
+
+Description:
+The extension `Zclsd` (Compressed LS-Pair) appears twice in the extension
+catalog data:
+  - z_compress group: line 634: { id: 'Zclsd', ... desc: 'Compressed LS-Pair' }
+  - z_system group: line 776: { id: 'Zclsd', ... desc: 'Compressed LS Pair' }
+
+Both `riscv_extensions.json` and the hardcoded commented-out data in the JSX
+have this duplication. This causes:
+  1. The extension tile to render twice in the UI
+  2. The sync script to write instruction data to both entries
+  3. Profile/volume membership checks to behave unpredictably (first-match)
+  4. React key warnings if rendered in the same list
+
+Impact: MEDIUM — Duplicate tiles in the UI, data consistency issues.
+
+Fix (estimated 30-35 lines):
+- Determine canonical group for Zclsd (it should be z_compress per naming)
+- Remove the duplicate from z_system in riscv_extensions.json
+- Remove the duplicate from the commented-out data in risc_v_visualizer.jsx
+- Add a validation step to sync_instructions.mjs to detect duplicate IDs
+  across groups and warn/error
+- Re-run sync script to update the catalog
+
+
+ISSUE #9: Sync Script Uses `vm.runInNewContext` — Security Risk & Fragility
+================================================================================
+File: scripts/sync_instructions.mjs (line 80)
+
+Description:
+The sync script extracts `extensionInstructions` from the JSX file by:
+  1. Finding the string `const extensionInstructions =`
+  2. Extracting the text between matching braces
+  3. Running it through `vm.runInNewContext()`
+
+This approach:
+  - Executes arbitrary JavaScript from the JSX file in a sandboxed VM context.
+    While sandboxed, this is fragile and could execute unexpected code if the
+    JSX format changes (e.g., if the object uses imports, function calls, or
+    template literals).
+  - Relies on regex-like brace matching that doesn't handle all JS edge cases
+    (e.g., regex literals containing braces, multi-line template literals
+    with nested expressions).
+  - The escape detection on line 25 uses `\\\\` which looks like a double
+    backslash literal, not a single backslash character check.
+
+Impact: MEDIUM — Fragile extraction that will break if the data format
+evolves. Potential security concern if untrusted JSX is processed.
+
+Fix (estimated 50-60 lines):
+- Move `extensionInstructions` to a separate JSON or JS data file
+  (`src/data/extension_instructions.json`) that can be imported by both
+  the visualizer and the sync script without vm.runInNewContext
+- The sync script would simply `JSON.parse(fs.readFileSync(...))` the
+  instruction mapping
+- Update the visualizer to `import extensionInstructions from './data/...'`
+- Remove the brace-matching and vm.runInNewContext code
+- Add proper error handling with descriptive messages
+
+
+ISSUE #10: No Error Boundaries — Unhandled Errors Crash the Entire App
+================================================================================
+File: src/risc_v_visualizer.jsx, src/main.jsx
+
+Description:
+There are no React Error Boundaries in the component tree. If any component
+throws during rendering (e.g., malformed JSON data in riscv_extensions.json,
+unexpected null instruction details, BigInt conversion error from bad hex
+data), the entire app crashes to a white screen with no user feedback.
+
+Given that the app processes external data (instruction dictionaries, extension
+catalogs), runtime errors from malformed data are a realistic risk.
+
+Impact: HIGH — Any data error crashes the entire UI with no recovery path
+and no user-visible error message.
+
+Fix (estimated 40-50 lines):
+- Create `src/components/ErrorBoundary.jsx`:
+  * Implement componentDidCatch and getDerivedStateFromError
+  * Render a user-friendly error message with the extension name or
+    instruction that caused the failure
+  * Provide a "Reset" button to clear state and retry
+- Wrap <RISCVExplorer /> in main.jsx with <ErrorBoundary>
+- Optionally wrap individual sections (encoding diagram, detail panel,
+  encoder validator) with their own boundaries so a failure in one
+  section doesn't crash the entire app
+
+
+ISSUE #11: `useMemo` Dependencies Are Empty Arrays — Stale Data on Extension
+Catalog Changes
+================================================================================
+File: src/risc_v_visualizer.jsx (lines 1964, 2010, 2131, 2334)
+
+Description:
+Several `useMemo` hooks have empty dependency arrays `[]`:
+  - `volumeMembership` (line 1964-1986)
+  - `instructionIndex` (line 2010-2027)
+  - `allInstructionPatterns` (line 2131-2168)
+  - `extensionSearchIndexById` (line 2334-2381)
+
+These memos read from `extensions` (imported JSON) which is a module-level
+constant. While this is technically correct today (the import never changes),
+it means these memos will never recompute even if the component were to
+receive extensions as a prop in the future. The code also references
+`extensionInstructions` and `extensionCsrs` which are defined inside the
+component but never listed as dependencies.
+
+Additionally, this pattern prevents React's exhaustive-deps lint rule from
+catching real bugs if the data source changes.
+
+Impact: LOW-MEDIUM — Currently functional but a maintenance trap. If anyone
+refactors extensions to be dynamic (e.g., loaded via fetch or passed as
+props), these memos will silently serve stale data.
+
+Fix (estimated 30-40 lines):
+- For truly static data, move the memo computations to module-level constants
+  (outside the component) so they're computed once at import time and never
+  re-evaluated
+- OR add the correct dependencies to each useMemo if the data should be
+  reactive
+- Add eslint-plugin-react-hooks to devDependencies and configure the
+  exhaustive-deps rule
+
+
+ISSUE #12: No Lazy Loading for Large JSON Data — 830KB Parsed on Initial Load
+================================================================================
+Files: src/risc_v_visualizer.jsx (line 13), src/riscv_extensions.json (528KB),
+       src/instr_dict.json (303KB)
+
+Description:
+Both JSON files (total ~830KB) are statically imported and bundled into the
+JavaScript bundle. They are parsed synchronously during initial module
+evaluation. While `instr_dict.json` is not directly used at runtime (it's
+only used by the sync script), it's still imported transitively through the
+extension catalog's embedded instruction data.
+
+The main `riscv_extensions.json` (528KB) is the entire extension catalog with
+all embedded instruction details for all 222 extensions. This is loaded and
+parsed even if the user only views a few extensions.
+
+Impact: MEDIUM — Large initial bundle size (>1MB including JS + JSON), slow
+time-to-interactive on mobile/low-bandwidth connections.
+
+Fix (estimated 40-50 lines):
+- Ensure `instr_dict.json` is NOT imported in the visualizer (it's only
+  needed by the sync script, which already reads it via fs)
+- Use dynamic import() for `riscv_extensions.json` with React.lazy or
+  a loading state:
+  ```
+  const [extensions, setExtensions] = useState(null);
+  useEffect(() => {
+    import('./riscv_extensions.json').then(mod => setExtensions(mod.default));
+  }, []);
+  ```
+- Add a loading skeleton/spinner while data loads
+- Configure webpack to emit the JSON as a separate chunk
+
+
+ISSUE #13: Inconsistent Code Formatting — Mixed Tabs/Spaces and Indentation
+================================================================================
+File: src/risc_v_visualizer.jsx (throughout)
+
+Description:
+The file uses a mix of tabs and spaces for indentation, sometimes within
+the same JSX block. For example:
+  - Lines 2406-2444 use tab indentation
+  - Lines 2450-2518 use tab+space mix
+  - Lines 2520-2650 alternate between tab-only and space-only indentation
+  - Some JSX blocks are indented with 2 spaces, others with tabs, and some
+    with tabs + additional spaces
+
+This makes the code visually inconsistent, difficult to review in diffs,
+and causes merge conflicts when different contributors use different
+editor settings.
+
+Impact: LOW-MEDIUM — Code quality and maintainability issue. Makes PRs
+harder to review due to whitespace noise.
+
+Fix (estimated 50+ lines of config + reformatting):
+- Add .editorconfig with consistent indentation rules
+- Add prettier as a devDependency
+- Add .prettierrc config (2-space indent, single quotes, trailing commas)
+- Add ESLint with eslint-plugin-react
+- Add `"lint": "eslint src/"` and `"format": "prettier --write src/"` scripts
+- Run formatter on entire codebase
+- Add pre-commit hook via husky + lint-staged
+
+
+ISSUE #14: Profile Filter and Volume Filter Can Be Active Simultaneously —
+Conflicting UI State
+================================================================================
+File: src/risc_v_visualizer.jsx (lines 2543-2596)
+
+Description:
+The Profile filter (RVA20, RVA22, RVA23, RVB23) and the Volume filter
+(Vol I, Vol II) can be activated at the same time. When both are active,
+the `isHighlighted` function (line 2383-2385) returns true if EITHER
+profile OR volume matches, and `isDimmed` (line 2387-2391) only checks
+profile, returning false when volume is active.
+
+This creates a confusing interaction:
+  - Selecting RVA20 profile dims non-RVA20 extensions
+  - Then selecting Vol II un-dims everything (isDimmed returns false when
+    activeVolume is set)
+  - The yellow highlight ring shows on extensions matching EITHER filter
+  - There's no visual indication of which filter is causing the highlight
+
+Impact: MEDIUM — Confusing user experience. Users cannot understand which
+extensions are highlighted by which filter.
+
+Fix (estimated 40-50 lines):
+- Make profile and volume filters mutually exclusive:
+  * When a profile is selected, clear activeVolume
+  * When a volume is selected, clear activeProfile
+  * OR allow both but visually distinguish them (different highlight colors)
+- Update isDimmed to handle the combined state correctly
+- Add visual legend or badge showing which filter(s) are active
+- Add a "Clear filters" button that resets both
+- Update the highlight rendering to show different colors for profile vs
+  volume matches
+
+
+ISSUE #15: Search Side Effects in useEffect — Should Use Debouncing
+================================================================================
+File: src/risc_v_visualizer.jsx (lines 2450-2518)
+
+Description:
+The search useEffect runs on every keystroke (fires whenever `searchQuery`
+changes). For each keystroke it:
+  1. Iterates all extensions to find matches
+  2. Iterates all instructions within matched extensions
+  3. Updates selectedExt, searchMatches, and selectedInstruction state
+  4. Triggers DOM scrollIntoView
+
+With ~222 extensions and potentially thousands of instructions, this runs
+O(n*m) matching on every keystroke with no debouncing. The state updates
+cause re-renders of the entire component tree on each keystroke.
+
+Impact: MEDIUM — Perceived input lag on slower devices, excessive re-renders,
+janky scroll behavior during fast typing.
+
+Fix (estimated 40-45 lines):
+- Add a debounce mechanism (300ms) before running the search:
+  ```
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  ```
+- Move the search effect to use debouncedQuery instead of searchQuery
+- Use useMemo or precomputed index for faster lookups
+- Consider using a Web Worker for search in large datasets
+- Show a "searching..." indicator during the debounce period
+
+
+ISSUE #16: Encoder Validator Modal Has No Escape Key or Focus Management
+================================================================================
+File: src/risc_v_visualizer.jsx (lines 3353-3588)
+
+Description:
+The encoder validator modal:
+  - Cannot be closed with Escape key (only via clicking the X button or
+    the backdrop)
+  - Does not trap focus within the modal (Tab key can reach elements behind
+    the backdrop)
+  - Does not return focus to the trigger button when closed
+  - Does not have aria-modal="true" or role="dialog"
+  - The backdrop click handler closes the modal but there's no keyboard
+    equivalent for non-mouse users
+
+Impact: MEDIUM — Poor keyboard navigation, accessibility violation. Users
+who rely on keyboard navigation cannot efficiently use the validator.
+
+Fix (estimated 40-50 lines):
+- Add onKeyDown handler to modal container for Escape key
+- Implement focus trapping:
+  * On open, move focus to the first input in the modal
+  * On Tab at the last focusable element, wrap to first
+  * On Shift+Tab at the first focusable element, wrap to last
+  * On close, return focus to the "Encoder Validator" button
+- Add role="dialog" and aria-modal="true" to the modal container
+- Add aria-labelledby pointing to the modal title
+- Add aria-describedby pointing to the modal description
+
+
+ISSUE #17: Copy-to-Clipboard Fallback Uses Deprecated `document.execCommand`
+================================================================================
+File: src/risc_v_visualizer.jsx (lines 2101-2129)
+
+Description:
+The `copyTextToClipboard` function first tries `navigator.clipboard.writeText`,
+then falls back to creating a hidden `<textarea>` and using
+`document.execCommand('copy')`. This fallback:
+  - Uses `document.execCommand('copy')` which is deprecated and removed from
+    web standards
+  - Creates/removes DOM elements synchronously which can cause layout thrash
+  - Does not handle the case where the textarea cannot receive focus (e.g.,
+    inside an iframe with sandbox restrictions)
+  - The `el.style.position = 'fixed'` + `opacity = '0'` approach can still
+    briefly affect screen readers
+
+Impact: LOW — The primary clipboard API works in all modern browsers. The
+fallback is only needed for very old browsers, but when it runs, it uses
+deprecated APIs.
+
+Fix (estimated 30-35 lines):
+- Remove the execCommand fallback entirely (clipboard API is supported in
+  all browsers since 2020)
+- OR replace with the Clipboard API's fallback using ClipboardItem
+- Add proper error messaging when clipboard access is denied (e.g., in
+  insecure contexts / non-HTTPS)
+- Show a "Copy failed — clipboard access denied" toast with instructions
+  to use Ctrl+C manually
+- Add a fallback that shows the text in a selectable textarea modal
+  (instead of trying to auto-copy)
+
+
+ISSUE #18: `z_atomics` Group Referenced in JSX But May Not Exist in JSON
+================================================================================
+File: src/risc_v_visualizer.jsx (line 2692)
+
+Description:
+The rendering code references `extensions.z_atomics` (line 2692), but the
+commented-out extension data in the JSX does not include a `z_atomics` group
+key. The atomics-related extensions (Zaamo, Zalrsc, Zacas, Zabha, Zawrs) are
+placed under `z_float` in the commented-out data (lines 648-650).
+
+If `riscv_extensions.json` does not have a `z_atomics` key, calling
+`extensions.z_atomics.map(...)` will throw `TypeError: Cannot read properties
+of undefined (reading 'map')`.
+
+Impact: HIGH — Potential runtime crash if z_atomics is missing from the JSON.
+
+Fix (estimated 30-35 lines):
+- Verify `riscv_extensions.json` has a `z_atomics` group
+- If not, either:
+  a) Add the z_atomics group to the JSON and move the relevant extensions
+  b) Guard the rendering with optional chaining:
+     `{(extensions.z_atomics || []).map(...)}`
+- Apply the same guard to ALL category group references in the rendering
+  code to prevent crashes from missing groups
+- Add a startup validation that checks all expected groups exist and
+  logs warnings for missing ones
+
+
+ISSUE #19: `z_load_store` and `z_integer` Groups May Be Empty or Missing
+================================================================================
+File: src/risc_v_visualizer.jsx (lines 2740, 2756)
+
+Description:
+Similar to Issue #18, the rendering code references `extensions.z_load_store`
+and `extensions.z_integer` but the commented-out extension data in the JSX
+does not include these as separate groups. Load/store extensions (Zicbom,
+Zicboz) appear under `z_system` in the JSX data. If these groups are absent
+from riscv_extensions.json, the UI will crash.
+
+Impact: HIGH — Potential runtime crash (TypeError on .map of undefined).
+
+Fix (estimated 35-40 lines):
+- Audit all group keys referenced in rendering code against
+  riscv_extensions.json keys
+- Add defensive checks: `{(extensions.z_load_store || []).map(...)}`
+- OR create a helper function:
+  ```
+  const getGroup = (key) => extensions[key] || [];
+  ```
+- Apply this pattern to every group rendering block (17 groups total)
+- Add a development-mode validation that checks all rendering group keys
+  exist in the loaded extension catalog
+
+
+ISSUE #20: Compressed Instruction Mappings Only Cover 33 of 43 Claimed
+================================================================================
+File: src/risc_v_visualizer.jsx (lines 20-259)
+
+Description:
+The README (line 223) and PROPOSAL.md (line 223) claim the compressed
+instruction mapping section shows "43 compressed (16-bit) instructions."
+However, COMPRESSED_INSTRUCTION_MAPPINGS only contains 33 entries. Missing:
+  - C.FLW, C.FSW (RV32 FP compressed loads/stores)
+  - C.FLD, C.FSD (FP64 compressed loads/stores)
+  - C.FLWSP, C.FSWSP (SP-relative FP loads/stores)
+  - C.FLDSP, C.FSDSP (SP-relative FP64 loads/stores)
+  - C.ADDW, C.SUBW (RV64 word operations)
+
+These instructions ARE listed in the `extensionInstructions` for the C
+extension (lines 1452-1454) but have no corresponding compressed mapping
+entry.
+
+Impact: LOW-MEDIUM — Incomplete data. Users looking up compressed FP
+instruction equivalents won't find them.
+
+Fix (estimated 40-50 lines):
+- Add the 10 missing compressed instruction mapping entries to
+  COMPRESSED_INSTRUCTION_MAPPINGS with their standard equivalents
+- Update the README/PROPOSAL to reflect the correct count
+- Add a validation that checks every C.* mnemonic in extensionInstructions
+  has a corresponding entry in COMPRESSED_INSTRUCTION_MAPPINGS
+
+
+================================================================================
+  END OF NEW ISSUES (20 total)
+================================================================================
