@@ -420,8 +420,12 @@ const EncodingDiagram = ({ encoding }) => {
     return () => {
       el.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      // Cancel any pending RAF *before* nullifying the ref to avoid
+      // a race where the callback fires between null-assignment and
+      // cancelAnimationFrame, calling setState on an unmounted component.
+      const pendingRaf = rafRef.current;
       rafRef.current = null;
+      if (pendingRaf) cancelAnimationFrame(pendingRaf);
     };
   }, [updateScrollState, normalized]);
 
@@ -581,6 +585,28 @@ const RISCVExplorer = () => {
   const [encoderValidatorResult, setEncoderValidatorResult] = useState(null);
   const [encoderValidatorCopyStatus, setEncoderValidatorCopyStatus] = useState(null);
   const lastScrolledKeyRef = React.useRef(null);
+
+  // ---------------------------------------------------------------------------
+  // Lifecycle refs for safe cleanup (Issue #7 – memory-leak fix)
+  // ---------------------------------------------------------------------------
+  const mountedRef = React.useRef(true);
+  const copyTimeoutRef = React.useRef(null);
+  const encoderCopyTimeoutRef = React.useRef(null);
+
+  React.useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+        copyTimeoutRef.current = null;
+      }
+      if (encoderCopyTimeoutRef.current) {
+        clearTimeout(encoderCopyTimeoutRef.current);
+        encoderCopyTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   // ---------------------------------------------------------------------------
   // Extension Catalog – loaded from `src/riscv_extensions.json`
@@ -3115,7 +3141,11 @@ const RISCVExplorer = () => {
 		                              const text = formatInstructionForClipboard(selectedExt, selectedInstruction);
 		                              const ok = await copyTextToClipboard(text);
 		                              setCopyStatus(ok ? 'copied' : 'failed');
-		                              window.setTimeout(() => setCopyStatus(null), 1500);
+		                              if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+		                              copyTimeoutRef.current = window.setTimeout(() => {
+		                                if (mountedRef.current) setCopyStatus(null);
+		                                copyTimeoutRef.current = null;
+		                              }, 1500);
 		                            }}
 		                            title="Copy extension + instruction details"
 		                          >
@@ -3484,7 +3514,11 @@ const RISCVExplorer = () => {
 	                        );
 	                        const ok = await copyTextToClipboard(report);
 	                        setEncoderValidatorCopyStatus(ok ? 'copied' : 'failed');
-	                        window.setTimeout(() => setEncoderValidatorCopyStatus(null), 1500);
+	                        if (encoderCopyTimeoutRef.current) clearTimeout(encoderCopyTimeoutRef.current);
+	                        encoderCopyTimeoutRef.current = window.setTimeout(() => {
+	                          if (mountedRef.current) setEncoderValidatorCopyStatus(null);
+	                          encoderCopyTimeoutRef.current = null;
+	                        }, 1500);
 	                      }}
 	                      className="inline-flex items-center gap-2 px-3 py-2 rounded border border-slate-600 bg-slate-800 text-xs font-bold text-slate-100 hover:border-slate-500 disabled:opacity-30"
 	                      title="Copy validation report"
