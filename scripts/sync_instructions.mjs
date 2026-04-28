@@ -82,6 +82,7 @@ function extractExtensionInstructions(jsxText) {
 
 function buildExtensionIndex(extensionsCatalog) {
   const index = new Map();
+  const duplicates = new Set();
 
   for (const [category, entries] of Object.entries(extensionsCatalog)) {
     if (!Array.isArray(entries)) continue;
@@ -92,7 +93,15 @@ function buildExtensionIndex(extensionsCatalog) {
       const list = index.get(id) ?? [];
       list.push({ category, entry });
       index.set(id, list);
+      
+      if (list.length > 1) {
+        duplicates.add(id);
+      }
     }
+  }
+
+  if (duplicates.size > 0) {
+    die(`ERROR: Duplicate extension IDs found across groups: ${Array.from(duplicates).join(', ')}`);
   }
 
   return index;

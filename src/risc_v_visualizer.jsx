@@ -773,7 +773,7 @@ const RISCVExplorer = () => {
       { id: 'Zilsm*', name: 'Zilsm*', desc: 'Streaming Mem (pattern)', use: 'Wildcard for Zilsm<x>b family' },
       { id: 'Zilsm<x>b', name: 'Zilsm<x>b', desc: 'Streaming Mem (x-byte)', use: 'Line-size specific streaming ops' },
 
-      { id: 'Zclsd', name: 'Zclsd', desc: 'Compressed LS Pair', use: 'Compressed LS pairs (RV32)' },
+
 
       // PMA / cache-block / reservation set / misc
       { id: 'Za64rs', name: 'Za64rs', desc: '64B Reservation Set', use: 'Reservation set granularity (64-byte)' },
