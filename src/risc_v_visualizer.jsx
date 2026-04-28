@@ -2406,6 +2406,8 @@ const RISCVExplorer = () => {
 	    return (
 	      <div
 	        id={`ext-${data.id}`}
+	        role="button"
+	        tabIndex={0}
 	        onClick={() =>
 	          setSelectedExt((current) => {
 	            const next = current?.id === data.id ? null : data;
@@ -2414,6 +2416,17 @@ const RISCVExplorer = () => {
 	            return next;
 	          })
 	        }
+	        onKeyDown={(e) => {
+	          if (e.key === 'Enter' || e.key === ' ') {
+	            e.preventDefault();
+	            setSelectedExt((current) => {
+	              const next = current?.id === data.id ? null : data;
+	              setSelectedInstruction(null);
+	              setSearchMatches(null);
+	              return next;
+	            });
+	          }
+	        }}
 	        className={`
 	          relative p-2 rounded border cursor-pointer transition-all duration-200
 	          ${
@@ -2429,6 +2442,9 @@ const RISCVExplorer = () => {
           ${isSelected ? 'z-20 shadow-xl shadow-yellow-900/40' : 'z-10'}
 	        `}
 	      >
+	        <span className="sr-only">
+	          {highlighted ? 'Highlighted' : isDimmed(data.id) && !matchesSearch && !isSelected ? 'Dimmed' : ''}
+	        </span>
 	        {isDiscontinued && (
 	          <span className="absolute top-1 right-1 px-1.5 py-0.5 rounded border border-red-600/60 bg-red-950/40 text-[8px] font-mono uppercase tracking-tight text-red-200">
 	            Discontinued
@@ -2519,7 +2535,8 @@ const RISCVExplorer = () => {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-50 p-2 md:p-6 font-sans">
-	      <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:p-2 focus:bg-slate-800 focus:text-slate-100 focus:z-50 focus:top-2 focus:left-2">Skip to content</a>
+	      <div id="main-content" className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
 	        {/* Header */}
 	        <div className="lg:col-span-12 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-700 pb-4 mb-2">
 	          <div>
@@ -2548,6 +2565,7 @@ const RISCVExplorer = () => {
 	                        return current === profile ? null : profile;
 	                      })
 	                    }
+	                    aria-pressed={activeProfile === profile}
 	                    className={`
 	                      px-3 py-1 rounded text-xs font-bold border transition-all
 	                      ${
@@ -2581,6 +2599,7 @@ const RISCVExplorer = () => {
 	                        return current === vol ? null : vol;
 	                      })
 	                    }
+	                    aria-pressed={activeVolume === vol}
 	                    className={`
 	                      px-3 py-1 rounded text-xs font-bold border transition-all
 	                      ${
@@ -2624,6 +2643,7 @@ const RISCVExplorer = () => {
 		                value={searchQuery}
 		                onChange={(e) => setSearchQuery(e.target.value)}
 		                placeholder="Search extensions by ID, name, or description..."
+		                aria-label="Search extensions by ID, name, or description..."
 		                className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-yellow-200/40 text-sm text-slate-100 placeholder-slate-400 shadow-sm shadow-yellow-900/10 focus:outline-none focus:ring-2 focus:ring-yellow-400/60 focus:border-yellow-300"
 		              />
 		              <p className="mt-1 text-[10px] text-center text-slate-500">
@@ -2921,7 +2941,7 @@ const RISCVExplorer = () => {
 	              </h2>
 	            </div>
 
-	            <div className="flex-1 overflow-y-auto overscroll-contain p-4 pt-3">
+	            <div className="flex-1 overflow-y-auto overscroll-contain p-4 pt-3" aria-live="polite">
 	              {selectedExt ? (
 	                <div className="animate-in fade-in slide-in-from-right-4 duration-300">
 	                <div className="mb-6 flex items-start justify-between gap-3">
@@ -3359,10 +3379,42 @@ const RISCVExplorer = () => {
 	          />
 
 	          <div className="absolute inset-0 p-3 md:p-8 flex items-start justify-center overflow-y-auto">
-	            <div className="w-full max-w-3xl bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden">
+	            <div
+	              className="w-full max-w-3xl bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden"
+	              role="dialog"
+	              aria-modal="true"
+	              aria-labelledby="encoder-validator-title"
+	              tabIndex={-1}
+	              ref={(el) => {
+	                if (el && !el.contains(document.activeElement)) {
+	                  const firstFocusable = el.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+	                  if (firstFocusable) firstFocusable.focus();
+	                  else el.focus();
+	                }
+	              }}
+	              onKeyDown={(e) => {
+	                if (e.key === 'Escape') {
+	                  setEncoderValidatorOpen(false);
+	                }
+	                if (e.key === 'Tab') {
+	                  const focusable = e.currentTarget.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+	                  if (focusable.length) {
+	                    const first = focusable[0];
+	                    const last = focusable[focusable.length - 1];
+	                    if (e.shiftKey && document.activeElement === first) {
+	                      e.preventDefault();
+	                      last.focus();
+	                    } else if (!e.shiftKey && document.activeElement === last) {
+	                      e.preventDefault();
+	                      first.focus();
+	                    }
+	                  }
+	                }
+	              }}
+	            >
 	              <div className="p-4 border-b border-slate-700 flex items-start justify-between gap-3">
 	                <div className="min-w-0">
-	                  <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wide flex items-center gap-2">
+	                  <h3 id="encoder-validator-title" className="text-sm font-bold text-slate-200 uppercase tracking-wide flex items-center gap-2">
 	                    <ScanSearch size={16} /> Encoder Validator
 	                  </h3>
 	                  <p className="text-xs text-slate-500 mt-1">
