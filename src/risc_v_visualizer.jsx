@@ -10,7 +10,6 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import extensions from './riscv_extensions.json';
 
 const BIT_WIDTH = 32n;
 const BIT_MASK_32 = (1n << BIT_WIDTH) - 1n;
@@ -564,6 +563,7 @@ const EncodingDiagram = ({ encoding }) => {
 };
 
 const RISCVExplorer = () => {
+  const [extensions, setExtensions] = useState(null);
   const [activeProfile, setActiveProfile] = useState(null);
   const [activeVolume, setActiveVolume] = useState(null);
   const [selectedExt, setSelectedExt] = useState(null);
@@ -581,6 +581,23 @@ const RISCVExplorer = () => {
   const [encoderValidatorResult, setEncoderValidatorResult] = useState(null);
   const [encoderValidatorCopyStatus, setEncoderValidatorCopyStatus] = useState(null);
   const lastScrolledKeyRef = React.useRef(null);
+
+  React.useEffect(() => {
+    import('./riscv_extensions.json').then((mod) => {
+      setExtensions(mod.default);
+    });
+  }, []);
+
+  if (!extensions) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-300 flex items-center justify-center font-sans">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="text-slate-400 font-medium">Loading RISC-V Extensions...</div>
+        </div>
+      </div>
+    );
+  }
 
   // ---------------------------------------------------------------------------
   // Extension Catalog – loaded from `src/riscv_extensions.json`

@@ -6,6 +6,7 @@ module.exports = {
   entry: './src/main.jsx',
   output: {
     filename: 'bundle.js',
+    chunkFilename: '[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
   },
   module: {
