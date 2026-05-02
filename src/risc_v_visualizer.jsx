@@ -2385,9 +2385,9 @@ const RISCVExplorer = () => {
   };
 
   const isDimmed = (id) => {
-    if (activeVolume) return false;
-    if (!activeProfile) return false;
-    return !profiles[activeProfile].includes(id);
+    if (activeVolume) return !volumeMembership[activeVolume]?.has(id);
+    if (activeProfile) return !profiles[activeProfile].includes(id);
+    return false;
   };
 
   const ExtensionBlock = ({ data, colorClass, searchQuery }) => {
@@ -2398,7 +2398,20 @@ const RISCVExplorer = () => {
     const isDiscontinued = data.discontinued === 1;
 
     const isSelected = selectedExt?.id === data.id;
-    const highlighted = isHighlighted(data.id) || matchesSearch || isSelected;
+    const isProfileMatch = isHighlightedByProfile(data.id);
+    const isVolumeMatch = isHighlightedByVolume(data.id);
+
+    let highlightClass = '';
+    if (isSelected) {
+      highlightClass = 'ring-2 ring-yellow-400 bg-slate-800 scale-105 shadow-xl shadow-yellow-900/40';
+    } else if (matchesSearch) {
+      highlightClass = 'ring-2 ring-yellow-400 bg-slate-800 scale-105 shadow-lg shadow-yellow-900/20';
+    } else if (isProfileMatch) {
+      highlightClass = 'ring-2 ring-blue-400 bg-slate-800 scale-105 shadow-lg shadow-blue-900/20';
+    } else if (isVolumeMatch) {
+      highlightClass = 'ring-2 ring-green-400 bg-slate-800 scale-105 shadow-lg shadow-green-900/20';
+    }
+
     const baseColor = isDiscontinued
       ? 'bg-slate-700 border-slate-500 text-slate-200'
       : colorClass;
@@ -2416,17 +2429,13 @@ const RISCVExplorer = () => {
 	        }
 	        className={`
 	          relative p-2 rounded border cursor-pointer transition-all duration-200
-	          ${
-            highlighted
-              ? 'ring-2 ring-yellow-400 bg-slate-800 scale-105 shadow-lg shadow-yellow-900/20'
-              : ''
-          }
+	          ${highlightClass}
           ${
             isDimmed(data.id) && !matchesSearch && !isSelected
               ? 'opacity-20 grayscale'
               : `${baseColor} hover:brightness-110`
           }
-          ${isSelected ? 'z-20 shadow-xl shadow-yellow-900/40' : 'z-10'}
+          ${isSelected ? 'z-20' : 'z-10'}
 	        `}
 	      >
 	        {isDiscontinued && (
@@ -2540,19 +2549,18 @@ const RISCVExplorer = () => {
 	                {Object.keys(profiles).map((profile) => (
 	                  <button
 	                    key={profile}
-	                    onClick={() =>
-	                      setActiveProfile((current) => {
-	                        setSelectedExt(null);
-	                        setSelectedInstruction(null);
-	                        setSearchMatches(null);
-	                        return current === profile ? null : profile;
-	                      })
-	                    }
+	                    onClick={() => {
+	                      setActiveProfile((current) => current === profile ? null : profile);
+	                      setActiveVolume(null);
+	                      setSelectedExt(null);
+	                      setSelectedInstruction(null);
+	                      setSearchMatches(null);
+	                    }}
 	                    className={`
 	                      px-3 py-1 rounded text-xs font-bold border transition-all
 	                      ${
 		                        activeProfile === profile
-		                          ? 'bg-yellow-500/20 border-yellow-500 text-yellow-200'
+		                          ? 'bg-blue-500/20 border-blue-500 text-blue-200'
 		                          : 'bg-slate-800 border-slate-600 text-slate-200 hover:border-slate-500'
 	                      }
 	                    `}
@@ -2573,19 +2581,18 @@ const RISCVExplorer = () => {
 	                {['I', 'II'].map((vol) => (
 	                  <button
 	                    key={vol}
-	                    onClick={() =>
-	                      setActiveVolume((current) => {
-	                        setSelectedExt(null);
-	                        setSelectedInstruction(null);
-	                        setSearchMatches(null);
-	                        return current === vol ? null : vol;
-	                      })
-	                    }
+	                    onClick={() => {
+	                      setActiveVolume((current) => current === vol ? null : vol);
+	                      setActiveProfile(null);
+	                      setSelectedExt(null);
+	                      setSelectedInstruction(null);
+	                      setSearchMatches(null);
+	                    }}
 	                    className={`
 	                      px-3 py-1 rounded text-xs font-bold border transition-all
 	                      ${
 		                        activeVolume === vol
-		                          ? 'bg-yellow-500/20 border-yellow-500 text-yellow-200'
+		                          ? 'bg-green-500/20 border-green-500 text-green-200'
 		                          : 'bg-slate-800 border-slate-600 text-slate-200 hover:border-slate-500'
 	                      }
 	                    `}
@@ -2595,6 +2602,25 @@ const RISCVExplorer = () => {
 	                ))}
 		              </div>
 		            </div>
+
+                {(activeProfile || activeVolume) && (
+                  <>
+                    <div className="hidden md:block h-7 w-px bg-slate-800" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveProfile(null);
+                        setActiveVolume(null);
+                        setSelectedExt(null);
+                        setSelectedInstruction(null);
+                        setSearchMatches(null);
+                      }}
+                      className="px-3 py-1 rounded text-xs font-bold border transition-all bg-red-950/40 border-red-800/40 text-red-200 hover:bg-red-900/60 hover:border-red-700"
+                    >
+                      Clear Filters
+                    </button>
+                  </>
+                )}
 
 		            <div className="hidden md:block h-7 w-px bg-slate-700" />
 
