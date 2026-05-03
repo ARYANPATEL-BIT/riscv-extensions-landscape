@@ -570,6 +570,13 @@ const RISCVExplorer = () => {
   const [selectedInstruction, setSelectedInstruction] = useState(null);
   const [copyStatus, setCopyStatus] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const [searchMatches, setSearchMatches] = useState(null);
   const [encoderValidatorOpen, setEncoderValidatorOpen] = useState(false);
   const [encoderValidatorInput, setEncoderValidatorInput] = useState({
@@ -2448,7 +2455,7 @@ const RISCVExplorer = () => {
   // and automatically open the Selected Details panel. Use a ref to avoid re-scrolling
   // on every render while the query stays the same.
 	  React.useEffect(() => {
-	    const q = searchQuery.trim().toLowerCase();
+	    const q = debouncedQuery.trim().toLowerCase();
 
 	    if (!q) {
 	      // Reset tracking when query is cleared
@@ -2515,7 +2522,7 @@ const RISCVExplorer = () => {
 	        lastScrolledKeyRef.current = key;
 	      }
 	    }
-	  }, [searchQuery, extensionSearchIndexById]);
+	  }, [debouncedQuery, extensionSearchIndexById]);
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-50 p-2 md:p-6 font-sans">
@@ -2627,7 +2634,11 @@ const RISCVExplorer = () => {
 		                className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-yellow-200/40 text-sm text-slate-100 placeholder-slate-400 shadow-sm shadow-yellow-900/10 focus:outline-none focus:ring-2 focus:ring-yellow-400/60 focus:border-yellow-300"
 		              />
 		              <p className="mt-1 text-[10px] text-center text-slate-500">
-		                Typing here will highlight matching tiles in yellow (case-insensitive).
+		                {searchQuery !== debouncedQuery ? (
+		                  <span className="text-yellow-400 animate-pulse font-bold">Searching...</span>
+		                ) : (
+		                  "Typing here will highlight matching tiles in yellow (case-insensitive)."
+		                )}
 		              </p>
 		            </div>
 		          </div>
