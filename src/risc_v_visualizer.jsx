@@ -582,6 +582,70 @@ const RISCVExplorer = () => {
   const [encoderValidatorCopyStatus, setEncoderValidatorCopyStatus] = useState(null);
   const lastScrolledKeyRef = React.useRef(null);
 
+  const modalRef = React.useRef(null);
+  const previousFocusRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (encoderValidatorOpen) {
+      previousFocusRef.current = document.activeElement;
+      
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape') {
+          setEncoderValidatorOpen(false);
+          return;
+        }
+        
+        if (e.key === 'Tab') {
+          if (!modalRef.current) return;
+          
+          const focusableElements = modalRef.current.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
+          
+          if (focusableElements.length === 0) return;
+          
+          const firstElement = focusableElements[0];
+          const lastElement = focusableElements[focusableElements.length - 1];
+          
+          if (e.shiftKey) {
+            if (document.activeElement === firstElement) {
+              lastElement.focus();
+              e.preventDefault();
+            }
+          } else {
+            if (document.activeElement === lastElement) {
+              firstElement.focus();
+              e.preventDefault();
+            }
+          }
+        }
+      };
+      
+      document.addEventListener('keydown', handleKeyDown);
+      
+      setTimeout(() => {
+        if (modalRef.current) {
+          const focusableElements = modalRef.current.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
+          const firstInput = modalRef.current.querySelector('input');
+          if (firstInput) {
+            firstInput.focus();
+          } else if (focusableElements.length > 0) {
+            focusableElements[0].focus();
+          }
+        }
+      }, 10);
+      
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+        if (previousFocusRef.current) {
+          previousFocusRef.current.focus();
+        }
+      };
+    }
+  }, [encoderValidatorOpen]);
+
   // ---------------------------------------------------------------------------
   // Extension Catalog – loaded from `src/riscv_extensions.json`
   // ---------------------------------------------------------------------------
@@ -3359,13 +3423,20 @@ const RISCVExplorer = () => {
 	          />
 
 	          <div className="absolute inset-0 p-3 md:p-8 flex items-start justify-center overflow-y-auto">
-	            <div className="w-full max-w-3xl bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden">
+	            <div
+	              ref={modalRef}
+	              role="dialog"
+	              aria-modal="true"
+	              aria-labelledby="encoder-modal-title"
+	              aria-describedby="encoder-modal-desc"
+	              className="w-full max-w-3xl bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden"
+	            >
 	              <div className="p-4 border-b border-slate-700 flex items-start justify-between gap-3">
 	                <div className="min-w-0">
-	                  <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wide flex items-center gap-2">
+	                  <h3 id="encoder-modal-title" className="text-sm font-bold text-slate-200 uppercase tracking-wide flex items-center gap-2">
 	                    <ScanSearch size={16} /> Encoder Validator
 	                  </h3>
-	                  <p className="text-xs text-slate-500 mt-1">
+	                  <p id="encoder-modal-desc" className="text-xs text-slate-500 mt-1">
 	                    Provide either a 32-bit Encoding pattern (0/1/-), or Match+Mask (hex). The validator lists any
 	                    existing instructions that overlap.
 	                  </p>
