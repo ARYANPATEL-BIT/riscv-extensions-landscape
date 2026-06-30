@@ -4,7 +4,9 @@
       "id": "RV32I",
       "name": "RV32I",
       "tags": [
-        "rv_i"
+        "rv_i",
+        "rv_zicsr",
+        "rv_zifencei"
       ],
       "desc": "Standard Integer Base (32-bit)",
       "use": "Microcontrollers, IoT",
@@ -628,7 +630,9 @@
       "name": "RV64I",
       "tags": [
         "rv64_i",
-        "rv_i"
+        "rv_i",
+        "rv_zicsr",
+        "rv_zifencei"
       ],
       "desc": "Standard Integer Base (64-bit)",
       "use": "Servers, Mobile, PC",
@@ -1408,7 +1412,9 @@
       "id": "RV32E",
       "name": "RV32E",
       "tags": [
-        "rv_i"
+        "rv_i",
+        "rv_zicsr",
+        "rv_zifencei"
       ],
       "desc": "Embedded Base (16 regs)",
       "use": "Tiny cores (Reduced silicon)",
@@ -2032,7 +2038,9 @@
       "name": "RV64E",
       "tags": [
         "rv64_i",
-        "rv_i"
+        "rv_i",
+        "rv_zicsr",
+        "rv_zifencei"
       ],
       "desc": "Embedded Base (64-bit, 16 regs)",
       "use": "Efficient 64-bit controllers",
@@ -2813,7 +2821,9 @@
       "name": "RV128I",
       "tags": [
         "rv64_i",
-        "rv_i"
+        "rv_i",
+        "rv_zicsr",
+        "rv_zifencei"
       ],
       "desc": "128-bit Address Space",
       "use": "Experimental/Research",
