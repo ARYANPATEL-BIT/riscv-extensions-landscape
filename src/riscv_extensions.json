@@ -3,6 +3,11 @@
     {
       "id": "RV32I",
       "name": "RV32I",
+      "tags": [
+        "rv_i",
+        "rv_zicsr",
+        "rv_zifencei"
+      ],
       "desc": "Standard Integer Base (32-bit)",
       "use": "Microcontrollers, IoT",
       "instructions": {
@@ -623,6 +628,12 @@
     {
       "id": "RV64I",
       "name": "RV64I",
+      "tags": [
+        "rv64_i",
+        "rv_i",
+        "rv_zicsr",
+        "rv_zifencei"
+      ],
       "desc": "Standard Integer Base (64-bit)",
       "use": "Servers, Mobile, PC",
       "instructions": {
@@ -1400,6 +1411,11 @@
     {
       "id": "RV32E",
       "name": "RV32E",
+      "tags": [
+        "rv_i",
+        "rv_zicsr",
+        "rv_zifencei"
+      ],
       "desc": "Embedded Base (16 regs)",
       "use": "Tiny cores (Reduced silicon)",
       "instructions": {
@@ -2020,6 +2036,12 @@
     {
       "id": "RV64E",
       "name": "RV64E",
+      "tags": [
+        "rv64_i",
+        "rv_i",
+        "rv_zicsr",
+        "rv_zifencei"
+      ],
       "desc": "Embedded Base (64-bit, 16 regs)",
       "use": "Efficient 64-bit controllers",
       "instructions": {
@@ -2797,6 +2819,12 @@
     {
       "id": "RV128I",
       "name": "RV128I",
+      "tags": [
+        "rv64_i",
+        "rv_i",
+        "rv_zicsr",
+        "rv_zifencei"
+      ],
       "desc": "128-bit Address Space",
       "use": "Experimental/Research",
       "instructions": {
@@ -3576,6 +3604,10 @@
     {
       "id": "A",
       "name": "A",
+      "tags": [
+        "rv64_a",
+        "rv_a"
+      ],
       "desc": "Atomics Bundle",
       "use": "LR/SC & AMO ops in hardware",
       "discontinued": 0,
@@ -3914,6 +3946,7 @@
     {
       "id": "B",
       "name": "B",
+      "tags": [],
       "desc": "Bit-Manip Bundle",
       "use": "Aggregates Zba/Zbb/Zbc/Zbs",
       "discontinued": 0,
@@ -4548,6 +4581,11 @@
     {
       "id": "C",
       "name": "C",
+      "tags": [
+        "rv32_c",
+        "rv64_c",
+        "rv_c"
+      ],
       "desc": "Compressed",
       "use": "16-bit instruction encodings",
       "discontinued": 0,
@@ -5085,6 +5123,10 @@
     {
       "id": "D",
       "name": "D",
+      "tags": [
+        "rv64_d",
+        "rv_d"
+      ],
       "desc": "Double-Precision Float (64-bit)",
       "use": "General-purpose FP, HPC",
       "discontinued": 0,
@@ -5521,6 +5563,10 @@
     {
       "id": "F",
       "name": "F",
+      "tags": [
+        "rv64_f",
+        "rv_f"
+      ],
       "desc": "Single-Precision Float (32-bit)",
       "use": "Basic floating-point workloads",
       "discontinued": 0,
@@ -5931,6 +5977,11 @@
     {
       "id": "H",
       "name": "H",
+      "tags": [
+        "rv64_h",
+        "rv_h",
+        "rv_svinval_h"
+      ],
       "desc": "Hypervisor",
       "use": "Virtualization / VMs",
       "discontinued": 0,
@@ -6155,6 +6206,7 @@
     {
       "id": "K",
       "name": "K",
+      "tags": [],
       "desc": "Crypto Umbrella (Scalar + Vector)",
       "use": "Top-level tag signaling bundled Zk*/Zvk* NIST & ShangMi crypto support",
       "discontinued": 0,
@@ -6437,6 +6489,10 @@
     {
       "id": "M",
       "name": "M",
+      "tags": [
+        "rv64_m",
+        "rv_m"
+      ],
       "desc": "Integer Multiply/Divide",
       "use": "Hardware multiplication and division",
       "discontinued": 0,
@@ -6616,6 +6672,7 @@
     {
       "id": "N",
       "name": "N",
+      "tags": [],
       "desc": "User-Level Interrupts",
       "use": "User-mode interrupt handling",
       "discontinued": 1,
@@ -6624,6 +6681,7 @@
     {
       "id": "P",
       "name": "P",
+      "tags": [],
       "desc": "Packed-SIMD",
       "use": "Packed SIMD / DSP-style operations",
       "discontinued": 0,
@@ -6632,6 +6690,10 @@
     {
       "id": "Q",
       "name": "Q",
+      "tags": [
+        "rv64_q",
+        "rv_q"
+      ],
       "desc": "Quad-Precision Float (128-bit)",
       "use": "High-precision scientific math",
       "discontinued": 0,
@@ -7094,6 +7156,9 @@
     {
       "id": "S",
       "name": "S",
+      "tags": [
+        "rv_s"
+      ],
       "desc": "Supervisor ISA",
       "use": "Supervisor privilege level (Volume II)",
       "discontinued": 0,
@@ -7134,6 +7199,9 @@
     {
       "id": "U",
       "name": "U",
+      "tags": [
+        "rv_u"
+      ],
       "desc": "User ISA",
       "use": "User privilege level (Volume II)",
       "discontinued": 0,
@@ -7171,6 +7239,9 @@
     {
       "id": "V",
       "name": "V",
+      "tags": [
+        "rv_v"
+      ],
       "desc": "Vector (RVV)",
       "use": "Full RVV 1.0 vector ISA",
       "discontinued": 0,
@@ -11864,6 +11935,10 @@
     {
       "id": "Zba",
       "name": "Zba",
+      "tags": [
+        "rv64_zba",
+        "rv_zba"
+      ],
       "desc": "Address-Generation Bitmanip",
       "use": "Shift/add address generation",
       "instructions": {
@@ -11977,6 +12052,10 @@
     {
       "id": "Zbb",
       "name": "Zbb",
+      "tags": [
+        "rv64_zbb",
+        "rv_zbb"
+      ],
       "desc": "Basic Bitmanip",
       "use": "CLZ/CTZ, popcnt, min/max, etc.",
       "instructions": {
@@ -12355,6 +12434,9 @@
     {
       "id": "Zbc",
       "name": "Zbc",
+      "tags": [
+        "rv_zbc"
+      ],
       "desc": "Carry-less Multiply",
       "use": "CRC, Galois-field crypto",
       "instructions": {
@@ -12411,6 +12493,10 @@
     {
       "id": "Zbs",
       "name": "Zbs",
+      "tags": [
+        "rv64_zbs",
+        "rv_zbs"
+      ],
       "desc": "Single-Bit Ops",
       "use": "Set/clear/invert bit in word",
       "instructions": {
@@ -12526,6 +12612,7 @@
     {
       "id": "Zaamo",
       "name": "Zaamo",
+      "tags": [],
       "desc": "Atomic Memory Operations",
       "use": "Defines atomic granularity",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -12805,6 +12892,11 @@
     {
       "id": "Zacas",
       "name": "Zacas",
+      "tags": [
+        "rv64_zacas",
+        "rv_zabha_zacas",
+        "rv_zacas"
+      ],
       "desc": "Atomic Compare-and-Swap",
       "use": "Lock-free algorithms (CAS)",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -12889,6 +12981,9 @@
     {
       "id": "Zalasr",
       "name": "Zalasr",
+      "tags": [
+        "rv_zalasr"
+      ],
       "desc": "LR/SC Alias Rules",
       "use": "Alias rules for LR/SC sequences",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -13002,6 +13097,7 @@
     {
       "id": "Zalrsc",
       "name": "Zalrsc",
+      "tags": [],
       "desc": "LR/SC Extension",
       "use": "Extended LR/SC semantics",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -13069,6 +13165,7 @@
     {
       "id": "Ziccrse",
       "name": "Ziccrse",
+      "tags": [],
       "desc": "LR/SC Forward Progress",
       "use": "Guarantees LR/SC forward progress",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -13078,6 +13175,7 @@
     {
       "id": "Zca",
       "name": "Zca",
+      "tags": [],
       "desc": "Base Compressed (no FP)",
       "use": "Compressed base integer ops",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -13508,6 +13606,10 @@
     {
       "id": "Zcb",
       "name": "Zcb",
+      "tags": [
+        "rv64_zcb",
+        "rv_zcb"
+      ],
       "desc": "Extra Compressed Integer",
       "use": "More 16-bit ALU/control ops",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -13660,6 +13762,9 @@
     {
       "id": "Zcd",
       "name": "Zcd",
+      "tags": [
+        "rv_c_d"
+      ],
       "desc": "Compressed Double Float",
       "use": "16-bit encodings for 64-bit FP",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -13722,6 +13827,7 @@
     {
       "id": "Zce",
       "name": "Zce",
+      "tags": [],
       "desc": "Embedded Compressed",
       "use": "RV32E/RV64E-focused compressed subset",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -13729,6 +13835,9 @@
     {
       "id": "Zcf",
       "name": "Zcf",
+      "tags": [
+        "rv32_c_f"
+      ],
       "desc": "Compressed Float Load/Store",
       "use": "16-bit encodings for FP LD/ST",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -13791,6 +13900,9 @@
     {
       "id": "Zcmp",
       "name": "Zcmp",
+      "tags": [
+        "rv_zcmp"
+      ],
       "desc": "Push/Pop & Reg Save/Restore",
       "use": "Stack push/pop, frame save",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -13872,6 +13984,9 @@
     {
       "id": "Zcmt",
       "name": "Zcmt",
+      "tags": [
+        "rv_zcmt"
+      ],
       "desc": "Compressed Table Jumps",
       "use": "Switch/jumptable compression",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -13892,6 +14007,9 @@
     {
       "id": "Zcmop",
       "name": "Zcmop",
+      "tags": [
+        "rv_zcmop"
+      ],
       "desc": "Compressed May-Be-Ops",
       "use": "Reserved 16-bit NOP/future ops",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -13900,6 +14018,7 @@
     {
       "id": "Zclsd",
       "name": "Zclsd",
+      "tags": [],
       "desc": "Compressed LS-Pair",
       "use": "Compressed load/store pairs",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -13907,6 +14026,7 @@
     {
       "id": "Zcmlsd",
       "name": "Zcmlsd",
+      "tags": [],
       "desc": "Compressed Mem-Loop",
       "use": "Compact memcpy/memset-style sequences",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -13916,6 +14036,7 @@
     {
       "id": "Zdinx",
       "name": "Zdinx",
+      "tags": [],
       "desc": "FP in Integer Regs (D)",
       "use": "Double-precision FP in x-regs",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -14248,6 +14369,14 @@
     {
       "id": "Zfa",
       "name": "Zfa",
+      "tags": [
+        "rv32_d_zfa",
+        "rv64_q_zfa",
+        "rv_d_zfa",
+        "rv_f_zfa",
+        "rv_q_zfa",
+        "rv_zfh_zfa"
+      ],
       "desc": "Additional FP Instructions",
       "use": "Fused ops, sign inject, etc.",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -14679,6 +14808,9 @@
     {
       "id": "Zfbfmin",
       "name": "Zfbfmin",
+      "tags": [
+        "rv_zfbfmin"
+      ],
       "desc": "Minimal BF16 FP",
       "use": "BFloat16 conversions and storage",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -14714,6 +14846,10 @@
     {
       "id": "Zfh",
       "name": "Zfh",
+      "tags": [
+        "rv64_zfh",
+        "rv_zfh"
+      ],
       "desc": "Half-Precision FP (16-bit)",
       "use": "Low-precision FP (AI/graphics)",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -15201,6 +15337,11 @@
     {
       "id": "Zfhmin",
       "name": "Zfhmin",
+      "tags": [
+        "rv_d_zfhmin",
+        "rv_q_zfhmin",
+        "rv_zfhmin"
+      ],
       "desc": "Minimal Half-Precision FP",
       "use": "Conversions, no arithmetic",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -15236,6 +15377,7 @@
     {
       "id": "Zfinx",
       "name": "Zfinx",
+      "tags": [],
       "desc": "FP in Integer Regs (F)",
       "use": "Single-precision FP in x-regs",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -15542,6 +15684,7 @@
     {
       "id": "Zhinx",
       "name": "Zhinx",
+      "tags": [],
       "desc": "FP in Integer Regs (Half)",
       "use": "Half-precision FP in x-regs",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -15874,6 +16017,7 @@
     {
       "id": "Zhinxmin",
       "name": "Zhinxmin",
+      "tags": [],
       "desc": "Minimal Half-in-Int",
       "use": "Minimal half-precision in x-regs",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -15909,6 +16053,7 @@
     {
       "id": "Zmmul",
       "name": "Zmmul",
+      "tags": [],
       "desc": "Multiply-Only (no DIV)",
       "use": "Cheaper M subset (mul only)",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -15985,6 +16130,7 @@
     {
       "id": "Zicclsm",
       "name": "Zicclsm",
+      "tags": [],
       "desc": "Misaligned L/S Support",
       "use": "Misaligned loads/stores in cacheable+coherent regions",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -15992,6 +16138,7 @@
     {
       "id": "Zilsd",
       "name": "Zilsd",
+      "tags": [],
       "desc": "Load/Store Pair for RV32",
       "use": "Streaming loads/stores (data)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16001,6 +16148,9 @@
     {
       "id": "Zicond",
       "name": "Zicond",
+      "tags": [
+        "rv_zicond"
+      ],
       "desc": "Integer Conditional Ops",
       "use": "Branchless selects / cmov",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -16038,6 +16188,7 @@
     {
       "id": "Zve",
       "name": "Zve",
+      "tags": [],
       "desc": "Embedded Vector Base",
       "use": "Baseline V subset for MCUs",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16045,6 +16196,7 @@
     {
       "id": "Zve32x",
       "name": "Zve32x",
+      "tags": [],
       "desc": "Vec Int (32-bit, embedded)",
       "use": "Int-only embedded vectors",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16052,6 +16204,7 @@
     {
       "id": "Zve32f",
       "name": "Zve32f",
+      "tags": [],
       "desc": "Vec FP32 (embedded)",
       "use": "Embedded FP32 vector compute",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16059,6 +16212,7 @@
     {
       "id": "Zve64x",
       "name": "Zve64x",
+      "tags": [],
       "desc": "Vec Int (64-bit, embedded)",
       "use": "64-bit int embedded vectors",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16066,6 +16220,7 @@
     {
       "id": "Zve64f",
       "name": "Zve64f",
+      "tags": [],
       "desc": "Vec FP32+Int (64-bit, embedded)",
       "use": "FP32 + 64-bit int vectors",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16073,6 +16228,7 @@
     {
       "id": "Zve64d",
       "name": "Zve64d",
+      "tags": [],
       "desc": "Vec FP64+FP32+Int",
       "use": "Full FP64 embedded vectors",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16080,6 +16236,7 @@
     {
       "id": "Zv",
       "name": "Zv",
+      "tags": [],
       "desc": "Vector Alias for V",
       "use": "ISA alias for full RVV",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16087,6 +16244,7 @@
     {
       "id": "Zvl32b",
       "name": "Zvl32b",
+      "tags": [],
       "desc": "Min VLEN ≥ 32b",
       "use": "Vector length capability",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16094,6 +16252,7 @@
     {
       "id": "Zvl64b",
       "name": "Zvl64b",
+      "tags": [],
       "desc": "Min VLEN ≥ 64b",
       "use": "Vector length capability",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16101,6 +16260,7 @@
     {
       "id": "Zvl128b",
       "name": "Zvl128b",
+      "tags": [],
       "desc": "Min VLEN ≥ 128b",
       "use": "Vector length capability",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16108,6 +16268,7 @@
     {
       "id": "Zvl256b",
       "name": "Zvl256b",
+      "tags": [],
       "desc": "Min VLEN ≥ 256b",
       "use": "Vector length capability",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16115,6 +16276,7 @@
     {
       "id": "Zvl512b",
       "name": "Zvl512b",
+      "tags": [],
       "desc": "Min VLEN ≥ 512b",
       "use": "Vector length capability",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16122,6 +16284,7 @@
     {
       "id": "Zvl1024b",
       "name": "Zvl1024b",
+      "tags": [],
       "desc": "Min VLEN ≥ 1024b",
       "use": "Vector length capability",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16129,6 +16292,7 @@
     {
       "id": "Zvf",
       "name": "Zvf",
+      "tags": [],
       "desc": "Vector FP minimal",
       "use": "Minimal scalar-like vector FP",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16136,6 +16300,7 @@
     {
       "id": "Zvfh",
       "name": "Zvfh",
+      "tags": [],
       "desc": "Vector Half-Precision FP",
       "use": "16-bit FP vector arithmetic",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -16466,6 +16631,7 @@
     {
       "id": "Zvfhmin",
       "name": "Zvfhmin",
+      "tags": [],
       "desc": "Vector Half-Precision Minimal",
       "use": "Conv/storage, minimal Zvfh",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -16501,6 +16667,9 @@
     {
       "id": "Zvfbfmin",
       "name": "Zvfbfmin",
+      "tags": [
+        "rv_zvfbfmin"
+      ],
       "desc": "Vector BF16 Minimal",
       "use": "BF16 conversions in vectors",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -16536,6 +16705,7 @@
     {
       "id": "Zvfbfa",
       "name": "Zvfbfa",
+      "tags": [],
       "desc": "Vector BF16 Arithmetic",
       "use": "BF16 arithmetic in vectors",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16543,6 +16713,9 @@
     {
       "id": "Zvfbfwma",
       "name": "Zvfbfwma",
+      "tags": [
+        "rv_zvfbfwma"
+      ],
       "desc": "Vector BF16 Widening MAC",
       "use": "BF16 GEMM-style MAC",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -16580,6 +16753,9 @@
     {
       "id": "Zvfofp8min",
       "name": "Zvfofp8min",
+      "tags": [
+        "rv_zvfofp8min"
+      ],
       "desc": "Vector FP8 Minimal",
       "use": "Minimal FP8 vector support",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16587,6 +16763,9 @@
     {
       "id": "Zvabd",
       "name": "Zvabd",
+      "tags": [
+        "rv_zvabd"
+      ],
       "desc": "Vector Abs-Diff",
       "use": "Absolute-difference operations",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16594,6 +16773,9 @@
     {
       "id": "Zvbb",
       "name": "Zvbb",
+      "tags": [
+        "rv_zvbb"
+      ],
       "desc": "Vector Bitmanip Base",
       "use": "Vectorized scalar Zbb ops",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -16840,6 +17022,9 @@
     {
       "id": "Zvbc",
       "name": "Zvbc",
+      "tags": [
+        "rv_zvbc"
+      ],
       "desc": "Vector Carryless Multiply",
       "use": "Vector CRC / GF ops",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -16905,6 +17090,7 @@
     {
       "id": "Zvbc32e",
       "name": "Zvbc32e",
+      "tags": [],
       "desc": "Vector CLMUL (32E)",
       "use": "Carryless multiply for embedded vectors",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16912,6 +17098,7 @@
     {
       "id": "Zvbdota",
       "name": "Zvbdota",
+      "tags": [],
       "desc": "Vector BF16 Dot-Acc",
       "use": "BF16 dot-product accumulate",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16919,6 +17106,7 @@
     {
       "id": "Zvdota",
       "name": "Zvdota",
+      "tags": [],
       "desc": "Vector Dot-Acc",
       "use": "Generic FP dot-product accumulate",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16926,6 +17114,7 @@
     {
       "id": "Zvdot4a",
       "name": "Zvdot4a",
+      "tags": [],
       "desc": "Vector 4-way Dot-Acc",
       "use": "4-way dot-product accumulate",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16933,6 +17122,7 @@
     {
       "id": "Zvw",
       "name": "Zvw",
+      "tags": [],
       "desc": "Vector Wide Groups",
       "use": "Wider element/vector width options",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16942,6 +17132,7 @@
     {
       "id": "Zicfilp",
       "name": "Zicfilp",
+      "tags": [],
       "desc": "CFI Landing Pads",
       "use": "Forward-edge CFI for calls",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -16949,6 +17140,9 @@
     {
       "id": "Zicfiss",
       "name": "Zicfiss",
+      "tags": [
+        "rv_zicfiss"
+      ],
       "desc": "CFI Shadow Stacks",
       "use": "Backward-edge CFI (returns)",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -16988,6 +17182,9 @@
     {
       "id": "Zimop",
       "name": "Zimop",
+      "tags": [
+        "rv_zimop"
+      ],
       "desc": "May-Be-Ops (NOP family)",
       "use": "Reserved NOP encodings for future",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -16998,6 +17195,10 @@
     {
       "id": "Zbkb",
       "name": "Zbkb",
+      "tags": [
+        "rv64_zbkb",
+        "rv_zbkb"
+      ],
       "desc": "Crypto Bitmanip (byte)",
       "use": "Byte-wise crypto bit ops",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -17208,6 +17409,9 @@
     {
       "id": "Zbkc",
       "name": "Zbkc",
+      "tags": [
+        "rv_zbkc"
+      ],
       "desc": "Crypto Bitmanip (carryless)",
       "use": "Carryless ops for crypto",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -17251,6 +17455,9 @@
     {
       "id": "Zbkx",
       "name": "Zbkx",
+      "tags": [
+        "rv_zbkx"
+      ],
       "desc": "Crypto Bitmanip (crossbar)",
       "use": "Bit/byte crossbar operations",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -17292,6 +17499,11 @@
     {
       "id": "Zk",
       "name": "Zk",
+      "tags": [
+        "rv32_zk",
+        "rv64_zk",
+        "rv_zk"
+      ],
       "desc": "Scalar Crypto Base",
       "use": "Top-level scalar crypto bundle",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -17940,6 +18152,11 @@
     {
       "id": "Zkn",
       "name": "Zkn",
+      "tags": [
+        "rv32_zkn",
+        "rv64_zkn",
+        "rv_zkn"
+      ],
       "desc": "NIST Suite (Scalar)",
       "use": "AES/SHA NIST suite",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -18588,6 +18805,10 @@
     {
       "id": "Zknd",
       "name": "Zknd",
+      "tags": [
+        "rv32_zknd",
+        "rv64_zknd"
+      ],
       "desc": "NIST AES Decrypt",
       "use": "AES decryption instructions",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -18705,6 +18926,10 @@
     {
       "id": "Zkne",
       "name": "Zkne",
+      "tags": [
+        "rv32_zkne",
+        "rv64_zkne"
+      ],
       "desc": "NIST AES Encrypt",
       "use": "AES encryption instructions",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -18808,6 +19033,11 @@
     {
       "id": "Zknh",
       "name": "Zknh",
+      "tags": [
+        "rv32_zknh",
+        "rv64_zknh",
+        "rv_zknh"
+      ],
       "desc": "NIST Hash",
       "use": "SHA-2 hash instructions",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -19019,6 +19249,10 @@
     {
       "id": "Zkr",
       "name": "Zkr",
+      "tags": [
+        "rv64_zkr",
+        "rv_zkr"
+      ],
       "desc": "Entropy Source",
       "use": "True random source interface",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -19027,6 +19261,10 @@
     {
       "id": "Zks",
       "name": "Zks",
+      "tags": [
+        "rv64_zks",
+        "rv_zks"
+      ],
       "desc": "ShangMi Suite (Scalar)",
       "use": "Chinese SMx crypto bundle",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -19359,6 +19597,9 @@
     {
       "id": "Zksed",
       "name": "Zksed",
+      "tags": [
+        "rv_zksed"
+      ],
       "desc": "SM4 Block Cipher",
       "use": "SM4 encrypt/decrypt",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -19398,6 +19639,9 @@
     {
       "id": "Zksh",
       "name": "Zksh",
+      "tags": [
+        "rv_zksh"
+      ],
       "desc": "SM3 Hash",
       "use": "SM3 hash operations",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -19433,6 +19677,7 @@
     {
       "id": "Zkt",
       "name": "Zkt",
+      "tags": [],
       "desc": "Timing-Safe Crypto",
       "use": "Data-independent latency constraints",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19442,6 +19687,7 @@
     {
       "id": "Zvk",
       "name": "Zvk",
+      "tags": [],
       "desc": "Vector Crypto (umbrella)",
       "use": "Top-level vector crypto suite",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19449,6 +19695,7 @@
     {
       "id": "Zvkb",
       "name": "Zvkb",
+      "tags": [],
       "desc": "Vector Crypto Bitmanip",
       "use": "Vector crypto bit ops",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19456,6 +19703,9 @@
     {
       "id": "Zvkg",
       "name": "Zvkg",
+      "tags": [
+        "rv_zvkg"
+      ],
       "desc": "Vector GCM/GMAC",
       "use": "AES-GCM/GMAC acceleration",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -19490,6 +19740,7 @@
     {
       "id": "Zvkgs",
       "name": "Zvkgs",
+      "tags": [],
       "desc": "Vector GCM Shim",
       "use": "Profile-specific GCM subset",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19497,6 +19748,9 @@
     {
       "id": "Zvkn",
       "name": "Zvkn",
+      "tags": [
+        "rv_zvkn"
+      ],
       "desc": "Vector NIST Suite",
       "use": "Vector AES/SHA suite",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19504,6 +19758,7 @@
     {
       "id": "Zvknc",
       "name": "Zvknc",
+      "tags": [],
       "desc": "Vector NIST + CLMUL",
       "use": "NIST crypto with carryless multiply",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19511,6 +19766,9 @@
     {
       "id": "Zvkned",
       "name": "Zvkned",
+      "tags": [
+        "rv_zvkned"
+      ],
       "desc": "Vector AES",
       "use": "Vector AES-ECB/CTR/GCM cores",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -19665,6 +19923,7 @@
     {
       "id": "Zvknf",
       "name": "Zvknf",
+      "tags": [],
       "desc": "Vector AES Finite-field",
       "use": "Vector AES finite-field helpers",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19672,6 +19931,7 @@
     {
       "id": "Zvkng",
       "name": "Zvkng",
+      "tags": [],
       "desc": "Vector NIST + GCM",
       "use": "NIST suite + GCM vector bundle",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19679,6 +19939,9 @@
     {
       "id": "Zvknha",
       "name": "Zvknha",
+      "tags": [
+        "rv_zvknha"
+      ],
       "desc": "Vector SHA-2 (subset)",
       "use": "Vector SHA-256 subset",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -19733,6 +19996,9 @@
     {
       "id": "Zvknhb",
       "name": "Zvknhb",
+      "tags": [
+        "rv_zvknhb"
+      ],
       "desc": "Vector SHA-2 (full)",
       "use": "Vector SHA-256/512",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -19787,6 +20053,9 @@
     {
       "id": "Zvks",
       "name": "Zvks",
+      "tags": [
+        "rv_zvks"
+      ],
       "desc": "Vector ShangMi Suite",
       "use": "Vector SMx algorithms",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19794,6 +20063,7 @@
     {
       "id": "Zvksc",
       "name": "Zvksc",
+      "tags": [],
       "desc": "Vector ShangMi + CLMUL",
       "use": "SMx with carryless multiply",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19801,6 +20071,9 @@
     {
       "id": "Zvksed",
       "name": "Zvksed",
+      "tags": [
+        "rv_zvksed"
+      ],
       "desc": "Vector SM4",
       "use": "Vector SM4 cipher",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -19850,6 +20123,7 @@
     {
       "id": "Zvksg",
       "name": "Zvksg",
+      "tags": [],
       "desc": "Vector ShangMi + GCM",
       "use": "ShangMi + GCM vectors",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19857,6 +20131,9 @@
     {
       "id": "Zvksh",
       "name": "Zvksh",
+      "tags": [
+        "rv_zvksh"
+      ],
       "desc": "Vector SM3 Hash",
       "use": "Vector SM3",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -19894,6 +20171,7 @@
     {
       "id": "Zvkt",
       "name": "Zvkt",
+      "tags": [],
       "desc": "Vector Timing-Safe Crypto",
       "use": "Vector data-independent latency",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19903,6 +20181,7 @@
     {
       "id": "Za128rs",
       "name": "Za128rs",
+      "tags": [],
       "desc": "128B Reservation Set",
       "use": "Reservation set granularity (128-byte)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19910,6 +20189,7 @@
     {
       "id": "Za64rs",
       "name": "Za64rs",
+      "tags": [],
       "desc": "64B Reservation Set",
       "use": "Reservation set granularity (64-byte)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -19917,6 +20197,9 @@
     {
       "id": "Zabha",
       "name": "Zabha",
+      "tags": [
+        "rv_zabha"
+      ],
       "desc": "Byte/Halfword AMO",
       "use": "Subword AMO support",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -20196,6 +20479,7 @@
     {
       "id": "Zama16b",
       "name": "Zama16b",
+      "tags": [],
       "desc": "16B Misaligned Atomicity",
       "use": "Misaligned atomicity granule (16 bytes)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20203,6 +20487,9 @@
     {
       "id": "Zawrs",
       "name": "Zawrs",
+      "tags": [
+        "rv_zawrs"
+      ],
       "desc": "Wait-on-Reservation-Set",
       "use": "Low-power waiting on LR/SC reservations",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -20230,6 +20517,7 @@
     {
       "id": "Zccid",
       "name": "Zccid",
+      "tags": [],
       "desc": "Cache-Block ID",
       "use": "Cache block identity / debugging",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20237,6 +20525,9 @@
     {
       "id": "Zibi",
       "name": "Zibi",
+      "tags": [
+        "rv_zibi"
+      ],
       "desc": "Interruptible Mem Ops",
       "use": "Interruptible load/store semantics",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20244,6 +20535,7 @@
     {
       "id": "Zicntr",
       "name": "Zicntr",
+      "tags": [],
       "desc": "Base Counters/Timers",
       "use": "cycle/instret + timers",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20251,6 +20543,7 @@
     {
       "id": "Zicntrpmf",
       "name": "Zicntrpmf",
+      "tags": [],
       "desc": "Counter Filtering",
       "use": "Mode-based filtering for counters",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20258,6 +20551,9 @@
     {
       "id": "Zicsr",
       "name": "Zicsr",
+      "tags": [
+        "rv_zicsr"
+      ],
       "desc": "CSR Access",
       "use": "Explicit CSR read/write",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -20345,6 +20641,9 @@
     {
       "id": "Zifencei",
       "name": "Zifencei",
+      "tags": [
+        "rv_zifencei"
+      ],
       "desc": "Instruction-Fetch Fence",
       "use": "Sync I-cache with writes",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -20367,6 +20666,7 @@
     {
       "id": "Zihintntl",
       "name": "Zihintntl",
+      "tags": [],
       "desc": "Non-Temporal Locality Hints",
       "use": "NT load/store hints",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20374,6 +20674,7 @@
     {
       "id": "Zihintpause",
       "name": "Zihintpause",
+      "tags": [],
       "desc": "Pause Hint",
       "use": "Power-friendly spin-wait",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20381,6 +20682,7 @@
     {
       "id": "Zihpm",
       "name": "Zihpm",
+      "tags": [],
       "desc": "Perf Counters",
       "use": "Hardware performance monitors",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20388,6 +20690,7 @@
     {
       "id": "Zilsm*",
       "name": "Zilsm*",
+      "tags": [],
       "desc": "Streaming Mem (pattern)",
       "use": "Wildcard for Zilsm<x>b family",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20395,6 +20698,7 @@
     {
       "id": "Zilsm<x>b",
       "name": "Zilsm<x>b",
+      "tags": [],
       "desc": "Streaming Mem (x-byte)",
       "use": "Line-size specific streaming ops",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20402,6 +20706,7 @@
     {
       "id": "Zilsme",
       "name": "Zilsme",
+      "tags": [],
       "desc": "Streaming Stores (exclusive)",
       "use": "Streaming store hints",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20409,6 +20714,7 @@
     {
       "id": "Zilsmea",
       "name": "Zilsmea",
+      "tags": [],
       "desc": "Streaming Stores (alloc)",
       "use": "Streaming store + allocate",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20416,6 +20722,7 @@
     {
       "id": "Zilsp",
       "name": "Zilsp",
+      "tags": [],
       "desc": "Streaming LS (prefetch)",
       "use": "Streaming prefetch hints",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20423,6 +20730,7 @@
     {
       "id": "Zimt",
       "name": "Zimt",
+      "tags": [],
       "desc": "Time Instructions",
       "use": "Extended time/TIMECMP instructions",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20430,6 +20738,7 @@
     {
       "id": "Zitagelide",
       "name": "Zitagelide",
+      "tags": [],
       "desc": "Tag & ELIDE",
       "use": "Tagged-memory / elide behaviors",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20437,6 +20746,7 @@
     {
       "id": "Zjid",
       "name": "Zjid",
+      "tags": [],
       "desc": "ICache Coherence Alt",
       "use": "Alternative to Zifencei for I-cache coherence",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20444,6 +20754,7 @@
     {
       "id": "Zjpm",
       "name": "Zjpm",
+      "tags": [],
       "desc": "Pointer-Mask Qualifier",
       "use": "Auxiliary pointer-masking semantics",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20451,6 +20762,7 @@
     {
       "id": "Ztso",
       "name": "Ztso",
+      "tags": [],
       "desc": "Total Store Ordering",
       "use": "x86-style TSO memory model",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20460,6 +20772,7 @@
     {
       "id": "Zic64b",
       "name": "Zic64b",
+      "tags": [],
       "desc": "64B Cache Blocks",
       "use": "Requires 64B naturally aligned cache lines",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20467,6 +20780,7 @@
     {
       "id": "Zicbom",
       "name": "Zicbom",
+      "tags": [],
       "desc": "Cache Management Operations",
       "use": "Invalidate/clean/flush blocks",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -20509,6 +20823,7 @@
     {
       "id": "Zicbop",
       "name": "Zicbop",
+      "tags": [],
       "desc": "Cache Prefetch",
       "use": "Prefetch cache blocks",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20516,6 +20831,7 @@
     {
       "id": "Zicboz",
       "name": "Zicboz",
+      "tags": [],
       "desc": "Cache Block Zero",
       "use": "Fast memset-to-zero",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -20536,6 +20852,7 @@
     {
       "id": "Ziccamoa",
       "name": "Ziccamoa",
+      "tags": [],
       "desc": "Atomics PMA",
       "use": "PMA guarantees for A-extension atomics",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20543,6 +20860,7 @@
     {
       "id": "Ziccamoc",
       "name": "Ziccamoc",
+      "tags": [],
       "desc": "CAS PMA",
       "use": "PMA guarantees for CAS-style atomics",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20550,6 +20868,7 @@
     {
       "id": "Ziccif",
       "name": "Ziccif",
+      "tags": [],
       "desc": "Inst-Fetch Atomicity",
       "use": "Atomic I-fetch in cacheable+coherent regions",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20559,6 +20878,7 @@
     {
       "id": "Sv32",
       "name": "Sv32",
+      "tags": [],
       "desc": "Virtual Memory, 32-bit",
       "use": "2-level page tables (RV32 Linux)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20566,6 +20886,7 @@
     {
       "id": "Sv39",
       "name": "Sv39",
+      "tags": [],
       "desc": "Virtual Memory, 39-bit VA",
       "use": "3-level page tables (RV64 Linux)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20573,6 +20894,7 @@
     {
       "id": "Sv48",
       "name": "Sv48",
+      "tags": [],
       "desc": "Virtual Memory, 48-bit VA",
       "use": "4-level page tables",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20580,6 +20902,7 @@
     {
       "id": "Sv57",
       "name": "Sv57",
+      "tags": [],
       "desc": "Virtual Memory, 57-bit VA",
       "use": "5-level page tables",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20587,6 +20910,7 @@
     {
       "id": "Svbare",
       "name": "Svbare",
+      "tags": [],
       "desc": "Bare Mode",
       "use": "No address translation (satp bare)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20594,6 +20918,7 @@
     {
       "id": "Svpbmt",
       "name": "Svpbmt",
+      "tags": [],
       "desc": "Page-Based Memory Types",
       "use": "Per-page memory types / cacheability",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20601,6 +20926,7 @@
     {
       "id": "Svnapot",
       "name": "Svnapot",
+      "tags": [],
       "desc": "NAPOT Mappings",
       "use": "Hugepages via NAPOT PTEs",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20608,6 +20934,9 @@
     {
       "id": "Svinval",
       "name": "Svinval",
+      "tags": [
+        "rv_svinval"
+      ],
       "desc": "Fine-Grained TLB Invalidate",
       "use": "Fine-grain TLB shootdown instructions",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20615,6 +20944,7 @@
     {
       "id": "Svade",
       "name": "Svade",
+      "tags": [],
       "desc": "Access/Dirty Exceptions",
       "use": "Page-fault on A/D bit issues",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20622,6 +20952,7 @@
     {
       "id": "Svadu",
       "name": "Svadu",
+      "tags": [],
       "desc": "Access/Dirty Update",
       "use": "Hardware A/D-bit updates",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20629,6 +20960,7 @@
     {
       "id": "Svvptc",
       "name": "Svvptc",
+      "tags": [],
       "desc": "Visible PTE Changes",
       "use": "Bounded-time PTE visibility guarantees",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20636,6 +20968,7 @@
     {
       "id": "Svrsw60t59b",
       "name": "Svrsw60t59b",
+      "tags": [],
       "desc": "PTE RSW Bits",
       "use": "Standard RSW field behavior",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20643,6 +20976,7 @@
     {
       "id": "Svatag",
       "name": "Svatag",
+      "tags": [],
       "desc": "Tagged Translations",
       "use": "Address-tagged translation behavior",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20650,6 +20984,7 @@
     {
       "id": "Svukte",
       "name": "Svukte",
+      "tags": [],
       "desc": "User-Keyed TLB Entries",
       "use": "Per-user TLB tagging",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20657,6 +20992,7 @@
     {
       "id": "Supm",
       "name": "Supm",
+      "tags": [],
       "desc": "User Pointer Masking",
       "use": "Mask user pointers",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20664,6 +21000,7 @@
     {
       "id": "Ssnpm",
       "name": "Ssnpm",
+      "tags": [],
       "desc": "Supervisor Next-Pointer Mask",
       "use": "Mask next-mode pointers (S)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20671,6 +21008,7 @@
     {
       "id": "Sspm",
       "name": "Sspm",
+      "tags": [],
       "desc": "Supervisor Pointer Masking",
       "use": "Supervisor pointer-mask policy",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20680,6 +21018,7 @@
     {
       "id": "Smaia",
       "name": "Smaia",
+      "tags": [],
       "desc": "AIA Machine Extension",
       "use": "Advanced interrupt arch (M)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20687,6 +21026,7 @@
     {
       "id": "Ssaia",
       "name": "Ssaia",
+      "tags": [],
       "desc": "AIA Supervisor Extension",
       "use": "Advanced interrupt arch (S)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20694,6 +21034,7 @@
     {
       "id": "Smclic",
       "name": "Smclic",
+      "tags": [],
       "desc": "Machine CLIC",
       "use": "Machine-level CLIC interrupt controller",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20701,6 +21042,7 @@
     {
       "id": "Smclicconfig",
       "name": "Smclicconfig",
+      "tags": [],
       "desc": "Machine CLIC Config",
       "use": "MCLIC configuration CSRs",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20708,6 +21050,7 @@
     {
       "id": "Smclicshv",
       "name": "Smclicshv",
+      "tags": [],
       "desc": "Machine CLIC SHV",
       "use": "Selective hardware vectored interrupts",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20715,6 +21058,7 @@
     {
       "id": "Ssclic",
       "name": "Ssclic",
+      "tags": [],
       "desc": "Supervisor CLIC",
       "use": "Supervisor-level CLIC interface",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20722,6 +21066,7 @@
     {
       "id": "Suclic",
       "name": "Suclic",
+      "tags": [],
       "desc": "User CLIC",
       "use": "User-level CLIC interface",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20729,6 +21074,7 @@
     {
       "id": "Sstc",
       "name": "Sstc",
+      "tags": [],
       "desc": "Supervisor Timer Compare",
       "use": "Per-hart timer interrupts",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20736,6 +21082,7 @@
     {
       "id": "Smcdeleg",
       "name": "Smcdeleg",
+      "tags": [],
       "desc": "M-Mode Counter Delegation",
       "use": "Delegates HPM counters to S",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20743,6 +21090,7 @@
     {
       "id": "Smcntrpmf",
       "name": "Smcntrpmf",
+      "tags": [],
       "desc": "M-Mode Counter Filtering",
       "use": "Filter counters by privilege",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20750,6 +21098,7 @@
     {
       "id": "Ssccfg",
       "name": "Ssccfg",
+      "tags": [],
       "desc": "Counter Configuration (S)",
       "use": "S-mode control of delegated HPM",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20757,6 +21106,7 @@
     {
       "id": "Sscntrcfg",
       "name": "Sscntrcfg",
+      "tags": [],
       "desc": "S-Mode Counter Config",
       "use": "Supervisor counter configuration",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20764,6 +21114,7 @@
     {
       "id": "Sscounterenw",
       "name": "Sscounterenw",
+      "tags": [],
       "desc": "Writable scounteren",
       "use": "Writable enables for HPMs",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20771,6 +21122,7 @@
     {
       "id": "Sscofpmf",
       "name": "Sscofpmf",
+      "tags": [],
       "desc": "Counter Overflow & Filtering",
       "use": "Overflow + filtering in S-mode",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20778,6 +21130,7 @@
     {
       "id": "Ssccptr",
       "name": "Ssccptr",
+      "tags": [],
       "desc": "S Counter Pointer CSR",
       "use": "Supervisor counter pointer CSR",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20785,6 +21138,7 @@
     {
       "id": "Ssqosid",
       "name": "Ssqosid",
+      "tags": [],
       "desc": "QoS Identifiers",
       "use": "Per-thread QoS tagging",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20792,6 +21146,7 @@
     {
       "id": "Sshpmcfg",
       "name": "Sshpmcfg",
+      "tags": [],
       "desc": "S-Mode HPM Config",
       "use": "Supervisor HPM configuration",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20799,6 +21154,9 @@
     {
       "id": "Smrnmi",
       "name": "Smrnmi",
+      "tags": [
+        "rv_smrnmi"
+      ],
       "desc": "Resumable NMI",
       "use": "Restartable non-maskable interrupts",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20808,6 +21166,9 @@
     {
       "id": "Sdext",
       "name": "Sdext",
+      "tags": [
+        "rv_sdext"
+      ],
       "desc": "External Debug",
       "use": "External debug architecture",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20815,6 +21176,7 @@
     {
       "id": "Sdtrig",
       "name": "Sdtrig",
+      "tags": [],
       "desc": "Debug Triggers",
       "use": "HW breakpoints / watchpoints",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20822,6 +21184,7 @@
     {
       "id": "Sdtrigepm",
       "name": "Sdtrigepm",
+      "tags": [],
       "desc": "Debug Trigger EPM",
       "use": "Trigger matching for external PM",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20829,6 +21192,7 @@
     {
       "id": "Sdtrigpend",
       "name": "Sdtrigpend",
+      "tags": [],
       "desc": "Debug Trigger Pending",
       "use": "Pending trigger cause reporting",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20836,6 +21200,7 @@
     {
       "id": "Smcsrind",
       "name": "Smcsrind",
+      "tags": [],
       "desc": "Indirect CSR Access (M)",
       "use": "CSR indirection at M-mode",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20843,6 +21208,7 @@
     {
       "id": "Sscsrind",
       "name": "Sscsrind",
+      "tags": [],
       "desc": "Indirect CSR Access (S)",
       "use": "CSR indirection at S-mode",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20850,6 +21216,7 @@
     {
       "id": "Smctr",
       "name": "Smctr",
+      "tags": [],
       "desc": "Control Transfer Records (M)",
       "use": "Hardware CFI logs (M)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20857,6 +21224,9 @@
     {
       "id": "Ssctr",
       "name": "Ssctr",
+      "tags": [
+        "rv_ssctr"
+      ],
       "desc": "Control Transfer Records (S)",
       "use": "Hardware CFI logs (S)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20864,6 +21234,7 @@
     {
       "id": "Sddbltrp",
       "name": "Sddbltrp",
+      "tags": [],
       "desc": "Debug Double Trap",
       "use": "Debug-level nested traps",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20871,6 +21242,7 @@
     {
       "id": "Ssdbltrp",
       "name": "Ssdbltrp",
+      "tags": [],
       "desc": "Supervisor Double Trap",
       "use": "Recoverable nested traps (S)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20878,6 +21250,7 @@
     {
       "id": "Smdbltrp",
       "name": "Smdbltrp",
+      "tags": [],
       "desc": "Machine Double Trap",
       "use": "Recoverable nested traps (M)",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20885,6 +21258,7 @@
     {
       "id": "Smstateen",
       "name": "Smstateen",
+      "tags": [],
       "desc": "M-Mode State Enable",
       "use": "Gate access to extension CSRs",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20892,6 +21266,7 @@
     {
       "id": "Ssstateen",
       "name": "Ssstateen",
+      "tags": [],
       "desc": "S-Mode State Enable",
       "use": "State-enable for S/VS/VU",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20899,6 +21274,7 @@
     {
       "id": "Smepmp",
       "name": "Smepmp",
+      "tags": [],
       "desc": "Enhanced PMP",
       "use": "More flexible PMP rules",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20906,6 +21282,7 @@
     {
       "id": "Smmpm",
       "name": "Smmpm",
+      "tags": [],
       "desc": "Machine PMP Mgmt",
       "use": "Machine-level PMP management",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20913,6 +21290,7 @@
     {
       "id": "Sm1p11",
       "name": "Sm1p11",
+      "tags": [],
       "desc": "Priv Spec M v1.11",
       "use": "Machine architecture tag",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20920,6 +21298,7 @@
     {
       "id": "Ss1p11",
       "name": "Ss1p11",
+      "tags": [],
       "desc": "Priv Spec S v1.11",
       "use": "Supervisor architecture tag",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20927,6 +21306,7 @@
     {
       "id": "Sm1p12",
       "name": "Sm1p12",
+      "tags": [],
       "desc": "Priv Spec M v1.12",
       "use": "Machine architecture tag",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20934,6 +21314,7 @@
     {
       "id": "Ss1p12",
       "name": "Ss1p12",
+      "tags": [],
       "desc": "Priv Spec S v1.12",
       "use": "Supervisor architecture tag",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20941,6 +21322,7 @@
     {
       "id": "Sm1p13",
       "name": "Sm1p13",
+      "tags": [],
       "desc": "Priv Spec M v1.13",
       "use": "Machine architecture tag",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20948,6 +21330,7 @@
     {
       "id": "Ss1p13",
       "name": "Ss1p13",
+      "tags": [],
       "desc": "Priv Spec S v1.13",
       "use": "Supervisor architecture tag",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20955,6 +21338,7 @@
     {
       "id": "Sstvala",
       "name": "Sstvala",
+      "tags": [],
       "desc": "stval Address Rule",
       "use": "Precise faulting VA / instruction",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20962,6 +21346,7 @@
     {
       "id": "Sstvecd",
       "name": "Sstvecd",
+      "tags": [],
       "desc": "stvec Direct Mode",
       "use": "Direct-mode trap vector",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20969,6 +21354,7 @@
     {
       "id": "Sstvecv",
       "name": "Sstvecv",
+      "tags": [],
       "desc": "stvec Vectored Mode",
       "use": "Vectored trap routing",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20976,6 +21362,7 @@
     {
       "id": "Ssdtso",
       "name": "Ssdtso",
+      "tags": [],
       "desc": "Supervisor TSO Opt-in",
       "use": "Supervisors opt into TSO behavior",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20983,6 +21370,7 @@
     {
       "id": "Sstcfg",
       "name": "Sstcfg",
+      "tags": [],
       "desc": "Trap Config",
       "use": "Per-trap configuration controls",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20990,6 +21378,7 @@
     {
       "id": "Ssstrict",
       "name": "Ssstrict",
+      "tags": [],
       "desc": "No Non-Conforming Exts",
       "use": "Disallows non-conforming extensions",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -20997,6 +21386,7 @@
     {
       "id": "Ssu32xl",
       "name": "Ssu32xl",
+      "tags": [],
       "desc": "UXL=32 support",
       "use": "User XLEN=32 capability",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21004,6 +21394,7 @@
     {
       "id": "Ssu64xl",
       "name": "Ssu64xl",
+      "tags": [],
       "desc": "UXL=64 support",
       "use": "User XLEN=64 capability",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21011,6 +21402,7 @@
     {
       "id": "Ssube",
       "name": "Ssube",
+      "tags": [],
       "desc": "Big-Endian S",
       "use": "Supervisor big-endian/bi-endian",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21018,6 +21410,7 @@
     {
       "id": "Ssvxscr",
       "name": "Ssvxscr",
+      "tags": [],
       "desc": "VS CSR",
       "use": "Vector state control at S-mode",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21025,6 +21418,7 @@
     {
       "id": "Ssptead",
       "name": "Ssptead",
+      "tags": [],
       "desc": "Sup PTE A/D (legacy)",
       "use": "Legacy name for Svade-style semantics",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21032,6 +21426,7 @@
     {
       "id": "Smcfiss",
       "name": "Smcfiss",
+      "tags": [],
       "desc": "M-Mode Shadow Stack",
       "use": "Machine-level shadow stack config",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21039,6 +21434,7 @@
     {
       "id": "Smdid",
       "name": "Smdid",
+      "tags": [],
       "desc": "Debug ID",
       "use": "Debug/trace identification",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21046,6 +21442,7 @@
     {
       "id": "Smrnpt",
       "name": "Smrnpt",
+      "tags": [],
       "desc": "Non-Precise Traps",
       "use": "Relaxed trap precision",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21053,6 +21450,7 @@
     {
       "id": "Smrntt",
       "name": "Smrntt",
+      "tags": [],
       "desc": "Non-Taken Traps",
       "use": "Trap behavior when not taken",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21060,6 +21458,7 @@
     {
       "id": "Smnpm",
       "name": "Smnpm",
+      "tags": [],
       "desc": "Non-Maskable PM",
       "use": "Power-management/trap interactions",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21067,6 +21466,7 @@
     {
       "id": "Smpmpmt",
       "name": "Smpmpmt",
+      "tags": [],
       "desc": "PMP Machine Trap",
       "use": "PMP-related trap behavior",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21074,6 +21474,7 @@
     {
       "id": "Smsdia",
       "name": "Smsdia",
+      "tags": [],
       "desc": "Soft Debug/Instr",
       "use": "Soft-debug / diagnostics assist",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21081,6 +21482,7 @@
     {
       "id": "Smtdeleg",
       "name": "Smtdeleg",
+      "tags": [],
       "desc": "Trap Delegation",
       "use": "Fine-grain trap delegation controls",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21088,6 +21490,7 @@
     {
       "id": "Smvatag",
       "name": "Smvatag",
+      "tags": [],
       "desc": "VA Tagging (M)",
       "use": "Machine-level virtual-address tagging",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21095,6 +21498,7 @@
     {
       "id": "RERI",
       "name": "RERI",
+      "tags": [],
       "desc": "RAS Error Reporting",
       "use": "RAS error reporting arch tag",
       "url": "https://github.com/riscv/riscv-isa-manual"
@@ -21102,6 +21506,7 @@
     {
       "id": "HTI",
       "name": "HTI",
+      "tags": [],
       "desc": "Trace & Instrumentation",
       "use": "Trace / instrumentation spec tag",
       "url": "https://github.com/riscv/riscv-isa-manual"
