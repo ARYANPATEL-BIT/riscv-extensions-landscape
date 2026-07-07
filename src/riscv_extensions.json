@@ -22289,7 +22289,11 @@
     {
       "id": "Zk",
       "name": "Zk",
-      "tags": [],
+      "tags": [
+        "rv32_zk",
+        "rv64_zk",
+        "rv_zk"
+      ],
       "desc": "Scalar Crypto Base",
       "use": "Top-level scalar crypto bundle",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -23022,7 +23026,11 @@
     {
       "id": "Zkn",
       "name": "Zkn",
-      "tags": [],
+      "tags": [
+        "rv32_zkn",
+        "rv64_zkn",
+        "rv_zkn"
+      ],
       "desc": "NIST Suite (Scalar)",
       "use": "AES/SHA NIST suite",
       "url": "https://github.com/riscv/riscv-isa-manual",
@@ -24158,7 +24166,10 @@
     {
       "id": "Zks",
       "name": "Zks",
-      "tags": [],
+      "tags": [
+        "rv64_zks",
+        "rv_zks"
+      ],
       "desc": "ShangMi Suite (Scalar)",
       "use": "Chinese SMx crypto bundle",
       "url": "https://github.com/riscv/riscv-isa-manual",
