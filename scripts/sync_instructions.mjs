@@ -305,7 +305,7 @@ for (const entry of umbrellaEntries) {
 }
 
 assertExtension('B', { count: 42 });
-assertExtension('Zk', { count: 47 });
+assertExtension('Zk', { count: 47 }); // Zkn(41) ∪ Zks(20) minus shared Zbkb/Zbkc/Zbkx = 47 unique
 
 const zkExt = extMap.get('Zk');
 assert(zkExt?.members?.includes('Zkt'), 'Zk umbrella must include Zkt.');
