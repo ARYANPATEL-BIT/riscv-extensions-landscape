@@ -305,7 +305,7 @@ for (const entry of umbrellaEntries) {
 }
 
 assertExtension('B', { count: 42 });
-assertExtension('Zk', { count: 43 });
+assertExtension('Zk', { count: 47 });
 
 const zkExt = extMap.get('Zk');
 assert(zkExt?.members?.includes('Zkt'), 'Zk umbrella must include Zkt.');
