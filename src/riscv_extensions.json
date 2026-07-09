@@ -20887,25 +20887,50 @@
       "id": "Sv39",
       "name": "Sv39",
       "tags": [],
-      "desc": "Virtual Memory, 39-bit VA",
+      "desc": "39-bit virtual address space paging scheme. Maps virtual addresses through 3-level page tables (VPN[2:0]).",
       "use": "3-level page tables (RV64 Linux)",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "39-bit virtual address translation (3 level)",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2019-05",
+      "requires": [
+        "S",
+        "SXLEN"
+      ],
+      "behavior": "Defines a 39-bit virtual address space using 3-level page tables. Each page table entry is 8 bytes. Supports 4KB base pages plus 2MB and 1GB superpages."
     },
     {
       "id": "Sv48",
       "name": "Sv48",
       "tags": [],
-      "desc": "Virtual Memory, 48-bit VA",
+      "desc": "48-bit virtual address space paging scheme. Maps virtual addresses through 4-level page tables (VPN[3:0]).",
       "use": "4-level page tables",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "48-bit virtual address translation (4 level)",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2019-05",
+      "requires": [
+        "Sv39"
+      ],
+      "behavior": "Defines a 48-bit virtual address space using 4-level page tables. Supports 4KB base pages plus 2MB, 1GB, and 512GB superpages."
     },
     {
       "id": "Sv57",
       "name": "Sv57",
       "tags": [],
-      "desc": "Virtual Memory, 57-bit VA",
+      "desc": "57-bit virtual address space paging scheme. Maps virtual addresses through 5-level page tables (VPN[4:0]).",
       "use": "5-level page tables",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "57-bit virtual address translation (5 level)",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "unknown",
+      "requires": [
+        "Sv48"
+      ],
+      "behavior": "Defines a 57-bit virtual address space using 5-level page tables. Supports 4KB base pages plus 2MB, 1GB, 512GB, and 256TB superpages."
     },
     {
       "id": "Svbare",
@@ -20927,9 +20952,18 @@
       "id": "Svnapot",
       "name": "Svnapot",
       "tags": [],
-      "desc": "NAPOT Mappings",
+      "desc": "Naturally Aligned Power-of-Two Translation Contiguity — 64KB hugepage support via NAPOT PTE encoding",
       "use": "Hugepages via NAPOT PTEs",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Naturally Aligned Power-of-Two Translation Contiguity",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2021-11",
+      "requires": [
+        "Sv39",
+        "S"
+      ],
+      "behavior": "When a PTE has the N bit set in Sv39/Sv48/Sv57, it represents a NAPOT range of contiguous virtual-to-physical translations. The minimum NAPOT granularity is 64KB (napot_shift=4). Reduces TLB pressure for large memory-mapped regions like device memory or huge pages."
     },
     {
       "id": "Svinval",
@@ -21075,9 +21109,27 @@
       "id": "Sstc",
       "name": "Sstc",
       "tags": [],
-      "desc": "Supervisor Timer Compare",
+      "desc": "Supervisor-mode timer interrupts",
       "use": "Per-hart timer interrupts",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Supervisor-mode timer interrupts",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-03",
+      "csrs": {
+        "menvcfg": {
+          "address": "0x30A",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine Environment Configuration"
+        },
+        "menvcfgh": {
+          "address": "0x31A",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Machine Environment Configuration"
+        }
+      }
     },
     {
       "id": "Smcdeleg",
@@ -21091,9 +21143,39 @@
       "id": "Smcntrpmf",
       "name": "Smcntrpmf",
       "tags": [],
-      "desc": "M-Mode Counter Filtering",
+      "desc": "Cycle and Instret Privilege Mode Filtering",
       "use": "Filter counters by privilege",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Cycle and Instret Privilege Mode Filtering",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2023-08",
+      "csrs": {
+        "mcyclecfg": {
+          "address": "0x321",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine Cycle Counter Configuration"
+        },
+        "mcyclecfgh": {
+          "address": "0x721",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Machine Cycle Counter Configuration High"
+        },
+        "minstretcfg": {
+          "address": "0x322",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine Instructions-Retired Counter Configuration"
+        },
+        "minstretcfgh": {
+          "address": "0x722",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Machine Instructions-Retired Counter Configuration High"
+        }
+      }
     },
     {
       "id": "Ssccfg",
@@ -21123,9 +21205,21 @@
       "id": "Sscofpmf",
       "name": "Sscofpmf",
       "tags": [],
-      "desc": "Counter Overflow & Filtering",
+      "desc": "Counter Overflow and Privilege Mode Filtering",
       "use": "Overflow + filtering in S-mode",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Counter Overflow and Privilege Mode Filtering",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2023-08",
+      "csrs": {
+        "scountovf": {
+          "address": "0xDA0",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Supervisor Count Overflow"
+        }
+      }
     },
     {
       "id": "Ssccptr",
@@ -21139,9 +21233,24 @@
       "id": "Ssqosid",
       "name": "Ssqosid",
       "tags": [],
-      "desc": "QoS Identifiers",
+      "desc": "Quality of Service (QoS) is defined as the minimal end-to-end performance guaranteed in advance by a service level agreement (SLA) to a workload.",
       "use": "Per-thread QoS tagging",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Quality-of-Service Identifiers",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-06",
+      "requires": [
+        "S,"
+      ],
+      "csrs": {
+        "srmcfg": {
+          "address": "0x181",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor Resource Management Configuration"
+        }
+      }
     },
     {
       "id": "Sshpmcfg",
@@ -21177,9 +21286,63 @@
       "id": "Sdtrig",
       "name": "Sdtrig",
       "tags": [],
-      "desc": "Debug Triggers",
+      "desc": "Hardware debug triggers for breakpoints and watchpoints. Allows the debugger to halt execution on instruction execution or data access.",
       "use": "HW breakpoints / watchpoints",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Debug triggers",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2025-02",
+      "csrs": {
+        "hcontext": {
+          "address": "0x6A8",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor Context"
+        },
+        "mcontext": {
+          "address": "0x7A8",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine Context"
+        },
+        "mscontext": {
+          "address": "0x7AA",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Machine Supervisor Context"
+        },
+        "scontext": {
+          "address": "0x5A8",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor Context"
+        },
+        "tdata1": {
+          "address": "0x7A1",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Trigger Data 1"
+        },
+        "tdata2": {
+          "address": "0x7A2",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Trigger Data 2"
+        },
+        "tdata3": {
+          "address": "0x7A3",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Trigger Data 3"
+        },
+        "tselect": {
+          "address": "0x7A0",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Trigger Select"
+        }
+      }
     },
     {
       "id": "Sdtrigepm",
@@ -21217,9 +21380,38 @@
       "id": "Smctr",
       "name": "Smctr",
       "tags": [],
-      "desc": "Control Transfer Records (M)",
+      "desc": "A method for recording control flow transfer history is valuable not only for performance",
       "use": "Hardware CFI logs (M)",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Control Transfer Records",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-11",
+      "requires": [
+        "S",
+        "Smcsrind",
+        "Ssctr"
+      ],
+      "csrs": {
+        "mctrctl": {
+          "address": "0x34E",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine Control Transfer Records Control Register"
+        },
+        "sctrctl": {
+          "address": "0x14E",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor Control Transfer Records Control Register"
+        },
+        "vsctrctl": {
+          "address": "0x24E",
+          "priv_mode": "VS",
+          "length": 64,
+          "desc": "Virtual Supervisor Control Transfer Records Control Register"
+        }
+      }
     },
     {
       "id": "Ssctr",
@@ -21259,9 +21451,135 @@
       "id": "Smstateen",
       "name": "Smstateen",
       "tags": [],
-      "desc": "M-Mode State Enable",
+      "desc": "State-enable registers that let M-mode control which extension state is accessible from lower privilege modes.",
       "use": "Gate access to extension CSRs",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Machine-mode view of the state-enable extension",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-03",
+      "csrs": {
+        "hstateen0": {
+          "address": "0x60C",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 0 Register"
+        },
+        "hstateen0h": {
+          "address": "0x61C",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 0 Register"
+        },
+        "hstateen1": {
+          "address": "0x60D",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 1 Register"
+        },
+        "hstateen1h": {
+          "address": "0x61D",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 1 Register"
+        },
+        "hstateen2": {
+          "address": "0x60E",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 2 Register"
+        },
+        "hstateen2h": {
+          "address": "0x61E",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 2 Register"
+        },
+        "hstateen3": {
+          "address": "0x60F",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 3 Register"
+        },
+        "hstateen3h": {
+          "address": "0x61F",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 3 Register"
+        },
+        "mstateen0": {
+          "address": "0x30C",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine State Enable 0 Register"
+        },
+        "mstateen0h": {
+          "address": "0x31C",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Upper 32 bits of Machine State Enable 0 Register"
+        },
+        "mstateen1": {
+          "address": "0x30D",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine State Enable 1 Register"
+        },
+        "mstateen1h": {
+          "address": "0x31D",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Upper 32 bits of Machine State Enable 1 Register"
+        },
+        "mstateen2": {
+          "address": "0x30E",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine State Enable 2 Register"
+        },
+        "mstateen2h": {
+          "address": "0x31E",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Upper 32 bits of Machine State Enable 2 Register"
+        },
+        "mstateen3": {
+          "address": "0x30F",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine State Enable 3 Register"
+        },
+        "mstateen3h": {
+          "address": "0x31F",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Upper 32 bits of Machine State Enable 3 Register"
+        },
+        "sstateen0": {
+          "address": "0x10C",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor State Enable 0 Register"
+        },
+        "sstateen1": {
+          "address": "0x10D",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor State Enable 1 Register"
+        },
+        "sstateen2": {
+          "address": "0x10E",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor State Enable 2 Register"
+        },
+        "sstateen3": {
+          "address": "0x10F",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor State Enable 3 Register"
+        }
+      }
     },
     {
       "id": "Ssstateen",
@@ -21275,9 +21593,27 @@
       "id": "Smepmp",
       "name": "Smepmp",
       "tags": [],
-      "desc": "Enhanced PMP",
+      "desc": "PMP enhancements for M-mode memory access and execution prevention. Adds mseccfg CSR with MML, MMWP, and RLB bits.",
       "use": "More flexible PMP rules",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "PMP Enhancements for memory access and execution prevention on Machine mode",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2021-12",
+      "csrs": {
+        "mseccfg": {
+          "address": "0x747",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine Security Configuration"
+        },
+        "mseccfgh": {
+          "address": "0x757",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Most significant 32 bits of Machine Security Configuration"
+        }
+      }
     },
     {
       "id": "Smmpm",
