@@ -20953,8 +20953,7 @@
       "state": "ratified",
       "ratification_date": "2023-03",
       "requires": [
-        "S",
-        "SATP_MODE_BARE"
+        "S"
       ],
       "behavior": "The Bare translation mode disables virtual memory entirely. All virtual addresses equal physical addresses. Selected by writing satp.MODE = 0."
     },
@@ -21422,7 +21421,7 @@
       "state": "ratified",
       "ratification_date": "2024-06",
       "requires": [
-        "S,"
+        "S"
       ],
       "csrs": {
         "srmcfg": {
@@ -21553,7 +21552,7 @@
       "state": "ratified",
       "ratification_date": "2024-11",
       "requires": [
-        "S,"
+        "S"
       ],
       "csrs": {
         "mireg": {
@@ -22157,19 +22156,6 @@
       "type": "privileged",
       "state": "ratified",
       "ratification_date": "2023-03",
-      "requires": [
-        "REPORT_VA_IN_STVAL_ON_BREAKPOINT",
-        "REPORT_VA_IN_STVAL_ON_INSTRUCTION_ACCESS_FAULT",
-        "REPORT_VA_IN_STVAL_ON_LOAD_ACCESS_FAULT",
-        "REPORT_VA_IN_STVAL_ON_STORE_AMO_ACCESS_FAULT",
-        "REPORT_VA_IN_STVAL_ON_INSTRUCTION_PAGE_FAULT",
-        "REPORT_VA_IN_STVAL_ON_LOAD_PAGE_FAULT",
-        "REPORT_VA_IN_STVAL_ON_STORE_AMO_PAGE_FAULT",
-        "REPORT_VA_IN_STVAL_ON_INSTRUCTION_MISALIGNED",
-        "REPORT_VA_IN_STVAL_ON_LOAD_MISALIGNED",
-        "REPORT_VA_IN_STVAL_ON_STORE_AMO_MISALIGNED",
-        "REPORT_ENCODING_IN_STVAL_ON_ILLEGAL_INSTRUCTION"
-      ],
       "behavior": "Specifies that stval always writes the faulting virtual address on instruction/load/store/AMO address-misaligned or access-fault exceptions."
     },
     {
@@ -22183,9 +22169,6 @@
       "type": "privileged",
       "state": "ratified",
       "ratification_date": "2023-03",
-      "requires": [
-        "STVEC_MODE_DIRECT"
-      ],
       "behavior": "Specifies that the stvec register supports Direct mode (MODE=0), where all traps vector to the single base address."
     },
     {
@@ -22199,9 +22182,6 @@
       "type": "privileged",
       "state": "ratified",
       "ratification_date": "2023-03",
-      "requires": [
-        "STVEC_MODE_VECTORED"
-      ],
       "behavior": "Specifies that the stvec register supports Vectored mode (MODE=1), where interrupts vector to base + 4*cause."
     },
     {
@@ -22231,10 +22211,6 @@
       "type": "privileged",
       "state": "ratified",
       "ratification_date": "2024-10",
-      "requires": [
-        "TRAP_ON_UNIMPLEMENTED_INSTRUCTION",
-        "TRAP_ON_UNIMPLEMENTED_CSR"
-      ],
       "behavior": "Guarantees that no non-conforming extensions are present. All instructions not defined by ratified extensions raise illegal-instruction exceptions."
     },
     {
@@ -22280,9 +22256,6 @@
       "type": "privileged",
       "state": "ratified",
       "ratification_date": "2021-12",
-      "requires": [
-        "U_MODE_ENDIANNESS"
-      ],
       "behavior": "Indicates that the supervisor supports big-endian byte ordering for user-mode memory accesses."
     },
     {
