@@ -20879,9 +20879,18 @@
       "id": "Sv32",
       "name": "Sv32",
       "tags": [],
-      "desc": "Virtual Memory, 32-bit",
+      "desc": "32-bit virtual address translation (3 level)",
       "use": "2-level page tables (RV32 Linux)",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "32-bit virtual address translation (3 level)",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2019-05",
+      "requires": [
+        "S",
+        "SXLEN"
+      ],
+      "behavior": "Defines a 32-bit virtual address space using 2-level page tables. Each PTE is 4 bytes. Supports 4KB base pages and 4MB megapages. Used on RV32 systems."
     },
     {
       "id": "Sv39",
@@ -20936,17 +20945,50 @@
       "id": "Svbare",
       "name": "Svbare",
       "tags": [],
-      "desc": "Bare Mode",
+      "desc": "This extension mandates that the `satp` mode Bare must",
       "use": "No address translation (satp bare)",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Bare virtual addressing",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2023-03",
+      "requires": [
+        "S",
+        "SATP_MODE_BARE"
+      ],
+      "behavior": "The Bare translation mode disables virtual memory entirely. All virtual addresses equal physical addresses. Selected by writing satp.MODE = 0."
     },
     {
       "id": "Svpbmt",
       "name": "Svpbmt",
       "tags": [],
-      "desc": "Page-Based Memory Types",
+      "desc": "This extension mandates that the `satp` mode Bare must",
       "use": "Per-page memory types / cacheability",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Page-based memory types",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2021-12",
+      "requires": [
+        "S",
+        "Sv39",
+        "Sv48",
+        "Sv57"
+      ],
+      "csrs": {
+        "menvcfg": {
+          "address": "0x30A",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine Environment Configuration"
+        },
+        "menvcfgh": {
+          "address": "0x31A",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Machine Environment Configuration"
+        }
+      }
     },
     {
       "id": "Svnapot",
@@ -20979,33 +21021,79 @@
       "id": "Svade",
       "name": "Svade",
       "tags": [],
-      "desc": "Access/Dirty Exceptions",
+      "desc": "The Svade extension indicates that hardware does *not* update the A/D bits of a page table",
       "use": "Page-fault on A/D bit issues",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Exception on PTE A/D Bits",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2023-11",
+      "requires": [
+        "Sm",
+        "Sv32",
+        "Sv39"
+      ],
+      "behavior": "Hardware raises a page-fault exception when A (Accessed) or D (Dirty) bits need to be set, rather than updating them in hardware. OS software must handle the update."
     },
     {
       "id": "Svadu",
       "name": "Svadu",
       "tags": [],
-      "desc": "Access/Dirty Update",
+      "desc": "The Svadu extension adds support and CSR controls for hardware updating of PTE",
       "use": "Hardware A/D-bit updates",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Hardware Updating of PTE A/D Bits",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2023-11",
+      "requires": [
+        "Sm",
+        "Sv32",
+        "Sv39"
+      ],
+      "csrs": {
+        "menvcfg": {
+          "address": "0x30A",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine Environment Configuration"
+        },
+        "menvcfgh": {
+          "address": "0x31A",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Machine Environment Configuration"
+        }
+      }
     },
     {
       "id": "Svvptc",
       "name": "Svvptc",
       "tags": [],
-      "desc": "Visible PTE Changes",
+      "desc": "When the Svvptc extension is implemented, explicit stores by a hart that update",
       "use": "Bounded-time PTE visibility guarantees",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Guarantee visibility of PTE transitions from invalid to valid",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-06",
+      "behavior": "Defines the semantics of when changes to page table entries become visible to the hardware page table walker, without requiring an SFENCE.VMA."
     },
     {
       "id": "Svrsw60t59b",
       "name": "Svrsw60t59b",
       "tags": [],
-      "desc": "PTE RSW Bits",
+      "desc": "== \"Svrsw60t59b\" Extension for PTE Reserved-for-Software Bits 60-59, Version 1",
       "use": "Standard RSW field behavior",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "PTE Reserved-for-Software Bits 60-59",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2025-08",
+      "requires": [
+        "Sv39"
+      ],
+      "behavior": "Defines the use of PTE bits 60 and 59 (the RSW field) for supervisor software."
     },
     {
       "id": "Svatag",
@@ -21019,33 +21107,68 @@
       "id": "Svukte",
       "name": "Svukte",
       "tags": [],
-      "desc": "User-Keyed TLB Entries",
+      "desc": "== \"Svukte\" Extension for Address-Independent Latency of User-Mode Faults to Supervisor Addresses, Version 0.4",
       "use": "Per-user TLB tagging",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Address-Independent Latency of User-Mode Faults to Supervisor Addresses",
+      "type": "privileged",
+      "state": "development",
+      "requires": [
+        "Sv39"
+      ],
+      "csrs": {
+        "hstatus": {
+          "address": "0x600",
+          "priv_mode": "S",
+          "length": "SXLEN",
+          "desc": "Hypervisor Status"
+        },
+        "senvcfg": {
+          "address": "0x10A",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor Environment Configuration"
+        }
+      }
     },
     {
       "id": "Supm",
       "name": "Supm",
       "tags": [],
-      "desc": "User Pointer Masking",
+      "desc": "Indicates that there is pointer-masking support available in user mode,",
       "use": "Mask user pointers",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Pointer masking available in user mode",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-10",
+      "behavior": "Enables pointer masking in User mode. The high bits of user-mode pointers are masked/ignored, enabling tagged pointers and memory tagging."
     },
     {
       "id": "Ssnpm",
       "name": "Ssnpm",
       "tags": [],
-      "desc": "Supervisor Next-Pointer Mask",
+      "desc": "A supervisor-level extension that provides pointer masking for the next lower privilege mode (U-mode),",
       "use": "Mask next-mode pointers (S)",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Pointer masking for next privilege level less than S-mode",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-10",
+      "behavior": "Controls the next pointer masking mode for Supervisor mode. Determines how pointer masking applies when transitioning between privilege modes."
     },
     {
       "id": "Sspm",
       "name": "Sspm",
       "tags": [],
-      "desc": "Supervisor Pointer Masking",
+      "desc": "Indicates that there is pointer-masking support available in supervisor mode,",
       "use": "Supervisor pointer-mask policy",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Pointer masking available in supervisor mode",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-10",
+      "behavior": "Enables pointer masking in Supervisor mode. The high bits of supervisor-mode pointers are masked/ignored."
     }
   ],
   "s_interrupt": [
@@ -21053,17 +21176,55 @@
       "id": "Smaia",
       "name": "Smaia",
       "tags": [],
-      "desc": "AIA Machine Extension",
+      "desc": "Advanced Interrupt Architecture, M-mode extension",
       "use": "Advanced interrupt arch (M)",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Advanced Interrupt Architecture, M-mode extension",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2023-06",
+      "behavior": "Adds machine-level support for the Advanced Interrupt Architecture (AIA). Introduces an Incoming MSI Controller (IMSIC) for message-signaled interrupts and an Advanced PLIC (APLIC) for wired interrupts, replacing the original PLIC."
     },
     {
       "id": "Ssaia",
       "name": "Ssaia",
       "tags": [],
-      "desc": "AIA Supervisor Extension",
+      "desc": "Advanced Interrupt Architecture, S-mode extension",
       "use": "Advanced interrupt arch (S)",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Advanced Interrupt Architecture, S-mode extension",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2023-06",
+      "requires": [
+        "S"
+      ],
+      "csrs": {
+        "hstateen0": {
+          "address": "0x60C",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 0 Register"
+        },
+        "hstateen0h": {
+          "address": "0x61C",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 0 Register"
+        },
+        "mstateen0": {
+          "address": "0x30C",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine State Enable 0 Register"
+        },
+        "mstateen0h": {
+          "address": "0x31C",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Upper 32 bits of Machine State Enable 0 Register"
+        }
+      }
     },
     {
       "id": "Smclic",
@@ -21137,7 +21298,12 @@
       "tags": [],
       "desc": "M-Mode Counter Delegation",
       "use": "Delegates HPM counters to S",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Performance counter delegation",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-03",
+      "behavior": "Allows M-mode to delegate hardware performance counter access to S-mode. S-mode can directly configure and read delegated counters without M-mode ecalls, reducing performance monitoring overhead."
     },
     {
       "id": "Smcntrpmf",
@@ -21181,9 +21347,14 @@
       "id": "Ssccfg",
       "name": "Ssccfg",
       "tags": [],
-      "desc": "Counter Configuration (S)",
+      "desc": "Supervisor-mode counter configuration",
       "use": "S-mode control of delegated HPM",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Supervisor-mode counter configuration",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-03",
+      "behavior": "Provides S-mode counter configuration support, complementing Smcdeleg. Allows supervisor software to configure the behavior of delegated hardware performance counters."
     },
     {
       "id": "Sscntrcfg",
@@ -21197,9 +21368,14 @@
       "id": "Sscounterenw",
       "name": "Sscounterenw",
       "tags": [],
-      "desc": "Writable scounteren",
+      "desc": "For any hpmcounter that is not read-only zero, the corresponding bit in `scounteren` must be writable",
       "use": "Writable enables for HPMs",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Support writeable enables for any supported counter",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2023-08",
+      "behavior": "For any hpmcounter that is not read-only zero, the corresponding bit in `scounteren` must be writable.\n\n[NOTE]\nThis extension was ratified with the RVA22 profiles."
     },
     {
       "id": "Sscofpmf",
@@ -21225,9 +21401,14 @@
       "id": "Ssccptr",
       "name": "Ssccptr",
       "tags": [],
-      "desc": "S Counter Pointer CSR",
+      "desc": "Main memory regions with both the cacheability and coherence PMAs must support hardware page-table reads",
       "use": "Supervisor counter pointer CSR",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Cacheable and coherent main memory page table reads",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2023-03",
+      "behavior": "Main memory regions with both the cacheability and coherence PMAs must support hardware page-table reads.\n\n[NOTE]\nThis extension was ratified with the RVA20 profiles."
     },
     {
       "id": "Ssqosid",
@@ -21364,17 +21545,186 @@
       "id": "Smcsrind",
       "name": "Smcsrind",
       "tags": [],
-      "desc": "Indirect CSR Access (M)",
+      "desc": "Smcsrind/Sscsrind is an ISA extension that extends the indirect CSR access mechanism originally defined as",
       "use": "CSR indirection at M-mode",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Machine-mode Indirect CSR Access",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-11",
+      "requires": [
+        "S,"
+      ],
+      "csrs": {
+        "mireg": {
+          "address": "0x351",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine Indirect Register Alias"
+        },
+        "mireg2": {
+          "address": "0x352",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine Indirect Register Alias 2"
+        },
+        "mireg3": {
+          "address": "0x353",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine Indirect Register Alias 3"
+        },
+        "mireg4": {
+          "address": "0x355",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine Indirect Register Alias 4"
+        },
+        "mireg5": {
+          "address": "0x356",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine Indirect Register Alias 5"
+        },
+        "mireg6": {
+          "address": "0x357",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine Indirect Register Alias 6"
+        },
+        "miselect": {
+          "address": "0x350",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine Indirect Register Select"
+        },
+        "sireg": {
+          "address": "0x151",
+          "priv_mode": "S",
+          "length": "SXLEN",
+          "desc": "Supervisor Indirect Register Alias"
+        },
+        "sireg2": {
+          "address": "0x152",
+          "priv_mode": "S",
+          "length": "SXLEN",
+          "desc": "Supervisor Indirect Register Alias 2"
+        },
+        "sireg3": {
+          "address": "0x153",
+          "priv_mode": "S",
+          "length": "SXLEN",
+          "desc": "Supervisor Indirect Register Alias 3"
+        },
+        "sireg4": {
+          "address": "0x155",
+          "priv_mode": "S",
+          "length": "SXLEN",
+          "desc": "Supervisor Indirect Register Alias 4"
+        },
+        "sireg5": {
+          "address": "0x156",
+          "priv_mode": "S",
+          "length": "SXLEN",
+          "desc": "Supervisor Indirect Register Alias 5"
+        },
+        "sireg6": {
+          "address": "0x157",
+          "priv_mode": "S",
+          "length": "SXLEN",
+          "desc": "Supervisor Indirect Register Alias 6"
+        },
+        "siselect": {
+          "address": "0x150",
+          "priv_mode": "S",
+          "length": "SXLEN",
+          "desc": "Supervisor Indirect Register Select"
+        },
+        "vsireg": {
+          "address": "0x251",
+          "priv_mode": "VS",
+          "length": "VSXLEN",
+          "desc": "Virtual Supervisor Indirect Register Alias"
+        },
+        "vsireg2": {
+          "address": "0x252",
+          "priv_mode": "VS",
+          "length": "VSXLEN",
+          "desc": "Virtual Supervisor Indirect Register Alias 2"
+        },
+        "vsireg3": {
+          "address": "0x253",
+          "priv_mode": "VS",
+          "length": "VSXLEN",
+          "desc": "Virtual Supervisor Indirect Register Alias 3"
+        },
+        "vsireg4": {
+          "address": "0x255",
+          "priv_mode": "VS",
+          "length": "VSXLEN",
+          "desc": "Virtual Supervisor Indirect Register Alias 4"
+        },
+        "vsireg5": {
+          "address": "0x256",
+          "priv_mode": "VS",
+          "length": "VSXLEN",
+          "desc": "Virtual Supervisor Indirect Register Alias 5"
+        },
+        "vsireg6": {
+          "address": "0x257",
+          "priv_mode": "VS",
+          "length": "VSXLEN",
+          "desc": "Virtual Supervisor Indirect Register Alias 6"
+        },
+        "vsiselect": {
+          "address": "0x250",
+          "priv_mode": "VS",
+          "length": "VSXLEN",
+          "desc": "Virtual Supervisor Indirect Register Select"
+        }
+      }
     },
     {
       "id": "Sscsrind",
       "name": "Sscsrind",
       "tags": [],
-      "desc": "Indirect CSR Access (S)",
+      "desc": "Smcsrind/Sscsrind is an ISA extension that extends the indirect CSR access mechanism originally defined as",
       "use": "CSR indirection at S-mode",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Supervisor-mode Indirect CSR Access",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-11",
+      "requires": [
+        "S",
+        "Smcsrind"
+      ],
+      "csrs": {
+        "hstateen0": {
+          "address": "0x60C",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 0 Register"
+        },
+        "hstateen0h": {
+          "address": "0x61C",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 0 Register"
+        },
+        "mstateen0": {
+          "address": "0x30C",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine State Enable 0 Register"
+        },
+        "mstateen0h": {
+          "address": "0x31C",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Upper 32 bits of Machine State Enable 0 Register"
+        }
+      }
     },
     {
       "id": "Smctr",
@@ -21435,17 +21785,46 @@
       "id": "Ssdbltrp",
       "name": "Ssdbltrp",
       "tags": [],
-      "desc": "Supervisor Double Trap",
+      "desc": "The Ssdbltrp extension addresses a double trap in privilege modes lower than M",
       "use": "Recoverable nested traps (S)",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Double trap for supervisor mode",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-08",
+      "behavior": "Supervisor double trap handling. Defines behavior when a second trap occurs while processing the first trap in S-mode."
     },
     {
       "id": "Smdbltrp",
       "name": "Smdbltrp",
       "tags": [],
-      "desc": "Machine Double Trap",
+      "desc": "The `Smdbltrp` extension addresses a double trap in M-mode.",
       "use": "Recoverable nested traps (M)",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Double trap in M-mode",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-08",
+      "csrs": {
+        "dcsr": {
+          "address": "0x7B0",
+          "priv_mode": "D",
+          "length": 32,
+          "desc": "Debug Control and Status Register"
+        },
+        "mstatus": {
+          "address": "0x300",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine Status"
+        },
+        "mstatush": {
+          "address": "0x310",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Machine Status High"
+        }
+      }
     },
     {
       "id": "Smstateen",
@@ -21585,9 +21964,87 @@
       "id": "Ssstateen",
       "name": "Ssstateen",
       "tags": [],
-      "desc": "S-Mode State Enable",
+      "desc": "Supervisor-mode view of the state-enable extension.  The",
       "use": "State-enable for S/VS/VU",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Supervisor-mode view of the state-enable extension",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-03",
+      "csrs": {
+        "hstateen0": {
+          "address": "0x60C",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 0 Register"
+        },
+        "hstateen0h": {
+          "address": "0x61C",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 0 Register"
+        },
+        "hstateen1": {
+          "address": "0x60D",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 1 Register"
+        },
+        "hstateen1h": {
+          "address": "0x61D",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 1 Register"
+        },
+        "hstateen2": {
+          "address": "0x60E",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 2 Register"
+        },
+        "hstateen2h": {
+          "address": "0x61E",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 2 Register"
+        },
+        "hstateen3": {
+          "address": "0x60F",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 3 Register"
+        },
+        "hstateen3h": {
+          "address": "0x61F",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 3 Register"
+        },
+        "sstateen0": {
+          "address": "0x10C",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Supervisor State Enable 0 Register"
+        },
+        "sstateen1": {
+          "address": "0x10D",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Supervisor State Enable 1 Register"
+        },
+        "sstateen2": {
+          "address": "0x10E",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Supervisor State Enable 2 Register"
+        },
+        "sstateen3": {
+          "address": "0x10F",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Supervisor State Enable 3 Register"
+        }
+      }
     },
     {
       "id": "Smepmp",
@@ -21619,9 +22076,27 @@
       "id": "Smmpm",
       "name": "Smmpm",
       "tags": [],
-      "desc": "Machine PMP Mgmt",
+      "desc": "A machine-level extension that provides pointer masking for M-mode.",
       "use": "Machine-level PMP management",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Pointer masking for M-mode",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-10",
+      "csrs": {
+        "mseccfg": {
+          "address": "0x747",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine Security Configuration"
+        },
+        "mseccfgh": {
+          "address": "0x757",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Most significant 32 bits of Machine Security Configuration"
+        }
+      }
     },
     {
       "id": "Sm1p11",
@@ -21675,9 +22150,27 @@
       "id": "Sstvala",
       "name": "Sstvala",
       "tags": [],
-      "desc": "stval Address Rule",
+      "desc": "`stval` must be written with the faulting virtual address for load, store,",
       "use": "Precise faulting VA / instruction",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Supervisor Trap Value provides all needed values",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2023-03",
+      "requires": [
+        "REPORT_VA_IN_STVAL_ON_BREAKPOINT",
+        "REPORT_VA_IN_STVAL_ON_INSTRUCTION_ACCESS_FAULT",
+        "REPORT_VA_IN_STVAL_ON_LOAD_ACCESS_FAULT",
+        "REPORT_VA_IN_STVAL_ON_STORE_AMO_ACCESS_FAULT",
+        "REPORT_VA_IN_STVAL_ON_INSTRUCTION_PAGE_FAULT",
+        "REPORT_VA_IN_STVAL_ON_LOAD_PAGE_FAULT",
+        "REPORT_VA_IN_STVAL_ON_STORE_AMO_PAGE_FAULT",
+        "REPORT_VA_IN_STVAL_ON_INSTRUCTION_MISALIGNED",
+        "REPORT_VA_IN_STVAL_ON_LOAD_MISALIGNED",
+        "REPORT_VA_IN_STVAL_ON_STORE_AMO_MISALIGNED",
+        "REPORT_ENCODING_IN_STVAL_ON_ILLEGAL_INSTRUCTION"
+      ],
+      "behavior": "Specifies that stval always writes the faulting virtual address on instruction/load/store/AMO address-misaligned or access-fault exceptions."
     },
     {
       "id": "Sstvecd",
@@ -21685,7 +22178,15 @@
       "tags": [],
       "desc": "stvec Direct Mode",
       "use": "Direct-mode trap vector",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Direct exception vectoring",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2023-03",
+      "requires": [
+        "STVEC_MODE_DIRECT"
+      ],
+      "behavior": "Specifies that the stvec register supports Direct mode (MODE=0), where all traps vector to the single base address."
     },
     {
       "id": "Sstvecv",
@@ -21693,7 +22194,15 @@
       "tags": [],
       "desc": "stvec Vectored Mode",
       "use": "Vectored trap routing",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Vectored exception handling",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2023-03",
+      "requires": [
+        "STVEC_MODE_VECTORED"
+      ],
+      "behavior": "Specifies that the stvec register supports Vectored mode (MODE=1), where interrupts vector to base + 4*cause."
     },
     {
       "id": "Ssdtso",
@@ -21715,9 +22224,18 @@
       "id": "Ssstrict",
       "name": "Ssstrict",
       "tags": [],
-      "desc": "No Non-Conforming Exts",
+      "desc": "No non-conforming extensions are present",
       "use": "Disallows non-conforming extensions",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Unimplemented reserved encodings trap and no non-conforming extensions",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-10",
+      "requires": [
+        "TRAP_ON_UNIMPLEMENTED_INSTRUCTION",
+        "TRAP_ON_UNIMPLEMENTED_CSR"
+      ],
+      "behavior": "Guarantees that no non-conforming extensions are present. All instructions not defined by ratified extensions raise illegal-instruction exceptions."
     },
     {
       "id": "Ssu32xl",
@@ -21725,7 +22243,15 @@
       "tags": [],
       "desc": "UXL=32 support",
       "use": "User XLEN=32 capability",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "32-bit UXLEN",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2021-12",
+      "requires": [
+        "UXLEN"
+      ],
+      "behavior": "Indicates that the implementation supports UXLEN=32 in S-mode, allowing 32-bit user-mode execution on a wider supervisor."
     },
     {
       "id": "Ssu64xl",
@@ -21733,7 +22259,15 @@
       "tags": [],
       "desc": "UXL=64 support",
       "use": "User XLEN=64 capability",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "64-bit UXLEN",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2023-03",
+      "requires": [
+        "UXLEN"
+      ],
+      "behavior": "Indicates that the implementation supports UXLEN=64 in S-mode."
     },
     {
       "id": "Ssube",
@@ -21741,7 +22275,15 @@
       "tags": [],
       "desc": "Big-Endian S",
       "use": "Supervisor big-endian/bi-endian",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Big-endian User Mode",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2021-12",
+      "requires": [
+        "U_MODE_ENDIANNESS"
+      ],
+      "behavior": "Indicates that the supervisor supports big-endian byte ordering for user-mode memory accesses."
     },
     {
       "id": "Ssvxscr",
@@ -21795,17 +22337,26 @@
       "id": "Smnpm",
       "name": "Smnpm",
       "tags": [],
-      "desc": "Non-Maskable PM",
+      "desc": "A machine-level extension that provides pointer masking for the next lower privilege mode",
       "use": "Power-management/trap interactions",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "Pointer masking for next privilege level less than M-mode",
+      "type": "privileged",
+      "state": "ratified",
+      "ratification_date": "2024-10",
+      "behavior": "Controls the next pointer masking mode for Machine mode. Determines how pointer masking applies when transitioning to lower privilege modes."
     },
     {
       "id": "Smpmpmt",
       "name": "Smpmpmt",
       "tags": [],
-      "desc": "PMP Machine Trap",
+      "desc": "The Smpmpmt extension provides a mechanism analogous to Svpbmt but associated",
       "use": "PMP-related trap behavior",
-      "url": "https://github.com/riscv/riscv-isa-manual"
+      "url": "https://github.com/riscv/riscv-isa-manual",
+      "long_name": "PMP-based Memory Types Extension",
+      "type": "privileged",
+      "state": "frozen",
+      "behavior": "Extends PMP to include memory type attributes, allowing PMP entries to specify memory type (cacheable, IO, etc.) alongside access permissions."
     },
     {
       "id": "Smsdia",
