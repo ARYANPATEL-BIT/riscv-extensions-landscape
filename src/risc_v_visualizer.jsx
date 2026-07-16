@@ -1511,8 +1511,8 @@ const RISCVExplorer = () => {
         if (field) parts.push(String(field));
       }
 
-      const mnemonicList = extensionInstructions[ext.id];
-      if (Array.isArray(mnemonicList) && mnemonicList.length) {
+      const mnemonicList = Object.keys(ext.instructions || {});
+      if (mnemonicList.length) {
         parts.push(mnemonicList.join(' '));
       }
       const csrList = extensionCsrs[ext.id];
@@ -1635,15 +1635,15 @@ const RISCVExplorer = () => {
 
 	    // If no exact extension ID match, try to match an instruction mnemonic
 	    if (!targetExt) {
-	      const matchEntry = Object.entries(extensionInstructions).find(([, mnemonics]) =>
-	        mnemonics.some((m) => m.toLowerCase() === q)
-	      );
-
-	      if (matchEntry) {
-	        const [extId, mnemonics] = matchEntry;
-	        targetExt = allExts.find((ext) => ext.id === extId) || null;
-	        matchedMnemonic = mnemonics.find((m) => m.toLowerCase() === q) || null;
-	        matchedDetails = targetExt?.instructions?.[matchedMnemonic] || null;
+	      for (const ext of allExts) {
+	        const mnemonics = Object.keys(ext.instructions || {});
+	        const found = mnemonics.find((m) => m.toLowerCase() === q);
+	        if (found) {
+	          targetExt = ext;
+	          matchedMnemonic = found;
+	          matchedDetails = ext.instructions[found] || null;
+	          break;
+	        }
 	      }
 	    }
 
@@ -2187,13 +2187,13 @@ const RISCVExplorer = () => {
 	                      </div>
 	                    )}
 
-	                  {extensionInstructions[selectedExt.id] && (
+	                  {Object.keys(selectedExt.instructions || {}).length > 0 && (
 	                    <div className="bg-slate-900 p-3 rounded border border-slate-700">
 	                      <h4 className="text-[10px] uppercase tracking-wider text-emerald-400 font-bold mb-2">
-	                        Instruction Set Snapshot ({extensionInstructions[selectedExt.id].length})
+	                        Instruction Set Snapshot ({Object.keys(selectedExt.instructions || {}).length})
 	                      </h4>
 	                      <div className="flex flex-wrap gap-1">
-		                        {extensionInstructions[selectedExt.id].map((mnemonic) => {
+		                        {Object.keys(selectedExt.instructions || {}).map((mnemonic) => {
 		                          const q = searchQuery.trim().toLowerCase();
 		                          const instructionDetails = selectedExt.instructions?.[mnemonic];
 		                          const isHit =
