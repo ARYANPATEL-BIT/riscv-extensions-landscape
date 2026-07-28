@@ -8,6 +8,7 @@
   "build": "webpack",
   "predeploy": "npm run build",
   "deploy": "gh-pages -d dist --branch gh-pages --dotfiles",
+  "sync:udb": "node scripts/sync_udb_extensions.cjs",
   "test": "echo \"Error: no test specified\" && exit 1"
 },
   "keywords": [],
