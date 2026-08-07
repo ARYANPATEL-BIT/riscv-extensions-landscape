@@ -23,6 +23,14 @@ const udbRoot = process.argv[2]
 const UDB_EXT_DIR = path.join(udbRoot, 'spec', 'std', 'isa', 'ext');
 const UDB_CSR_DIR = path.join(udbRoot, 'spec', 'std', 'isa', 'csr');
 
+// Individual YAML parse failures are tolerated (a single malformed file
+// shouldn't abort the whole sync), but a burst of them usually means UDB
+// restructured its layout and our minimal parser is silently missing
+// everything. Count them and fail the run past this threshold so the workflow
+// surfaces a real error instead of reporting "No new extensions found".
+const PARSE_FAILURE_THRESHOLD = 10;
+let parseFailures = 0;
+
 // ---- YAML helpers ----
 // Minimal parser — handles only the fields we need from UDB's extension and
 // CSR schemas. Not a general-purpose YAML parser.
@@ -89,8 +97,10 @@ function parseYaml(filepath) {
         const dm = lines[i].match(/name:\s*(\S+)/);
         if (dm) {
           let name = dm[1].replace(/,$/, '');
-          // skip implementation params (all-caps with underscores)
-          if (name !== name.toUpperCase() || !name.includes('_')) {
+          // skip implementation params — all-caps names like SXLEN/UXLEN/MXLEN
+          // or FOO_BAR. The length>=2 guard keeps single-letter extensions
+          // (F, D, S, U) which are all-caps but are real dependencies.
+          if (!(/^[A-Z0-9_]+$/.test(name) && name.length >= 2)) {
             deps.push(name);
           }
         }
@@ -117,6 +127,55 @@ function pickVersion(versions) {
   const ratified = versions.filter(v => v.state === 'ratified');
   const pool = ratified.length ? ratified : versions;
   return pool[pool.length - 1];
+}
+
+// ---- dependency extraction ----
+// Extract the flat list of extension dependencies from an extension YAML.
+//
+// This is intentionally independent of parseYaml/pickVersion. A `requirements:`
+// block can live either at the top level (F, Zve32f) or nested inside a version
+// entry under `versions:` (D puts its F requirement there). The minimal version
+// parser flattens version entries and even corrupts the version string when it
+// sees the nested `version:` constraint, so we cannot rely on it to locate the
+// nested block. Instead we scan the raw text for every `requirements:` block and
+// collect names directly, which reads from both places by construction.
+//
+// allOf/anyOf/oneOf are flattened into one array — no AND/OR structure is kept.
+// Version constraints are dropped (`name: F` -> "F", never "F 2.2.0"), and the
+// `name:` anchor means a sibling `version:` line can never be read as a name.
+function extractDependencies(filepath) {
+  const content = fs.readFileSync(filepath, 'utf8').replace(/\r/g, '');
+  const lines = content.split('\n');
+  const deps = [];
+  const seen = new Set();
+
+  for (let i = 0; i < lines.length; i++) {
+    const rm = lines[i].match(/^(\s*)requirements:\s*(.*)$/);
+    if (!rm) continue;
+    const reqIndent = rm[1].length;
+
+    // walk the block indented under this requirements: line
+    for (let j = i + 1; j < lines.length; j++) {
+      if (lines[j].trim() === '') continue;
+      const indent = lines[j].match(/^(\s*)/)[1].length;
+      if (indent <= reqIndent) break; // dedented out of the requirements block
+
+      // only lines whose key is exactly `name:` (optionally a `- name:` list
+      // item) — anchoring keeps `version:` and `long_name:` from matching
+      const nm = lines[j].match(/^\s*(?:-\s*)?name:\s*(\S+)/);
+      if (!nm) continue;
+      const name = nm[1].replace(/,$/, '').replace(/^["']|["']$/g, '');
+
+      // skip implementation params — all-caps names (SXLEN, VLEN, MUTABLE_MISA_D).
+      // Same rule as the `requires` filter above; the length>=2 guard keeps
+      // single-letter extensions (F, D, S, U).
+      if (/^[A-Z0-9_]+$/.test(name) && name.length >= 2) continue;
+
+      if (!seen.has(name)) { seen.add(name); deps.push(name); }
+    }
+  }
+
+  return deps;
 }
 
 // Truncate to at most `max` characters without cutting a word in half.
@@ -208,6 +267,7 @@ function findCsrs(extId) {
         const csr = parseYaml(path.join(subdir, f));
         if (csr.name) csrs[csr.name] = buildCsrEntry(csr);
       } catch (err) {
+        parseFailures++;
         console.warn('  warning: could not parse ' + path.join(subdir, f) + ': ' + err.message);
       }
     }
@@ -226,6 +286,7 @@ function findCsrs(extId) {
         if (csr.name) csrs[csr.name] = buildCsrEntry(csr);
       }
     } catch (err) {
+      parseFailures++;
       console.warn('  warning: could not parse ' + path.join(UDB_CSR_DIR, f) + ': ' + err.message);
     }
   }
@@ -233,13 +294,32 @@ function findCsrs(extId) {
   return csrs;
 }
 
+// Sanity floor: fail fast if a UDB directory is missing or holds no YAML at all.
+// This is distinct from PARSE_FAILURE_THRESHOLD, which only counts files that
+// were found and then failed to parse. If UDB renames or moves a directory,
+// readdirSync returns nothing, parseFailures stays 0, and the run would
+// otherwise exit 0 as "No new extensions found" — the exact silent failure the
+// threshold exists to prevent, which it can't catch because zero attempts
+// produce zero failures. The floor catches "never found the files"; the
+// threshold catches "found them, couldn't read them".
+function assertUdbDir(dir, label) {
+  if (!fs.existsSync(dir)) {
+    console.error('ERROR: UDB ' + label + ' directory not found: ' + dir);
+    console.error('UDB layout may have changed. Pass the path to riscv-unified-db as an argument, or clone it next to this repo.');
+    process.exit(1);
+  }
+  const yamlCount = fs.readdirSync(dir).filter(f => f.endsWith('.yaml')).length;
+  if (yamlCount === 0) {
+    console.error('ERROR: UDB ' + label + ' directory contains no .yaml files: ' + dir);
+    console.error('UDB layout may have changed.');
+    process.exit(1);
+  }
+}
+
 // ---- main ----
 
-if (!fs.existsSync(UDB_EXT_DIR)) {
-  console.error('UDB extension directory not found: ' + UDB_EXT_DIR);
-  console.error('Pass the path to riscv-unified-db as an argument, or clone it next to this repo.');
-  process.exit(1);
-}
+assertUdbDir(UDB_EXT_DIR, 'extension');
+assertUdbDir(UDB_CSR_DIR, 'CSR');
 
 if (!fs.existsSync(catalogPath)) {
   console.error('Catalog not found: ' + catalogPath);
@@ -297,6 +377,7 @@ for (const id of gaps) {
   try {
     ext = parseYaml(yamlPath);
   } catch (err) {
+    parseFailures++;
     console.warn('  warning: could not parse ' + yamlPath + ': ' + err.message + ' — skipping');
     continue;
   }
@@ -326,14 +407,13 @@ for (const id of gaps) {
     entry.behavior = truncateAtWord(ext.description, 300);
   }
 
-  // improve desc only if UDB genuinely gives us a longer one — compare the
-  // truncated candidate, so we never replace a longer desc with a shorter cut
-  if (ext.description) {
-    const first = ext.description.split(/[.\n]/)[0].trim();
-    const candidate = truncateAtWord(first, 150);
-    if (candidate.length > (entry.desc || '').length) {
-      entry.desc = candidate;
-    }
+  // Do NOT derive desc from the UDB `description`: those are hard-wrapped block
+  // scalars that truncate into malformed fragments (e.g. "This extension
+  // mandates that the `satp` mode Bare must"), and desc is the one field the UI
+  // renders (card, detail panel, search index). Keep the curated short label;
+  // fall back to UDB's clean `long_name` only when the entry has no desc at all.
+  if (!entry.desc && ext.long_name) {
+    entry.desc = ext.long_name;
   }
 
   // entry is already a reference to loc.entries[loc.index] — no reassignment needed
@@ -345,8 +425,40 @@ for (const id of gaps) {
   });
 }
 
+// ---- dependency pass ----
+// A SEPARATE pass over EVERY catalog entry (not just supervisor gaps): attach an
+// architectural dependency list generated from UDB. This exists only to produce
+// the `dependencies` field for the ISA Configuration Builder; it never touches
+// the csrs/behavior/desc/requires fields the supervisor sync above manages.
+//
+// The key is always emitted for entries that map to a UDB YAML — extensions with
+// no requirements get [] so the frontend never has to guard against undefined.
+// Ids with no YAML (RV32I/RV64I/RV128I and landscape-only composite ids) are
+// skipped silently.
+let depUpdated = 0;
+for (const [id, loc] of entryIndex) {
+  const yamlPath = path.join(UDB_EXT_DIR, id + '.yaml');
+  if (!fs.existsSync(yamlPath)) continue;
+
+  let deps;
+  try {
+    deps = extractDependencies(yamlPath);
+  } catch (err) {
+    parseFailures++;
+    console.warn('  warning: could not read requirements from ' + yamlPath + ': ' + err.message);
+    continue;
+  }
+
+  const entry = loc.entries[loc.index];
+  const prev = JSON.stringify(entry.dependencies);
+  entry.dependencies = deps;
+  if (JSON.stringify(deps) !== prev) depUpdated++;
+}
+
+console.log('Dependency links written/updated: ' + depUpdated);
+
 // write back only if something changed
-if (updated > 0) {
+if (updated > 0 || depUpdated > 0) {
   fs.writeFileSync(catalogPath, JSON.stringify(catalog, null, 2) + '\n');
 }
 
@@ -377,6 +489,20 @@ if (updated === 0) {
 
 console.log('');
 console.log('Done. Updated: ' + updated + ', Still missing: ' + stillMissing.length);
+if (parseFailures > 0) {
+  console.log('Parse failures: ' + parseFailures + ' (threshold ' + PARSE_FAILURE_THRESHOLD + ')');
+}
 
-// exit with code 0 regardless — the workflow checks git diff to decide
-// whether to open a PR.
+// Fail the run if parse failures cross the threshold — a burst almost always
+// means UDB restructured its layout and our minimal parser is quietly missing
+// data, which would otherwise be reported as "No new extensions found".
+if (parseFailures > PARSE_FAILURE_THRESHOLD) {
+  console.error(
+    'ERROR: ' + parseFailures + ' YAML parse failures exceed the threshold of ' +
+    PARSE_FAILURE_THRESHOLD + ' — UDB layout may have changed. Failing the run.'
+  );
+  process.exit(1);
+}
+
+// Otherwise exit 0 regardless of whether data changed — the workflow checks
+// git diff to decide whether to open a PR.
