@@ -10,6 +10,8 @@
   "deploy": "gh-pages -d dist --branch gh-pages --dotfiles",
   "sync:udb": "node scripts/sync_udb_extensions.cjs",
   "test": "echo \"Error: no test specified\" && exit 1"
+  "test": "npm run sync -- --strict",
+  "sync": "node scripts/sync_instructions.mjs"
 },
   "keywords": [],
   "author": "",
