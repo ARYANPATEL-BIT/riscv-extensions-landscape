@@ -8,7 +8,8 @@
   "build": "webpack",
   "predeploy": "npm run build",
   "deploy": "gh-pages -d dist --branch gh-pages --dotfiles",
-  "test": "echo \"Error: no test specified\" && exit 1"
+  "test": "npm run sync -- --strict",
+  "sync": "node scripts/sync_instructions.mjs"
 },
   "keywords": [],
   "author": "",
