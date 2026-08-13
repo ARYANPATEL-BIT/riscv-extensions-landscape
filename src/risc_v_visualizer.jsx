@@ -41,6 +41,9 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import extensions from './riscv_extensions.json';
+import WorkspacePanel from './WorkspacePanel.jsx';
+import { BASE_ISA_IDS, SMART_DEPENDENCIES, buildMarchString, buildCombinedCatalog } from './marchUtils.js';
+import { buildIsaConfigYaml } from './exportUtils.js';
 
 const BIT_WIDTH = 32n;
 const BIT_MASK_32 = (1n << BIT_WIDTH) - 1n;
@@ -662,6 +665,13 @@ const RISCVExplorer = () => {
   });
   const [encoderValidatorResult, setEncoderValidatorResult] = useState(null);
   const [encoderValidatorCopyStatus, setEncoderValidatorCopyStatus] = useState(null);
+  // ── ISA Workspace state ────────────────────────────────────────────────────
+  const [workspaceIds, setWorkspaceIds] = useState(new Set());
+  const [workspaceNotice, setWorkspaceNotice] = useState(null);
+  const [workspacePanelOpen, setWorkspacePanelOpen] = useState(false);
+  const [workspaceQuickOpen, setWorkspaceQuickOpen] = useState(false);
+  const [quickExportOpen, setQuickExportOpen] = useState(false);
+  const [quickExportIncludeInstr, setQuickExportIncludeInstr] = useState(true);
 
   // Smart lock: live reverse-lookup of dependencies
   const lockedExtensions = React.useMemo(() => {
@@ -1768,6 +1778,7 @@ const RISCVExplorer = () => {
     const isSelected = selectedExt?.id === data.id;
     const highlighted = isHighlighted(data.id) || matchesSearch || isSelected;
     const dimmed = isDimmed(data.id) && !matchesSearch && !isSelected;
+    const inWorkspace = workspaceIds.has(data.id);
 
     return (
       <div
@@ -2087,6 +2098,192 @@ const RISCVExplorer = () => {
                 <div className="relative inline-flex items-stretch rounded-xl">
 
                   {/* Active glow ring */}
+                  {workspaceIds.size > 0 && (
+                    <span className="absolute -inset-px rounded-xl animate-pulse bg-amber-400/20 pointer-events-none z-0" />
+                  )}
+
+                  {/* Main body — opens full panel */}
+                  <button
+                    type="button"
+                    onClick={() => setWorkspacePanelOpen(true)}
+                    className={[
+                      'relative z-10 inline-flex items-center gap-2 pl-3.5 pr-3 py-2 text-xs font-bold transition-all duration-300 whitespace-nowrap',
+                      workspaceIds.size > 0
+                        ? 'bg-gradient-to-b from-amber-400 to-amber-500 text-slate-900 hover:from-amber-300 hover:to-amber-400 rounded-l-xl'
+                        : 'bg-gradient-to-b from-[#ffc107] to-[#ffb300] text-[#1e1e1e] hover:from-[#ffca28] hover:to-[#ffc107] rounded-xl',
+                    ].join(' ')}
+                    style={{ boxShadow: workspaceIds.size > 0 ? '0 4px 18px rgba(251,191,36,0.4)' : '0 2px 10px rgba(0,0,0,0.2)' }}
+                    title={workspaceIds.size > 0 ? `Builder active — ${workspaceIds.size} extension${workspaceIds.size !== 1 ? 's' : ''}. Click to open panel.` : 'Open Custom ISA Builder'}
+                  >
+                    <Cpu size={14} className="opacity-80 flex-shrink-0" />
+                    <span className="whitespace-nowrap">Custom ISA Builder</span>
+                    {workspaceIds.size > 0 && (
+                      <span className="inline-flex items-center justify-center min-w-[18px] px-1 h-[18px] rounded-full text-[9px] font-black bg-slate-900/75 text-amber-400">
+                        {workspaceIds.size}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Fused action icons — only when config is active */}
+                  {workspaceIds.size > 0 && (<>
+                    {/* Hairline divider */}
+                    <div className="relative z-10 w-px self-stretch bg-amber-600/60" />
+
+                    {/* Clear */}
+                    <button
+                      type="button"
+                      title="Clear all extensions"
+                      onClick={() => setWorkspaceIds(new Set())}
+                      className="group relative z-10 inline-flex items-center justify-center px-3 bg-gradient-to-b from-amber-400 to-amber-500 text-slate-800 hover:from-rose-500 hover:to-rose-600 hover:text-white transition-all duration-300 hover:shadow-[0_0_14px_rgba(225,29,72,0.5)] z-20"
+                    >
+                      <Trash2 size={13} className="transition-transform group-hover:scale-110" />
+                    </button>
+
+                    {/* Hairline divider */}
+                    <div className="relative z-10 w-px self-stretch bg-amber-600/60" />
+
+                    {/* Export */}
+                    <div className="relative z-10 flex">
+                      <button
+                        type="button"
+                        title="Export configuration YAML"
+                        onClick={() => setQuickExportOpen(v => !v)}
+                        className={`group inline-flex items-center justify-center px-3 rounded-r-xl transition-all duration-300 z-20 ${
+                          quickExportOpen 
+                            ? 'bg-emerald-500 text-white shadow-inner' 
+                            : 'bg-gradient-to-b from-amber-400 to-amber-500 text-slate-800 hover:from-emerald-500 hover:to-emerald-600 hover:text-white hover:shadow-[0_0_14px_rgba(16,185,129,0.5)]'
+                        }`}
+                      >
+                        <Download size={13} className="transition-transform group-hover:scale-110" />
+                      </button>
+
+                      {quickExportOpen && (
+                        <div style={{
+                          position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                          zIndex: 50,
+                          display: 'flex', flexDirection: 'column', gap: 0,
+                          borderRadius: 10,
+                          background: 'linear-gradient(145deg, #1a1f2e 0%, #141824 100%)',
+                          border: '1px solid rgba(245,197,66,0.25)',
+                          boxShadow: '0 12px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03) inset',
+                          minWidth: 280, overflow: 'hidden',
+                        }}>
+                          {/* Header strip */}
+                          <div style={{
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                            padding: '10px 14px',
+                            borderBottom: '1px solid rgba(255,255,255,0.06)',
+                            background: 'rgba(245,197,66,0.04)',
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                              <Package size={12} style={{ color: 'var(--riscv-gold)', opacity: 0.85 }} />
+                              <span style={{ fontSize: 11, color: '#f1f5f9', fontWeight: 700, letterSpacing: '0.01em' }}>
+                                Export Configuration YAML
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => setQuickExportOpen(false)}
+                              style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: 2, lineHeight: 0, borderRadius: 4 }}
+                              onMouseEnter={e => e.currentTarget.style.color = '#94a3b8'}
+                              onMouseLeave={e => e.currentTarget.style.color = '#475569'}
+                            ><X size={13} /></button>
+                          </div>
+
+                          {/* Toggle card */}
+                          <div style={{ padding: '12px 14px' }}>
+                            <div
+                              onClick={() => setQuickExportIncludeInstr(v => !v)}
+                              style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+                                padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
+                                background: quickExportIncludeInstr ? 'rgba(245,197,66,0.07)' : 'rgba(255,255,255,0.03)',
+                                border: `1px solid ${quickExportIncludeInstr ? 'rgba(245,197,66,0.2)' : 'rgba(255,255,255,0.07)'}`,
+                                transition: 'all 0.2s',
+                                userSelect: 'none',
+                              }}
+                            >
+                              <div style={{ flex: 1 }}>
+                                <span style={{
+                                  fontSize: 11.5, fontWeight: 600,
+                                  color: quickExportIncludeInstr ? '#f1f5f9' : '#94a3b8',
+                                  display: 'block', lineHeight: 1.35, transition: 'color 0.2s',
+                                }}>
+                                  Include instruction catalog
+                                </span>
+                                <span style={{
+                                  fontSize: 10, marginTop: 2, display: 'block',
+                                  color: workspaceTotalInstr > 100 ? '#f59e0b' : '#64748b',
+                                  fontVariantNumeric: 'tabular-nums',
+                                }}>
+                                  {workspaceTotalInstr.toLocaleString()} instructions{workspaceTotalInstr > 100 ? ' · large export' : ''}
+                                </span>
+                              </div>
+
+                              {/* Premium toggle track */}
+                              <div style={{
+                                width: 38, height: 21, borderRadius: 11, flexShrink: 0,
+                                background: quickExportIncludeInstr
+                                  ? 'linear-gradient(135deg, #f5c542 0%, #fde68a 100%)'
+                                  : 'rgba(255,255,255,0.08)',
+                                boxShadow: quickExportIncludeInstr ? '0 0 8px rgba(245,197,66,0.4)' : 'none',
+                                position: 'relative', transition: 'all 0.25s',
+                                border: `1px solid ${quickExportIncludeInstr ? 'rgba(245,197,66,0.7)' : 'rgba(255,255,255,0.12)'}`,
+                              }}>
+                                <div style={{
+                                  width: 15, height: 15, borderRadius: '50%',
+                                  background: quickExportIncludeInstr ? '#1a1206' : '#475569',
+                                  position: 'absolute', top: 2,
+                                  left: quickExportIncludeInstr ? 19 : 2,
+                                  transition: 'all 0.25s',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
+                                }} />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Download button */}
+                          <div style={{ padding: '0 14px 13px' }}>
+                            <button
+                              onClick={() => {
+                                const { yaml } = buildIsaConfigYaml(Array.from(workspaceIds), allExtsList, quickExportIncludeInstr);
+                                const blob = new Blob([yaml], { type: 'text/yaml' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                const marchRes = buildMarchString(Array.from(workspaceIds), allExtsList);
+                                const base = marchRes.march ? marchRes.march.split('_')[0] : 'core';
+                                a.download = `riscv_${base}_config.yaml`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                                setQuickExportOpen(false);
+                              }}
+                              style={{
+                                width: '100%', padding: '9px 14px', borderRadius: 7,
+                                background: 'linear-gradient(135deg, rgba(245,197,66,0.22) 0%, rgba(245,197,66,0.12) 100%)',
+                                color: 'var(--riscv-gold)',
+                                border: '1px solid rgba(245,197,66,0.4)',
+                                fontSize: 11.5, fontWeight: 700,
+                                cursor: 'pointer', transition: 'all 0.18s',
+                                letterSpacing: '0.02em',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                              }}
+                              onMouseEnter={e => {
+                                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(245,197,66,0.35) 0%, rgba(245,197,66,0.22) 100%)';
+                                e.currentTarget.style.boxShadow = '0 0 12px rgba(245,197,66,0.2)';
+                              }}
+                              onMouseLeave={e => {
+                                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(245,197,66,0.22) 0%, rgba(245,197,66,0.12) 100%)';
+                                e.currentTarget.style.boxShadow = 'none';
+                              }}
+                            >
+                              <Package size={11} />
+                              Download .yaml
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </>)}
                 </div>
               </div>
             </div>
