@@ -9,6 +9,36 @@ import {
   Copy,
   ChevronLeft,
   ChevronRight,
+  Search,
+  Cpu,
+  Shield,
+  Zap,
+  Lock,
+  Database,
+  Settings2,
+  Layers,
+  Braces,
+  FlaskConical,
+  Network,
+  Activity,
+  BookOpen,
+  Gem,
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  Package,
+  Binary,
+  MemoryStick,
+  CircuitBoard,
+  Shuffle,
+  Timer,
+  ServerCrash,
+  KeyRound,
+  Plus,
+  Trash2,
+  Download,
+  ChevronDown,
 } from 'lucide-react';
 import extensions from './riscv_extensions.json';
 
@@ -374,11 +404,47 @@ const EncodingDiagram = ({ encoding }) => {
   const normalized = String(encoding || '').replace(/\s+/g, '');
   if (normalized.length !== 32) {
     return (
-      <div className="font-mono text-[11px] text-slate-100 bg-slate-800/70 border border-slate-700 rounded px-2 py-1 break-all">
+      <div className="font-mono text-[11px] bg-[var(--riscv-surface-2)] border border-[var(--riscv-border-2)] rounded px-2 py-1 break-all" style={{ color: 'var(--riscv-text-2)' }}>
         {encoding}
       </div>
     );
   }
+
+  // RISC-V standard R-type field ranges (bit index from MSB=0):
+  // bit 31..25 → funct7 (i=0..6)
+  // bit 24..20 → rs2    (i=7..11)
+  // bit 19..15 → rs1    (i=12..16)
+  // bit 14..12 → funct3 (i=17..19)
+  // bit 11..7  → rd     (i=20..24)
+  // bit 6..0   → opcode (i=25..31)
+  const getFieldClass = (i, isVar) => {
+    if (isVar) return 'enc-var';
+    if (i <= 6) return 'enc-funct7';
+    if (i <= 11) return 'enc-rs2';
+    if (i <= 16) return 'enc-rs1';
+    if (i <= 19) return 'enc-funct3';
+    if (i <= 24) return 'enc-rd';
+    return 'enc-opcode';
+  };
+
+  const getFieldName = (i) => {
+    if (i <= 6) return 'funct7';
+    if (i <= 11) return 'rs2';
+    if (i <= 16) return 'rs1';
+    if (i <= 19) return 'funct3';
+    if (i <= 24) return 'rd';
+    return 'opcode';
+  };
+
+  // Build field label spans for the legend row
+  const FIELD_LABELS = [
+    { name: 'funct7', from: 0, to: 6, cls: 'enc-funct7' },
+    { name: 'rs2', from: 7, to: 11, cls: 'enc-rs2' },
+    { name: 'rs1', from: 12, to: 16, cls: 'enc-rs1' },
+    { name: 'funct3', from: 17, to: 19, cls: 'enc-funct3' },
+    { name: 'rd', from: 20, to: 24, cls: 'enc-rd' },
+    { name: 'opcode', from: 25, to: 31, cls: 'enc-opcode' },
+  ];
 
   const updateScrollState = React.useCallback(() => {
     const el = scrollRef.current;
@@ -437,11 +503,12 @@ const EncodingDiagram = ({ encoding }) => {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
-          <span>Bits</span>
+        <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider font-semibold" style={{ color: 'var(--riscv-text-3)' }}>
+          <Binary size={11} />
+          <span>Bit Fields</span>
           {canScroll && (
-            <span className="inline-flex items-center gap-1 text-yellow-200/80 font-mono normal-case tracking-normal">
-              scroll <ArrowRight size={12} />
+            <span className="inline-flex items-center gap-1 normal-case tracking-normal" style={{ color: 'var(--riscv-gold)' }}>
+              scroll <ArrowRight size={11} />
             </span>
           )}
         </div>
@@ -449,49 +516,44 @@ const EncodingDiagram = ({ encoding }) => {
         <div className="flex items-center gap-1">
           <button
             type="button"
-            className="p-1 rounded border border-slate-600 bg-slate-800 text-slate-100 disabled:opacity-30"
+            className="riscv-btn p-1 disabled:opacity-30"
             onClick={() => scrollRef.current?.scrollBy({ left: -220, behavior: 'smooth' })}
             disabled={!canScroll || atLeft}
             title="Scroll left"
           >
-            <ChevronLeft size={14} />
+            <ChevronLeft size={13} />
           </button>
           <button
             type="button"
-            className="p-1 rounded border border-slate-600 bg-slate-800 text-slate-100 disabled:opacity-30"
+            className="riscv-btn p-1 disabled:opacity-30"
             onClick={() => scrollRef.current?.scrollBy({ left: 220, behavior: 'smooth' })}
             disabled={!canScroll || atRight}
             title="Scroll right"
           >
-            <ChevronRight size={14} />
+            <ChevronRight size={13} />
           </button>
         </div>
       </div>
 
       <div ref={scrollRef} className="overflow-x-auto">
         <div className="inline-block pr-2">
-          <div className="inline-grid grid-flow-col auto-cols-[18px] rounded border border-slate-700 bg-slate-900/40">
+          {/* Bit cells */}
+          <div className="inline-grid grid-flow-col auto-cols-[20px] rounded-md border border-[var(--riscv-border-2)] overflow-hidden">
             {normalized.split('').map((bit, i) => {
               const isVar = bit === '-';
               const isGroupEnd = (i + 1) % 4 === 0 && i !== 31;
               const value = isVar ? 'x' : bit;
+              const fieldCls = getFieldClass(i, isVar);
+              const fieldName = getFieldName(i);
               return (
                 <div
                   key={`${i}-${bit}`}
                   className={[
-                    'h-7 flex items-center justify-center font-mono text-[11px]',
-                    i === 0 ? 'rounded-l' : '',
-                    i === 31 ? 'rounded-r' : '',
-                    isVar
-                      ? 'bg-slate-800/60 text-purple-100'
-                      : 'bg-slate-700/40 text-slate-100',
-                    i === 31
-                      ? ''
-                      : isGroupEnd
-                          ? 'border-r-2 border-slate-600'
-                          : 'border-r border-slate-700',
+                    'h-7 flex items-center justify-center font-mono text-[11px] font-medium border-r',
+                    fieldCls,
+                    i === 31 ? 'border-r-0' : isGroupEnd ? 'border-r-2' : '',
                   ].join(' ')}
-                  title={`bit ${31 - i}`}
+                  title={`bit[${31 - i}] — ${fieldName}`}
                 >
                   {value}
                 </div>
@@ -499,16 +561,30 @@ const EncodingDiagram = ({ encoding }) => {
             })}
           </div>
 
-          <div className="mt-1 flex justify-between text-[10px] font-mono text-slate-500 px-0.5">
+          {/* Bit number labels */}
+          <div className="mt-1 flex justify-between text-[9px] font-mono px-0.5" style={{ color: 'var(--riscv-text-3)' }}>
             <span>31</span>
             <span>0</span>
+          </div>
+
+          {/* Field legend row */}
+          <div className="mt-2 flex gap-1.5 flex-wrap">
+            {FIELD_LABELS.map(({ name, cls }) => (
+              <span
+                key={name}
+                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold border ${cls}`}
+              >
+                {name}
+              </span>
+            ))}
           </div>
         </div>
       </div>
 
       {canScroll && (
         <div
-          className="mt-2 h-2 rounded bg-purple-300/15 border border-purple-300/20 relative cursor-pointer"
+          className="mt-2 h-1.5 rounded-full relative cursor-pointer"
+          style={{ background: 'var(--riscv-border)', border: '1px solid var(--riscv-border-2)' }}
           onClick={(e) => {
             const el = scrollRef.current;
             if (!el) return;
@@ -521,8 +597,13 @@ const EncodingDiagram = ({ encoding }) => {
           title="Click to scroll"
         >
           <div
-            className="absolute top-0 bottom-0 rounded bg-purple-200/40 border border-purple-200/30 cursor-grab active:cursor-grabbing"
-            style={{ left: `${thumbLeftPct}%`, width: `${thumbWidthPct}%` }}
+            className="absolute top-0 bottom-0 rounded-full cursor-grab active:cursor-grabbing"
+            style={{
+              left: `${thumbLeftPct}%`,
+              width: `${thumbWidthPct}%`,
+              background: 'var(--riscv-gold)',
+              opacity: 0.5,
+            }}
             onPointerDown={(e) => {
               const el = scrollRef.current;
               if (!el) return;
@@ -564,6 +645,7 @@ const EncodingDiagram = ({ encoding }) => {
 };
 
 const RISCVExplorer = () => {
+
   const [activeProfile, setActiveProfile] = useState(null);
   const [activeVolume, setActiveVolume] = useState(null);
   const [selectedExt, setSelectedExt] = useState(null);
@@ -580,7 +662,125 @@ const RISCVExplorer = () => {
   });
   const [encoderValidatorResult, setEncoderValidatorResult] = useState(null);
   const [encoderValidatorCopyStatus, setEncoderValidatorCopyStatus] = useState(null);
+
+  // Smart lock: live reverse-lookup of dependencies
+  const lockedExtensions = React.useMemo(() => {
+    const locked = new Map(); // ext -> [things requiring it]
+    const selected = Array.from(workspaceIds);
+    for (const ext of selected) {
+      const deps = SMART_DEPENDENCIES[ext] || [];
+      for (const dep of deps) {
+        if (workspaceIds.has(dep)) {
+          if (!locked.has(dep)) locked.set(dep, []);
+          locked.get(dep).push(ext);
+        }
+      }
+    }
+    return locked;
+  }, [workspaceIds]);
+
+  // Smart dependency and mutually-exclusive handler
+  const addWorkspaceIdsSmart = React.useCallback((idsToAdd, isToggle = false) => {
+    setWorkspaceIds(prev => {
+      const next = new Set(prev);
+      const autoAdded = [];
+      let baseChanged = false;
+
+      // Recompute lock state against current `prev` state to ensure up-to-date checks during batch updates
+      const currentLocked = new Map();
+      const currentSelected = Array.from(prev);
+      for (const ext of currentSelected) {
+        const deps = SMART_DEPENDENCIES[ext] || [];
+        for (const dep of deps) {
+          if (prev.has(dep)) {
+            if (!currentLocked.has(dep)) currentLocked.set(dep, []);
+            currentLocked.get(dep).push(ext);
+          }
+        }
+      }
+
+      const arrToAdd = Array.isArray(idsToAdd) ? idsToAdd : [idsToAdd];
+
+      for (const id of arrToAdd) {
+        if (isToggle && next.has(id)) {
+          // If locked, we cannot toggle it off
+          if (currentLocked.has(id)) {
+            setWorkspaceNotice(`Cannot remove ${id}: required by ${currentLocked.get(id).join(', ')}`);
+            setTimeout(() => setWorkspaceNotice(null), 4500);
+            continue; // block removal
+          }
+          next.delete(id);
+          continue;
+        }
+
+        // 1. Mutually Exclusive Base ISAs
+        if (BASE_ISA_IDS.has(id)) {
+          for (const baseId of BASE_ISA_IDS) {
+            if (baseId !== id && next.has(baseId)) {
+              // Note: Base ISAs aren't typically locked by other extensions in our SMART_DEPENDENCIES, 
+              // but if they were, we might need a lock check here too. Safe for now.
+              next.delete(baseId);
+              baseChanged = true;
+            }
+          }
+        }
+
+        next.add(id);
+
+        // 2. Smart Dependencies (e.g. D fundamentally requires F)
+        const deps = SMART_DEPENDENCIES[id];
+        if (deps) {
+          for (const dep of deps) {
+            if (!next.has(dep)) {
+              next.add(dep);
+              autoAdded.push(dep);
+            }
+          }
+        }
+      }
+
+      if (autoAdded.length > 0) {
+        setWorkspaceNotice(`Auto-added: ${autoAdded.join(', ')} (Required dependency)`);
+        setTimeout(() => setWorkspaceNotice(null), 4500);
+      } else if (baseChanged) {
+        setWorkspaceNotice('Base ISA is mutually exclusive. Previous base removed.');
+        setTimeout(() => setWorkspaceNotice(null), 4500);
+      }
+
+      return next;
+    });
+  }, []);
+
+  // Flat list of all extensions — stable reference for workspace utilities
+  const allExtsList = React.useMemo(
+    () => Object.values(extensions).flat().filter(Boolean),
+    []
+  );
+
+  const workspaceTotalInstr = React.useMemo(() => {
+    if (workspaceIds.size === 0) return 0;
+    return buildCombinedCatalog(Array.from(workspaceIds), allExtsList).length;
+  }, [workspaceIds, allExtsList]);
+
+  React.useEffect(() => {
+    setQuickExportIncludeInstr(workspaceTotalInstr <= 100);
+  }, [workspaceTotalInstr]);
+  // --------------------------------------------------------------------------
   const lastScrolledKeyRef = React.useRef(null);
+  const searchInputRef = React.useRef(null);
+
+  // Ctrl+K / Cmd+K → focus search
+  React.useEffect(() => {
+    const handler = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   // ---------------------------------------------------------------------------
   // Extension Catalog – loaded from `src/riscv_extensions.json`
@@ -1241,8 +1441,8 @@ const RISCVExplorer = () => {
     Boolean(standardEquivalentMnemonic) && instructionIndex.get(standardEquivalentMnemonic)?.length;
   const compressedEquivalents = selectedInstruction
     ? (COMPRESSED_BY_STANDARD[normalizeMnemonicKey(selectedInstruction.mnemonic)] || []).filter((entry) =>
-        instructionIndex.has(normalizeMnemonicKey(entry.mnemonic))
-      )
+      instructionIndex.has(normalizeMnemonicKey(entry.mnemonic))
+    )
     : [];
 
   const formatInstructionForClipboard = React.useCallback((ext, instr) => {
@@ -1565,1198 +1765,1481 @@ const RISCVExplorer = () => {
     const matchesSearch = q.length ? searchIndex.includes(q) : false;
 
     const isDiscontinued = data.discontinued === 1;
-
     const isSelected = selectedExt?.id === data.id;
     const highlighted = isHighlighted(data.id) || matchesSearch || isSelected;
-    const baseColor = isDiscontinued
-      ? 'bg-slate-700 border-slate-500 text-slate-200'
-      : colorClass;
+    const dimmed = isDimmed(data.id) && !matchesSearch && !isSelected;
 
-	    return (
-	      <div
-	        id={`ext-${data.id}`}
-	        onClick={() =>
-	          setSelectedExt((current) => {
-	            const next = current?.id === data.id ? null : data;
-	            setSelectedInstruction(null);
-	            setSearchMatches(null);
-	            return next;
-	          })
-	        }
-	        className={`
-	          relative p-2 rounded border cursor-pointer transition-all duration-200
-	          ${
-            highlighted
-              ? 'ring-2 ring-yellow-400 bg-slate-800 scale-105 shadow-lg shadow-yellow-900/20'
-              : ''
-          }
-          ${
-            isDimmed(data.id) && !matchesSearch && !isSelected
-              ? 'opacity-20 grayscale'
-              : `${baseColor} hover:brightness-110`
-          }
-          ${isSelected ? 'z-20 shadow-xl shadow-yellow-900/40' : 'z-10'}
-	        `}
-	      >
-	        {isDiscontinued && (
-	          <span className="absolute top-1 right-1 px-1.5 py-0.5 rounded border border-red-600/60 bg-red-950/40 text-[8px] font-mono uppercase tracking-tight text-red-200">
-	            Discontinued
-	          </span>
-	        )}
-	        <div className="flex items-center justify-between mb-0.5">
-	          <span className="font-bold text-xs">{data.name}</span>
-	        </div>
-        <div className="text-[9px] leading-tight opacity-80 truncate">
+    return (
+      <div
+        id={`ext-${data.id}`}
+        onClick={() =>
+          setSelectedExt((current) => {
+            const next = current?.id === data.id ? null : data;
+            setSelectedInstruction(null);
+            setSearchMatches(null);
+            return next;
+          })
+        }
+        className={[
+          'ext-tile group relative rounded-lg border cursor-pointer select-none',
+          isSelected ? 'ext-tile-active' : '',
+          highlighted && !isSelected ? 'ext-tile-highlighted' : '',
+          dimmed ? 'opacity-20 grayscale pointer-events-none' : '',
+          isDiscontinued && !dimmed
+            ? 'border-[var(--riscv-border-2)] bg-[var(--riscv-surface)]'
+            : !dimmed ? colorClass : '',
+        ].join(' ')}
+        style={{
+          padding: '10px',
+          // Amber glow ring when in workspace
+          ...(inWorkspace && !isDiscontinued ? {
+            borderColor: 'rgba(245,197,66,0.55)',
+            boxShadow: '0 0 0 1px rgba(245,197,66,0.2), inset 0 0 12px rgba(245,197,66,0.04)',
+          } : {}),
+          transition: 'border-color 0.2s, box-shadow 0.2s',
+        }}
+      >
+        {/* EOL badge */}
+        {isDiscontinued && (
+          <span
+            className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded text-[8px] font-mono uppercase tracking-wider"
+            style={{
+              background: 'rgba(255,77,107,0.12)',
+              color: '#ff7a8a',
+              border: '1px solid rgba(255,77,107,0.25)',
+            }}
+          >
+            EOL
+          </span>
+        )}
+
+        {/* ── ISA Workspace badge ── */}
+        {!isDiscontinued && (() => {
+          const isLocked = inWorkspace && lockedExtensions.has(data.id);
+          const lockedBy = isLocked ? lockedExtensions.get(data.id) : [];
+
+          return (
+            <button
+              type="button"
+              data-in-workspace={inWorkspace ? 'true' : 'false'}
+              onClick={(e) => {
+                e.stopPropagation();
+                // addWorkspaceIdsSmart handles the lock rejection/toast internally for clicks
+                addWorkspaceIdsSmart(data.id, true);
+              }}
+              className="workspace-tile-btn absolute top-1.5 right-1.5"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 18, height: 18,
+                borderRadius: 5,
+                border: `1px solid ${inWorkspace ? (isLocked ? 'rgba(245,197,66,0.3)' : 'rgba(245,197,66,0.5)') : 'rgba(255,255,255,0.12)'}`,
+                background: inWorkspace
+                  ? (isLocked ? 'rgba(245,197,66,0.08)' : 'rgba(245,197,66,0.2)')
+                  : 'rgba(10,10,20,0.6)',
+                backdropFilter: 'blur(4px)',
+                color: inWorkspace ? (isLocked ? 'rgba(245,197,66,0.5)' : '#f5c542') : '#64748b',
+                cursor: isLocked ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s',
+                padding: 0,
+              }}
+              title={isLocked ? `Required by ${lockedBy.join(', ')} — remove dependent first` : (inWorkspace ? `Remove ${data.id} from Custom ISA Configuration Builder` : `Add ${data.id} to Custom ISA Configuration Builder`)}
+            >
+              {inWorkspace
+                ? (
+                  <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                    <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#f5c542" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )
+                : <Plus size={9} />
+              }
+            </button>
+          );
+        })()}
+
+        <div className="flex items-start justify-between mb-1">
+          <span
+            className="font-mono font-semibold text-[11px] leading-tight"
+            style={{ letterSpacing: '0.02em' }}
+          >
+            {data.name}
+          </span>
+        </div>
+        <div
+          className="text-[10px] leading-snug line-clamp-2"
+          style={{ color: 'var(--riscv-text-2)' }}
+        >
           {data.desc}
         </div>
       </div>
     );
   };
 
+
+
+
   // Scroll to extension tile when search matches an extension ID or instruction mnemonic,
   // and automatically open the Selected Details panel. Use a ref to avoid re-scrolling
   // on every render while the query stays the same.
-	  React.useEffect(() => {
-	    const q = searchQuery.trim().toLowerCase();
+  React.useEffect(() => {
+    const q = searchQuery.trim().toLowerCase();
 
-	    if (!q) {
-	      // Reset tracking when query is cleared
-	      lastScrolledKeyRef.current = null;
-	      setSearchMatches(null);
-	      return;
-	    }
+    if (!q) {
+      // Reset tracking when query is cleared
+      lastScrolledKeyRef.current = null;
+      setSearchMatches(null);
+      return;
+    }
 
-	    const allExts = Object.values(extensions).flat();
-	    let matchedMnemonic = null;
-	    let matchedDetails = null;
+    const allExts = Object.values(extensions).flat();
+    let matchedMnemonic = null;
+    let matchedDetails = null;
 
-	    // First, try an exact extension ID match
-	    let targetExt = allExts.find((ext) => ext.id.toLowerCase() === q);
+    // First, try an exact extension ID match
+    let targetExt = allExts.find((ext) => ext.id.toLowerCase() === q);
 
-	    // If no exact extension ID match, try to match an instruction mnemonic
-	    if (!targetExt) {
-	      for (const ext of allExts) {
-	        const mnemonics = Object.keys(ext.instructions || {});
-	        const found = mnemonics.find((m) => m.toLowerCase() === q);
-	        if (found) {
-	          targetExt = ext;
-	          matchedMnemonic = found;
-	          matchedDetails = ext.instructions[found] || null;
-	          break;
-	        }
-	      }
-	    }
+    // If no exact extension ID match, try to match an instruction mnemonic
+    if (!targetExt) {
+      for (const ext of allExts) {
+        const mnemonics = Object.keys(ext.instructions || {});
+        const found = mnemonics.find((m) => m.toLowerCase() === q);
+        if (found) {
+          targetExt = ext;
+          matchedMnemonic = found;
+          matchedDetails = ext.instructions[found] || null;
+          break;
+        }
+      }
+    }
 
-	    // If still no match, try a deep search against indexed extension+instruction details
-	    if (!targetExt) {
-	      targetExt =
-	        allExts.find((ext) => (extensionSearchIndexById.get(ext.id) || '').includes(q)) ||
-	        null;
-	    }
+    // If still no match, try a deep search against indexed extension+instruction details
+    if (!targetExt) {
+      targetExt =
+        allExts.find((ext) => (extensionSearchIndexById.get(ext.id) || '').includes(q)) ||
+        null;
+    }
 
-	    if (targetExt) {
-	      const hits = [];
-	      if (targetExt.instructions && typeof targetExt.instructions === 'object') {
-	        for (const [mnemonic, details] of Object.entries(targetExt.instructions)) {
-	          if (instructionMatchesQuery(mnemonic, details, q)) {
-	            hits.push(mnemonic);
-	          }
-	        }
-	      }
+    if (targetExt) {
+      const hits = [];
+      if (targetExt.instructions && typeof targetExt.instructions === 'object') {
+        for (const [mnemonic, details] of Object.entries(targetExt.instructions)) {
+          if (instructionMatchesQuery(mnemonic, details, q)) {
+            hits.push(mnemonic);
+          }
+        }
+      }
 
-	      if (matchedMnemonic && !hits.includes(matchedMnemonic)) hits.unshift(matchedMnemonic);
-	      if (!matchedMnemonic && hits.length) matchedMnemonic = hits[0];
-	      matchedDetails = matchedMnemonic ? targetExt?.instructions?.[matchedMnemonic] : null;
+      if (matchedMnemonic && !hits.includes(matchedMnemonic)) hits.unshift(matchedMnemonic);
+      if (!matchedMnemonic && hits.length) matchedMnemonic = hits[0];
+      matchedDetails = matchedMnemonic ? targetExt?.instructions?.[matchedMnemonic] : null;
 
-	      // Always open/update the Selected Details panel for the matched extension
-	      setSelectedExt(targetExt);
-	      setSearchMatches(hits.length ? { extId: targetExt.id, query: q, mnemonics: hits, index: 0 } : null);
-	      setSelectedInstruction(matchedMnemonic && matchedDetails ? { mnemonic: matchedMnemonic, ...matchedDetails } : null);
+      // Always open/update the Selected Details panel for the matched extension
+      setSelectedExt(targetExt);
+      setSearchMatches(hits.length ? { extId: targetExt.id, query: q, mnemonics: hits, index: 0 } : null);
+      setSelectedInstruction(matchedMnemonic && matchedDetails ? { mnemonic: matchedMnemonic, ...matchedDetails } : null);
 
-	      const key = `${targetExt.id}:${q}`;
+      const key = `${targetExt.id}:${q}`;
 
-	      // Only auto-scroll once per unique (extension, query) pair
-	      if (lastScrolledKeyRef.current !== key) {
+      // Only auto-scroll once per unique (extension, query) pair
+      if (lastScrolledKeyRef.current !== key) {
         const el = document.getElementById(`ext-${targetExt.id}`);
         if (el) {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-	        lastScrolledKeyRef.current = key;
-	      }
-	    }
-	  }, [searchQuery, extensionSearchIndexById]);
+        lastScrolledKeyRef.current = key;
+      }
+    }
+  }, [searchQuery, extensionSearchIndexById]);
+
+  // Compute stat bar numbers from loaded JSON
+  const totalExtensions = React.useMemo(() => Object.values(extensions).flat().filter(Boolean).length, []);
+  const totalInstructions = React.useMemo(() => {
+    let c = 0;
+    for (const ext of Object.values(extensions).flat().filter(Boolean)) {
+      c += Object.keys(ext.instructions || {}).length;
+    }
+    return c;
+  }, []);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-50 p-2 md:p-6 font-sans">
-	      <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
-	        {/* Header */}
-	        <div className="lg:col-span-12 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-700 pb-4 mb-2">
-	          <div>
-            <h1 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500">
-              RISC-V Extension Landscape
-            </h1>
-            <p className="text-slate-500 text-xs md:text-sm mt-1">
-              Interactive breakdown of RISC-V Extensions.
-            </p>
-          </div>
+    <div className="min-h-screen text-slate-50" style={{ background: 'var(--riscv-bg)' }}>
+      {/* Gradient top border */}
+      <div className="riscv-top-border" />
+      <div className="px-3 md:px-6 py-4 md:py-6 max-w-[1700px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* ─── Header ───────────────────────────────────────────────────── */}
+          <div className="lg:col-span-12 pb-5 mb-2" style={{ borderBottom: '1px solid var(--riscv-border)' }}>
+            {/* Title row */}
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  <CircuitBoard size={22} style={{ color: 'var(--riscv-gold)' }} />
+                  <h1
+                    className="text-2xl md:text-3xl font-black tracking-tight"
+                    style={{
+                      background: 'linear-gradient(90deg, #f5c542 0%, #fde68a 50%, #f5c542 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
+                  >
+                    RISC-V Extension Landscape
+                  </h1>
+                </div>
+                <p className="text-xs ml-9 whitespace-nowrap" style={{ color: 'var(--riscv-text-2)' }}>
+                  Authoritative reference for extensions, profiles &amp; per-instruction encoding.
+                </p>
+                {/* Stat bar */}
+                <div className="flex items-center gap-4 mt-3 ml-9">
+                  {[
+                    { label: 'Extensions', value: totalExtensions },
+                    { label: 'Profiles', value: Object.keys(profiles).length },
+                    { label: 'Instructions', value: `${(totalInstructions / 1000).toFixed(1)}k+` },
+                    { label: 'Volumes', value: 2 },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="flex items-baseline gap-1.5">
+                      <span className="text-base font-black" style={{ color: 'var(--riscv-gold)' }}>{value}</span>
+                      <span className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--riscv-text-3)' }}>{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-	          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-4 md:mt-0">
-	            <div className="flex items-center gap-2">
-	              <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
-	                Profiles
-	              </span>
-	              <div className="flex gap-2">
-	                {Object.keys(profiles).map((profile) => (
-	                  <button
-	                    key={profile}
-	                    onClick={() =>
-	                      setActiveProfile((current) => {
-	                        setSelectedExt(null);
-	                        setSelectedInstruction(null);
-	                        setSearchMatches(null);
-	                        return current === profile ? null : profile;
-	                      })
-	                    }
-	                    className={`
-	                      px-3 py-1 rounded text-xs font-bold border transition-all
-	                      ${
-		                        activeProfile === profile
-		                          ? 'bg-yellow-500/20 border-yellow-500 text-yellow-200'
-		                          : 'bg-slate-800 border-slate-600 text-slate-200 hover:border-slate-500'
-	                      }
-	                    `}
-	                  >
-	                    {profile}
-	                  </button>
-	                ))}
-	              </div>
-	            </div>
+              {/* Controls - Single Row Design 1 */}
+              <div className="flex flex-wrap xl:flex-nowrap items-center justify-start lg:justify-end gap-x-3 gap-y-3 shrink-0">
+                {/* Grouped Filters Container */}
+                <div className="flex items-center gap-3 px-3.5 py-2 rounded-xl border shadow-lg backdrop-blur-md" style={{ background: 'rgba(15,23,42,0.4)', borderColor: 'rgba(255,255,255,0.08)' }}>
+                  
+                  {/* Profiles */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: 'var(--riscv-text-3)' }}>Profile</span>
+                    <div className="flex gap-1.5">
+                      {Object.keys(profiles).map((profile) => (
+                        <button
+                          key={profile}
+                          onClick={() =>
+                            setActiveProfile((current) => {
+                              setSelectedExt(null);
+                              setSelectedInstruction(null);
+                              setSearchMatches(null);
+                              return current === profile ? null : profile;
+                            })
+                          }
+                          className={[
+                            'px-3 py-1.5 text-[11px] rounded-lg transition-all duration-200 font-medium',
+                            activeProfile === profile 
+                              ? 'bg-slate-700/80 text-white shadow-inner border border-slate-500/50' 
+                              : 'text-slate-300 hover:text-white hover:bg-slate-700/40 border border-transparent hover:border-slate-600/30',
+                          ].join(' ')}
+                        >
+                          {profile}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-	            <div className="hidden md:block h-7 w-px bg-slate-800" />
+                  {/* Vertical Divider */}
+                  <div className="h-5 w-px bg-slate-700/60 mx-1" />
 
-		            <div className="flex items-center gap-2">
-		              <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
-		                Volumes
-		              </span>
-	              <div className="flex gap-2">
-	                {['I', 'II'].map((vol) => (
-	                  <button
-	                    key={vol}
-	                    onClick={() =>
-	                      setActiveVolume((current) => {
-	                        setSelectedExt(null);
-	                        setSelectedInstruction(null);
-	                        setSearchMatches(null);
-	                        return current === vol ? null : vol;
-	                      })
-	                    }
-	                    className={`
-	                      px-3 py-1 rounded text-xs font-bold border transition-all
-	                      ${
-		                        activeVolume === vol
-		                          ? 'bg-yellow-500/20 border-yellow-500 text-yellow-200'
-		                          : 'bg-slate-800 border-slate-600 text-slate-200 hover:border-slate-500'
-	                      }
-	                    `}
-	                  >
-	                    Vol {vol}
-	                  </button>
-	                ))}
-		              </div>
-		            </div>
+                  {/* Volumes */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: 'var(--riscv-text-3)' }}>Volume</span>
+                    <div className="flex gap-1.5">
+                      {['I', 'II'].map((vol) => (
+                        <button
+                          key={vol}
+                          onClick={() =>
+                            setActiveVolume((current) => {
+                              setSelectedExt(null);
+                              setSelectedInstruction(null);
+                              setSearchMatches(null);
+                              return current === vol ? null : vol;
+                            })
+                          }
+                          className={[
+                            'px-3 py-1.5 text-[11px] rounded-lg transition-all duration-200 font-medium',
+                            activeVolume === vol 
+                              ? 'bg-slate-700/80 text-white shadow-inner border border-slate-500/50' 
+                              : 'text-slate-300 hover:text-white hover:bg-slate-700/40 border border-transparent hover:border-slate-600/30',
+                          ].join(' ')}
+                        >
+                          Vol {vol}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
 
-		            <div className="hidden md:block h-7 w-px bg-slate-700" />
+                {/* Encoder Validator - Sleek Outline Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEncoderValidatorOpen(true);
+                    setEncoderValidatorResult(null);
+                    setEncoderValidatorCopyStatus(null);
+                  }}
+                  className="group inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-300 whitespace-nowrap border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/15 hover:border-indigo-400 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+                  title="Validate a proposed instruction encoding against the existing instruction set"
+                >
+                  <ScanSearch size={14} className="text-indigo-400/80 group-hover:text-indigo-300 transition-colors" />
+                  <span className="whitespace-nowrap">Encoder Validator</span>
+                </button>
 
-		            <button
-		              type="button"
-		              onClick={() => {
-		                setEncoderValidatorOpen(true);
-		                setEncoderValidatorResult(null);
-		                setEncoderValidatorCopyStatus(null);
-		              }}
-		              className="inline-flex items-center gap-2 px-3 py-1 rounded text-xs font-bold border transition-all bg-slate-800 border-slate-600 text-slate-100 hover:border-slate-500"
-		              title="Validate a proposed instruction encoding against existing instructions"
-		            >
-		              <ScanSearch size={16} />
-		              Encoder Validator
-		            </button>
-		          </div>
-		        </div>
+                {/* Custom ISA Configuration Builder — fused action group */}
+                <div className="relative inline-flex items-stretch rounded-xl">
 
-	        {/* Main Grid */}
-	        <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-min">
-	          {/* Search Bar – centered, before Base Architectures */}
-		          <div className="col-span-full flex justify-center mb-3 -mt-1">
-		            <div className="w-full max-w-lg">
-		              <input
-		                type="text"
-		                value={searchQuery}
-		                onChange={(e) => setSearchQuery(e.target.value)}
-		                placeholder="Search extensions by ID, name, or description..."
-		                className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-yellow-200/40 text-sm text-slate-100 placeholder-slate-400 shadow-sm shadow-yellow-900/10 focus:outline-none focus:ring-2 focus:ring-yellow-400/60 focus:border-yellow-300"
-		              />
-		              <p className="mt-1 text-[10px] text-center text-slate-500">
-		                Typing here will highlight matching tiles in yellow (case-insensitive).
-		              </p>
-		            </div>
-		          </div>
-
-          {/* 1. Base */}
-          <div className="space-y-2 col-span-full">
-            <h3 className="text-blue-400 text-xs font-bold uppercase flex items-center gap-2">
-              Base ISA
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-              {extensions.base.map((item) => (
-                <ExtensionBlock
-                  key={item.id}
-                  data={item}
-                  searchQuery={searchQuery}
-                  colorClass="bg-blue-950 border-blue-800 text-blue-100"
-                />
-              ))}
+                  {/* Active glow ring */}
+                </div>
+              </div>
             </div>
           </div>
-
-	          {/* 2. Single-Letter Extensions */}
-	          <div className="space-y-2 col-span-full">
-	            <h3 className="text-emerald-400 text-xs font-bold uppercase flex items-center gap-2">
-	              Single-Letter Extensions
-	            </h3>
-	            <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
-	              {extensions.standard.map((item) => (
-	                <ExtensionBlock
-                  key={item.id}
-                  data={item}
-                  searchQuery={searchQuery}
-                  colorClass="bg-emerald-950 border-emerald-800 text-emerald-100"
+          {/* ─── Main Grid ───────────────────────────────────────────────── */}
+          <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-min">
+            {/* Search Bar */}
+            <div className="col-span-full mb-2">
+              <div className="relative">
+                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--riscv-text-3)' }} />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search extensions, instructions, encodings…"
+                  className="riscv-input w-full pl-10 pr-24 py-2.5 text-sm"
                 />
-              ))}
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="p-0.5 rounded hover:opacity-80"
+                      style={{ color: 'var(--riscv-text-3)' }}
+                      title="Clear search"
+                    >
+                      <X size={13} />
+                    </button>
+                  )}
+                  <kbd
+                    className="hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono"
+                    style={{ background: 'var(--riscv-muted)', color: 'var(--riscv-text-3)', border: '1px solid var(--riscv-border-2)' }}
+                  >
+                    <span className="text-[9px]">⌘</span>K
+                  </kbd>
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* 3. Z-Extensions (User Mode) */}
-	          <div className="col-span-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pt-4 border-t border-slate-700">
-	            <div className="space-y-2">
-	              <h3 className="text-purple-400 text-xs font-bold uppercase flex items-center gap-2">
-	                Bit Manipulation (Zb)
-	              </h3>
-	              <div className="grid grid-cols-2 gap-2">
-	                {extensions.z_bit.map((item) => (
-	                  <ExtensionBlock
-                    key={item.id}
-                    data={item}
-                    searchQuery={searchQuery}
-                    colorClass="bg-purple-950/50 border-purple-800/50 text-purple-100"
-                  />
-                ))}
-	              </div>
-	            </div>
-
-	            <div className="space-y-2">
-	              <h3 className="text-amber-400 text-xs font-bold uppercase flex items-center gap-2">
-	                Atomics (Za/Zic*)
-	              </h3>
-	              <div className="grid grid-cols-2 gap-2">
-	                {extensions.z_atomics.map((item) => (
-	                  <ExtensionBlock
-	                    key={item.id}
-	                    data={item}
-	                    searchQuery={searchQuery}
-	                    colorClass="bg-amber-950/40 border-amber-800/50 text-amber-100"
-	                  />
-	                ))}
-	              </div>
-	            </div>
-
-		            <div className="space-y-2">
-		              <h3 className="text-indigo-400 text-xs font-bold uppercase flex items-center gap-2">
-		                Compressed Instructions (Zc)
-		              </h3>
-		              <div className="grid grid-cols-2 gap-2">
-	                {extensions.z_compress.map((item) => (
-	                  <ExtensionBlock
-	                    key={item.id}
-                    data={item}
-                    searchQuery={searchQuery}
-                    colorClass="bg-indigo-950/50 border-indigo-800/50 text-indigo-100"
-                  />
-                ))}
-	              </div>
-	            </div>
-
-	            <div className="space-y-2">
-	              <h3 className="text-pink-400 text-xs font-bold uppercase flex items-center gap-2">
-	                Float & Numerics (Zf/Za)
-              </h3>
-              <div className="grid grid-cols-2 gap-2">
-                {extensions.z_float.map((item) => (
+            {/* 1. Base ISA */}
+            <div className="space-y-2.5 col-span-full">
+              <div className="flex items-center gap-2">
+                <CircuitBoard size={13} style={{ color: '#60a5fa' }} />
+                <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#60a5fa' }}>Base ISA</h3>
+                <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.base.length} isa</span>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                {extensions.base.map((item) => (
                   <ExtensionBlock
                     key={item.id}
                     data={item}
                     searchQuery={searchQuery}
-                    colorClass="bg-pink-950/50 border-pink-800/50 text-pink-100"
+                    colorClass="border-blue-900/60 bg-blue-950/40 text-blue-100"
                   />
                 ))}
-	              </div>
-	            </div>
+              </div>
+            </div>
 
-		            <div className="space-y-2">
-		              <h3 className="text-sky-400 text-xs font-bold uppercase flex items-center gap-2">
-		                Load/Store
-		              </h3>
-		              <div className="grid grid-cols-2 gap-2">
-		                {extensions.z_load_store.map((item) => (
-		                  <ExtensionBlock
-		                    key={item.id}
-		                    data={item}
-		                    searchQuery={searchQuery}
-		                    colorClass="bg-sky-950/40 border-sky-800/40 text-sky-100"
-		                  />
-		                ))}
-		              </div>
-		            </div>
-
-		            <div className="space-y-2">
-		              <h3 className="text-fuchsia-300 text-xs font-bold uppercase flex items-center gap-2">
-		                Integer
-		              </h3>
-		              <div className="grid grid-cols-2 gap-2">
-		                {extensions.z_integer.map((item) => (
-		                  <ExtensionBlock
-		                    key={item.id}
-		                    data={item}
-		                    searchQuery={searchQuery}
-		                    colorClass="bg-fuchsia-950/40 border-fuchsia-800/40 text-fuchsia-100"
-		                  />
-		                ))}
-		              </div>
-		            </div>
-
-	            <div className="space-y-2">
-	              <h3 className="text-teal-400 text-xs font-bold uppercase flex items-center gap-2">
-	                Vector Subsets (Zv/Zve)
-	              </h3>
-              <div className="grid grid-cols-2 gap-2">
-                {extensions.z_vector.map((item) => (
+            {/* 2. Single-Letter Extensions */}
+            <div className="space-y-2.5 col-span-full">
+              <div className="flex items-center gap-2">
+                <Braces size={13} style={{ color: '#34d399' }} />
+                <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#34d399' }}>Single-Letter Extensions</h3>
+                <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.standard.length} ext</span>
+              </div>
+              <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+                {extensions.standard.map((item) => (
                   <ExtensionBlock
                     key={item.id}
                     data={item}
                     searchQuery={searchQuery}
-                    colorClass="bg-teal-950/50 border-teal-800/50 text-teal-100"
+                    colorClass="border-emerald-900/60 bg-emerald-950/40 text-emerald-100"
                   />
                 ))}
               </div>
             </div>
 
-	            <div className="space-y-2">
-	              <h3 className="text-red-400 text-xs font-bold uppercase flex items-center gap-2">
-	                Security (Zi)
-	              </h3>
-	              <div className="grid grid-cols-2 gap-2">
-	                {extensions.z_security.map((item) => (
-	                  <ExtensionBlock
-                    key={item.id}
-                    data={item}
-                    searchQuery={searchQuery}
-                    colorClass="bg-red-950/50 border-red-800/50 text-red-100"
-                  />
-                ))}
+            {/* 3. Z-Extensions */}
+            <div
+              className="col-span-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pt-5"
+              style={{ borderTop: '1px solid var(--riscv-border)' }}
+            >
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <Binary size={12} style={{ color: '#a78bfa' }} />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#a78bfa' }}>Bit Manipulation (Zb*)</h3>
+                  <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_bit.length}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {extensions.z_bit.map((item) => (
+                    <ExtensionBlock
+                      key={item.id}
+                      data={item}
+                      searchQuery={searchQuery}
+                      colorClass="border-purple-900/60 bg-purple-950/30 text-purple-100"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <Shuffle size={12} style={{ color: '#fbbf24' }} />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#fbbf24' }}>Atomics (Za/Zic*)</h3>
+                  <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_atomics.length}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {extensions.z_atomics.map((item) => (
+                    <ExtensionBlock
+                      key={item.id}
+                      data={item}
+                      searchQuery={searchQuery}
+                      colorClass="border-amber-900/60 bg-amber-950/30 text-amber-100"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <Layers size={12} style={{ color: '#818cf8' }} />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#818cf8' }}>Compressed (Zc*)</h3>
+                  <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_compress.length}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {extensions.z_compress.map((item) => (
+                    <ExtensionBlock
+                      key={item.id}
+                      data={item}
+                      searchQuery={searchQuery}
+                      colorClass="border-indigo-900/60 bg-indigo-950/30 text-indigo-100"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <FlaskConical size={12} style={{ color: '#f472b6' }} />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#f472b6' }}>Float & Numerics (Zf*)</h3>
+                  <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_float.length}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {extensions.z_float.map((item) => (
+                    <ExtensionBlock
+                      key={item.id}
+                      data={item}
+                      searchQuery={searchQuery}
+                      colorClass="border-pink-900/60 bg-pink-950/30 text-pink-100"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <Database size={12} style={{ color: '#38bdf8' }} />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#38bdf8' }}>Load / Store</h3>
+                  <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_load_store.length}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {extensions.z_load_store.map((item) => (
+                    <ExtensionBlock
+                      key={item.id}
+                      data={item}
+                      searchQuery={searchQuery}
+                      colorClass="border-sky-900/60 bg-sky-950/30 text-sky-100"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <Activity size={12} style={{ color: '#e879f9' }} />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#e879f9' }}>Integer</h3>
+                  <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_integer.length}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {extensions.z_integer.map((item) => (
+                    <ExtensionBlock
+                      key={item.id}
+                      data={item}
+                      searchQuery={searchQuery}
+                      colorClass="border-fuchsia-900/60 bg-fuchsia-950/30 text-fuchsia-100"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <Zap size={12} style={{ color: '#2dd4bf' }} />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#2dd4bf' }}>Vector Subsets (Zv/Zve)</h3>
+                  <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_vector.length}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {extensions.z_vector.map((item) => (
+                    <ExtensionBlock
+                      key={item.id}
+                      data={item}
+                      searchQuery={searchQuery}
+                      colorClass="border-teal-900/60 bg-teal-950/30 text-teal-100"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <Shield size={12} style={{ color: '#f87171' }} />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#f87171' }}>Security & CFI (Zi*)</h3>
+                  <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_security.length}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {extensions.z_security.map((item) => (
+                    <ExtensionBlock
+                      key={item.id}
+                      data={item}
+                      searchQuery={searchQuery}
+                      colorClass="border-red-900/60 bg-red-950/30 text-red-100"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <KeyRound size={12} style={{ color: '#94a3b8' }} />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#94a3b8' }}>Cryptography (Zk*)</h3>
+                  <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_crypto.length}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {extensions.z_crypto.map((item) => (
+                    <ExtensionBlock
+                      key={item.id}
+                      data={item}
+                      searchQuery={searchQuery}
+                      colorClass="border-[var(--riscv-border-2)] bg-[var(--riscv-surface-2)] text-slate-300"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <Lock size={12} style={{ color: '#c4b5fd' }} />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#c4b5fd' }}>Vector Cryptography (Zvk*)</h3>
+                  <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_vector_crypto.length}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {extensions.z_vector_crypto.map((item) => (
+                    <ExtensionBlock
+                      key={item.id}
+                      data={item}
+                      searchQuery={searchQuery}
+                      colorClass="border-violet-900/60 bg-violet-950/30 text-violet-100"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <Settings2 size={12} style={{ color: '#fb923c' }} />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#fb923c' }}>System</h3>
+                  <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_system.length}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {extensions.z_system.map((item) => (
+                    <ExtensionBlock
+                      key={item.id}
+                      data={item}
+                      searchQuery={searchQuery}
+                      colorClass="border-orange-900/60 bg-orange-950/30 text-orange-100"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <MemoryStick size={12} style={{ color: '#fdba74' }} />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#fdba74' }}>Caches</h3>
+                  <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_caches.length}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {extensions.z_caches.map((item) => (
+                    <ExtensionBlock
+                      key={item.id}
+                      data={item}
+                      searchQuery={searchQuery}
+                      colorClass="border-orange-900/40 bg-orange-950/20 text-orange-100"
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
-	            <div className="space-y-2">
-	              <h3 className="text-slate-400 text-xs font-bold uppercase flex items-center gap-2">
-	                Cryptography (Zk)
-	              </h3>
-	              <div className="grid grid-cols-2 gap-2">
-	                {extensions.z_crypto.map((item) => (
-	                  <ExtensionBlock
-                    key={item.id}
-                    data={item}
-                    searchQuery={searchQuery}
-                    colorClass="bg-slate-800 border-slate-600 text-slate-300"
-                  />
-                ))}
-	              </div>
-	            </div>
-
-	            <div className="space-y-2">
-	              <h3 className="text-violet-300 text-xs font-bold uppercase flex items-center gap-2">
-	                Vector Cryptography (Zvk)
-	              </h3>
-	              <div className="grid grid-cols-2 gap-2">
-	                {extensions.z_vector_crypto.map((item) => (
-	                  <ExtensionBlock
-	                    key={item.id}
-	                    data={item}
-	                    searchQuery={searchQuery}
-	                    colorClass="bg-violet-950/40 border-violet-800/40 text-violet-100"
-	                  />
-	                ))}
-	              </div>
-	            </div>
-
-	            <div className="space-y-2">
-	              <h3 className="text-orange-400 text-xs font-bold uppercase flex items-center gap-2">
-	                System
-	              </h3>
-	              <div className="grid grid-cols-2 gap-2">
-	                {extensions.z_system.map((item) => (
-	                  <ExtensionBlock
-	                    key={item.id}
-	                    data={item}
-	                    searchQuery={searchQuery}
-	                    colorClass="bg-orange-950/50 border-orange-800/50 text-orange-100"
-	                  />
-	                ))}
-	              </div>
-	            </div>
-
-	            <div className="space-y-2">
-	              <h3 className="text-orange-200 text-xs font-bold uppercase flex items-center gap-2">
-	                Caches
-	              </h3>
-	              <div className="grid grid-cols-2 gap-2">
-	                {extensions.z_caches.map((item) => (
-	                  <ExtensionBlock
-	                    key={item.id}
-	                    data={item}
-	                    searchQuery={searchQuery}
-	                    colorClass="bg-orange-950/30 border-orange-700/30 text-orange-100"
-	                  />
-	                ))}
-	              </div>
-	            </div>
-	          </div>
-
-          {/* 4. S-Extensions (Privileged) */}
-	          <div className="col-span-full pt-4 border-t border-slate-700">
-            <h3 className="text-cyan-400 text-xs font-bold uppercase flex items-center gap-2 mb-3">
-              S & Sv Extensions (Privileged)
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <h4 className="text-[10px] uppercase text-slate-500 font-bold">Memory (Sv)</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.s_mem.map((item) => (
-                    <ExtensionBlock
-                      key={item.id}
-                      data={item}
-                      searchQuery={searchQuery}
-                      colorClass="bg-cyan-950/30 border-cyan-800/30 text-cyan-100"
-                    />
-                  ))}
+            {/* 4. S-Extensions (Privileged) */}
+            <div
+              className="col-span-full pt-5"
+              style={{ borderTop: '1px solid var(--riscv-border)' }}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <Network size={13} style={{ color: '#22d3ee' }} />
+                <h3 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#22d3ee' }}>S &amp; Sv Extensions — Privileged ISA</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <Layers size={11} style={{ color: 'var(--riscv-text-3)' }} />
+                    <h4 className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: 'var(--riscv-text-3)' }}>Memory (Sv)</h4>
+                    <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.s_mem.length}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {extensions.s_mem.map((item) => (
+                      <ExtensionBlock
+                        key={item.id}
+                        data={item}
+                        searchQuery={searchQuery}
+                        colorClass="border-cyan-900/50 bg-cyan-950/20 text-cyan-100"
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <Timer size={11} style={{ color: 'var(--riscv-text-3)' }} />
+                    <h4 className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: 'var(--riscv-text-3)' }}>Interrupts (Sm/Ss)</h4>
+                    <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.s_interrupt.length}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {extensions.s_interrupt.map((item) => (
+                      <ExtensionBlock
+                        key={item.id}
+                        data={item}
+                        searchQuery={searchQuery}
+                        colorClass="border-cyan-900/50 bg-cyan-950/20 text-cyan-100"
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <ServerCrash size={11} style={{ color: 'var(--riscv-text-3)' }} />
+                    <h4 className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: 'var(--riscv-text-3)' }}>Trap, Debug &amp; Hypervisor</h4>
+                    <span className="text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.s_trap.length}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {extensions.s_trap.map((item) => (
+                      <ExtensionBlock
+                        key={item.id}
+                        data={item}
+                        searchQuery={searchQuery}
+                        colorClass="border-cyan-900/50 bg-cyan-950/20 text-cyan-100"
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <h4 className="text-[10px] uppercase text-slate-500 font-bold">Interrupts (Sm/Ss)</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.s_interrupt.map((item) => (
-                    <ExtensionBlock
-                      key={item.id}
-                      data={item}
-                      searchQuery={searchQuery}
-                      colorClass="bg-cyan-950/30 border-cyan-800/30 text-cyan-100"
-                    />
-                  ))}
-                </div>
+            </div>
+          </div>
+
+          {/* ─── Sidebar ─────────────────────────────────────────────────── */}
+          <div className="lg:col-span-3 mt-6 lg:mt-0">
+            <div
+              className="sticky top-6 riscv-card backdrop-blur-sm min-h-[400px] max-h-[calc(100vh-3rem)] flex flex-col overflow-hidden"
+              style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.6)' }}
+            >
+              <div className="p-4 pb-3 flex items-center gap-2" style={{ borderBottom: '1px solid var(--riscv-border)' }}>
+                <Info size={14} style={{ color: 'var(--riscv-text-3)' }} />
+                <h2 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--riscv-text-3)' }}>Selected Details</h2>
               </div>
-              <div className="space-y-2">
-                <h4 className="text-[10px] uppercase text-slate-500 font-bold">
-                  Trap, Debug & Hypervisor Aux
-                </h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.s_trap.map((item) => (
-                    <ExtensionBlock
-                      key={item.id}
-                      data={item}
-                      searchQuery={searchQuery}
-                      colorClass="bg-cyan-950/30 border-cyan-800/30 text-cyan-100"
-                    />
-                  ))}
-                </div>
+
+              <div className="flex-1 overflow-y-auto overscroll-contain p-4 pt-3">
+                {selectedExt ? (
+                  <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div className="mb-6 flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <a
+                          href={selectedExt.url || 'https://github.com/riscv/riscv-isa-manual'}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-start gap-1 font-black tracking-tight break-words hover:opacity-80"
+                          style={{ fontSize: '1.5rem', lineHeight: 1.2, color: 'var(--riscv-gold)' }}
+                          title="Open reference link"
+                        >
+                          <span>{selectedExt.name}</span>
+                          <ArrowUpRight size={15} className="mt-1 shrink-0 opacity-70" />
+                        </a>
+                      </div>
+
+                      {selectedExt.discontinued === 1 && (
+                        <span className="shrink-0 px-2 py-1 rounded-md text-[10px] font-mono uppercase tracking-wide border bg-red-950/40 text-red-200 border-red-600/60">
+                          Discontinued
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="space-y-6">
+                      <div>
+                        <h4 className="text-[10px] uppercase tracking-widest font-semibold mb-1.5" style={{ color: 'var(--riscv-text-3)' }}>Description</h4>
+                        <p className="text-sm leading-relaxed" style={{ color: 'var(--riscv-text)' }}>{selectedExt.desc}</p>
+                      </div>
+
+                      <div className="riscv-card-2 p-3 rounded-lg">
+                        <h4 className="text-[10px] uppercase tracking-widest font-semibold mb-2 flex items-center gap-1" style={{ color: 'var(--riscv-violet)' }}>
+                          <ArrowRight size={10} /> Use Case
+                        </h4>
+                        <p className="text-sm italic" style={{ color: 'var(--riscv-text-2)' }}>{selectedExt.use}</p>
+                      </div>
+
+                      {/* Instruction list, when available */}
+                      {searchMatches &&
+                        searchMatches.extId === selectedExt.id &&
+                        searchMatches.query === searchQuery.trim().toLowerCase() &&
+                        searchMatches.mnemonics.length > 0 && (
+                          <div className="bg-slate-900 p-3 rounded border border-slate-700">
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="text-[10px] uppercase tracking-wider text-yellow-300 font-bold mb-0.5">
+                                  Search Hits ({searchMatches.mnemonics.length})
+                                </div>
+                                <div className="text-[11px] font-mono text-slate-200 truncate">
+                                  {searchMatches.mnemonics[searchMatches.index] || ''}
+                                  <span className="ml-2 text-slate-500">
+                                    ({searchMatches.index + 1}/{searchMatches.mnemonics.length})
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2 shrink-0">
+                                <button
+                                  type="button"
+                                  className="px-2 py-1 rounded border border-slate-600 bg-slate-800 text-[10px] font-mono text-slate-100 disabled:opacity-40"
+                                  onClick={() => {
+                                    setSearchMatches((current) => {
+                                      if (!current || current.extId !== selectedExt.id) return current;
+                                      const nextIndex =
+                                        (current.index - 1 + current.mnemonics.length) % current.mnemonics.length;
+                                      const mnemonic = current.mnemonics[nextIndex];
+                                      selectInstructionByMnemonic(selectedExt, mnemonic);
+                                      return { ...current, index: nextIndex };
+                                    });
+                                  }}
+                                  disabled={searchMatches.mnemonics.length < 2}
+                                >
+                                  Prev
+                                </button>
+                                <button
+                                  type="button"
+                                  className="px-2 py-1 rounded border border-slate-600 bg-slate-800 text-[10px] font-mono text-slate-100 disabled:opacity-40"
+                                  onClick={() => {
+                                    setSearchMatches((current) => {
+                                      if (!current || current.extId !== selectedExt.id) return current;
+                                      const nextIndex = (current.index + 1) % current.mnemonics.length;
+                                      const mnemonic = current.mnemonics[nextIndex];
+                                      selectInstructionByMnemonic(selectedExt, mnemonic);
+                                      return { ...current, index: nextIndex };
+                                    });
+                                  }}
+                                  disabled={searchMatches.mnemonics.length < 2}
+                                >
+                                  Next
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                      {Object.keys(selectedExt.instructions || {}).length > 0 && (
+                        <div className="bg-slate-900 p-3 rounded border border-slate-700">
+                          <h4 className="text-[10px] uppercase tracking-wider text-emerald-400 font-bold mb-2">
+                            Instruction Set Snapshot ({Object.keys(selectedExt.instructions || {}).length})
+                          </h4>
+                          <div className="flex flex-wrap gap-1">
+                            {Object.keys(selectedExt.instructions || {}).map((mnemonic) => {
+                              const q = searchQuery.trim().toLowerCase();
+                              const instructionDetails = selectedExt.instructions?.[mnemonic];
+                              const isHit =
+                                q.length &&
+                                (mnemonic.toLowerCase().includes(q) ||
+                                  instructionMatchesQuery(mnemonic, instructionDetails, q));
+                              const isActive = selectedInstruction?.mnemonic === mnemonic;
+                              const isClickable = Boolean(instructionDetails);
+                              const isDeprecated = Boolean(instructionDetails?.deprecated);
+                              return (
+                                <button
+                                  key={mnemonic}
+                                  type="button"
+                                  onClick={() => {
+                                    if (!isClickable) return;
+                                    setSelectedInstruction(
+                                      isActive ? null : { mnemonic, ...instructionDetails }
+                                    );
+                                    setSearchMatches((current) => {
+                                      if (
+                                        !current ||
+                                        current.extId !== selectedExt.id ||
+                                        current.query !== searchQuery.trim().toLowerCase()
+                                      ) {
+                                        return current;
+                                      }
+                                      const idx = current.mnemonics.indexOf(mnemonic);
+                                      if (idx === -1) return current;
+                                      return { ...current, index: idx };
+                                    });
+                                  }}
+                                  className={`px-1.5 py-0.5 rounded border text-[10px] font-mono tracking-tight ${isActive
+                                    ? isDeprecated
+                                      ? 'border-red-400 bg-red-500/10 text-red-200'
+                                      : 'border-emerald-400 bg-emerald-500/10 text-emerald-200'
+                                    : isHit
+                                      ? 'border-yellow-400 bg-yellow-500/10 text-yellow-200'
+                                      : isDeprecated
+                                        ? 'border-red-500/60 bg-red-500/5 text-red-200'
+                                        : 'border-slate-700 bg-slate-800/70'
+                                    }`}
+                                  title={
+                                    isClickable
+                                      ? `View details for ${mnemonic}`
+                                      : `${mnemonic} (no details yet)`
+                                  }
+                                  disabled={!isClickable}
+                                >
+                                  {mnemonic}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {extensionCsrs[selectedExt.id] && (
+                        <div className="bg-slate-900 p-3 rounded border border-slate-700">
+                          <h4 className="text-[10px] uppercase tracking-wider text-sky-300 font-bold mb-2">
+                            {(extensionCsrLabels[selectedExt.id] || 'CSRs')}{' '}
+                            ({extensionCsrs[selectedExt.id].length})
+                          </h4>
+                          <div className="flex flex-wrap gap-1">
+                            {extensionCsrs[selectedExt.id].map((csr) => (
+                              <span
+                                key={csr}
+                                className="px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800/70 text-[10px] font-mono text-slate-200"
+                              >
+                                {csr}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedInstruction && (
+                        <div className="bg-slate-900 p-3 rounded border border-slate-700">
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            <h4 className="text-[10px] uppercase tracking-wider text-purple-300 font-bold flex items-center gap-1">
+                              <ArrowRight size={10} /> Instruction Details
+                            </h4>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded border border-slate-600 bg-slate-800 text-[10px] font-mono text-slate-100 hover:border-slate-500"
+                                onClick={async () => {
+                                  const text = formatInstructionForClipboard(selectedExt, selectedInstruction);
+                                  const ok = await copyTextToClipboard(text);
+                                  setCopyStatus(ok ? 'copied' : 'failed');
+                                  window.setTimeout(() => setCopyStatus(null), 1500);
+                                }}
+                                title="Copy extension + instruction details"
+                              >
+                                <Copy size={12} />
+                                {copyStatus === 'copied'
+                                  ? 'Copied'
+                                  : copyStatus === 'failed'
+                                    ? 'Copy failed'
+                                    : 'Copy'}
+                              </button>
+                              <button
+                                type="button"
+                                className="text-[10px] font-mono text-slate-500 hover:text-slate-300"
+                                onClick={() => setSelectedInstruction(null)}
+                              >
+                                Close
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="mb-3 flex items-start justify-between gap-2">
+                            <div className="text-white font-black tracking-tight text-xl">
+                              {selectedInstruction.mnemonic}
+                            </div>
+                            {selectedInstruction.deprecated && (
+                              <span className="shrink-0 px-2 py-1 rounded-md text-[10px] font-mono uppercase tracking-wide border bg-red-950/40 text-red-200 border-red-600/60">
+                                Discontinued
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="space-y-3">
+                            <div>
+                              <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
+                                Encoding
+                              </div>
+                              <EncodingDiagram encoding={selectedInstruction.encoding} />
+                              <div className="mt-1 text-[10px] text-slate-500">
+                                Fixed bits are <span className="font-mono">0/1</span>, variable bits are{' '}
+                                <span className="font-mono">x</span>.
+                              </div>
+                            </div>
+
+                            <div>
+                              <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
+                                Variable Fields
+                              </div>
+                              <div className="flex flex-wrap gap-1">
+                                {(selectedInstruction.variable_fields || []).map((field) => (
+                                  <span
+                                    key={field}
+                                    className="px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800/70 text-[10px] font-mono text-slate-200"
+                                  >
+                                    {field}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
+                                  Match
+                                </div>
+                                <div
+                                  className={`font-mono text-[11px] text-slate-100 bg-slate-800/70 border rounded px-2 py-1 ${searchQuery.trim().length &&
+                                    String(selectedInstruction.match || '')
+                                      .toLowerCase()
+                                      .includes(searchQuery.trim().toLowerCase())
+                                    ? 'border-yellow-400 bg-yellow-500/10'
+                                    : 'border-slate-700'
+                                    }`}
+                                >
+                                  {selectedInstruction.match}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
+                                  Mask
+                                </div>
+                                <div
+                                  className={`font-mono text-[11px] text-slate-100 bg-slate-800/70 border rounded px-2 py-1 ${searchQuery.trim().length &&
+                                    String(selectedInstruction.mask || '')
+                                      .toLowerCase()
+                                      .includes(searchQuery.trim().toLowerCase())
+                                    ? 'border-yellow-400 bg-yellow-500/10'
+                                    : 'border-slate-700'
+                                    }`}
+                                >
+                                  {selectedInstruction.mask}
+                                </div>
+                              </div>
+                            </div>
+
+                            {compressedMapping && (
+                              <div className="rounded border border-slate-700 bg-slate-950/50 p-3">
+                                <div className="text-[10px] uppercase tracking-wider text-cyan-300 font-bold mb-2">
+                                  Compressed Mapping
+                                </div>
+                                <div className="space-y-2">
+                                  <div>
+                                    <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
+                                      Compressed
+                                    </div>
+                                    <div className="font-mono text-[11px] text-slate-100 bg-slate-800/70 border border-slate-700 rounded px-2 py-1">
+                                      {compressedMapping.compressed}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
+                                      Standard Equivalent
+                                    </div>
+                                    {hasStandardEquivalent ? (
+                                      <button
+                                        type="button"
+                                        className="w-full text-left font-mono text-[11px] text-slate-100 bg-slate-800/70 border border-slate-700 rounded px-2 py-1 hover:border-cyan-400/60"
+                                        onClick={() => selectStandardEquivalent(standardEquivalentMnemonic)}
+                                        title="Open standard instruction details"
+                                      >
+                                        <span className="inline-flex items-center gap-1">
+                                          {compressedMapping.standard}
+                                          <ArrowUpRight size={12} className="opacity-70" />
+                                        </span>
+                                      </button>
+                                    ) : (
+                                      <div className="font-mono text-[11px] text-slate-100 bg-slate-800/70 border border-slate-700 rounded px-2 py-1">
+                                        {compressedMapping.standard}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
+                                      Equivalent Instruction
+                                    </div>
+                                    {standardEquivalentMnemonic ? (
+                                      hasStandardEquivalent ? (
+                                        <button
+                                          type="button"
+                                          className="inline-flex items-center gap-1 text-[11px] font-mono text-cyan-200 hover:text-cyan-100 underline"
+                                          onClick={() => selectStandardEquivalent(standardEquivalentMnemonic)}
+                                          title="Open standard instruction details"
+                                        >
+                                          {standardEquivalentMnemonic}
+                                          <ArrowUpRight size={12} className="opacity-70" />
+                                        </button>
+                                      ) : (
+                                        <div className="text-[11px] text-slate-500 font-mono">
+                                          {standardEquivalentMnemonic}
+                                        </div>
+                                      )
+                                    ) : (
+                                      <div className="text-[11px] text-slate-500">Unavailable</div>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
+                                      Description
+                                    </div>
+                                    <div className="text-[11px] text-slate-200">{compressedMapping.description}</div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {compressedEquivalents.length > 0 && (
+                              <div className="rounded border border-slate-700 bg-slate-950/40 p-3">
+                                <div className="text-[10px] uppercase tracking-wider text-emerald-300 font-bold mb-2">
+                                  Compressed Equivalents
+                                </div>
+                                <div className="space-y-2">
+                                  {compressedEquivalents.map((entry) => (
+                                    <button
+                                      key={entry.mnemonic}
+                                      type="button"
+                                      className="w-full text-left rounded border border-slate-700 bg-slate-900/60 px-2 py-1.5 hover:border-emerald-400/60"
+                                      onClick={() => selectCompressedEquivalent(entry.mnemonic)}
+                                      title={`Open ${entry.mnemonic} details`}
+                                    >
+                                      <div className="flex items-center gap-1 text-[11px] font-mono text-emerald-200">
+                                        {normalizeMnemonicKey(entry.mnemonic)}
+                                        <ArrowUpRight size={12} className="opacity-70" />
+                                      </div>
+                                      <div className="text-[10px] font-mono text-slate-400">{entry.compressed}</div>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                          </div>
+                        </div>
+                      )}
+
+                      {activeProfile && (
+                        <div
+                          className={`
+                      mt-4 p-3 rounded text-xs flex items-center gap-2 border
+                      ${isHighlighted(selectedExt.id)
+                              ? 'bg-yellow-900/20 border-yellow-700/30 text-yellow-200'
+                              : 'bg-slate-800 border-slate-700 text-slate-500'
+                            }
+                    `}
+                        >
+                          {isHighlighted(selectedExt.id) ? (
+                            <>
+                              <div className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
+                              Required in <strong>{activeProfile}</strong>
+                            </>
+                          ) : (
+                            <>
+                              <div className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+                              Not required in {activeProfile}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-[300px] flex flex-col items-center justify-center text-center space-y-3" style={{ color: 'var(--riscv-text-3)' }}>
+                    <div className="p-4 rounded-full" style={{ background: 'var(--riscv-surface-2)', border: '1px solid var(--riscv-border-2)' }}>
+                      <CircuitBoard size={28} style={{ color: 'var(--riscv-muted)' }} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium mb-1" style={{ color: 'var(--riscv-text-2)' }}>No Extension Selected</p>
+                      <p className="text-[11px] max-w-[160px] mx-auto" style={{ color: 'var(--riscv-text-3)' }}>
+                        Click any tile to explore specifications, encodings &amp; profiles.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-	        {/* Sidebar Info Panel */}
-		        <div className="lg:col-span-3 mt-6 lg:mt-0">
-		          <div className="sticky top-6 bg-slate-800/80 border border-slate-700 backdrop-blur-sm rounded-xl shadow-2xl min-h-[400px] max-h-[calc(100vh-3rem)] flex flex-col overflow-hidden">
-		            <div className="p-4 pb-3 border-b border-slate-700/60">
-	              <h2 className="text-sm font-bold text-slate-400 flex items-center gap-2 uppercase tracking-wide">
-	                <Info size={16} /> Selected Details
-	              </h2>
-	            </div>
+        {/* ─── Footer ─────────────────────────────────────────────────── */}
+        <footer
+          className="mt-10 pb-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px]"
+          style={{ borderTop: '1px solid var(--riscv-border)', paddingTop: '1.5rem', color: 'var(--riscv-text-3)' }}
+        >
+          <div className="flex items-center gap-2">
+            <CircuitBoard size={14} style={{ color: 'var(--riscv-gold)' }} />
+            <span className="font-semibold" style={{ color: 'var(--riscv-text-2)' }}>RISC-V Extension Landscape</span>
+            <span style={{ color: 'var(--riscv-border-2)' }}>·</span>
+            <span>Data sourced from <a href="https://github.com/riscv/riscv-isa-manual" target="_blank" rel="noreferrer" className="hover:underline" style={{ color: 'var(--riscv-violet)' }}>riscv/riscv-isa-manual</a></span>
+          </div>
+          <div className="flex items-center gap-3">
+            <a
+              href="https://github.com/riscv/riscv-isa-manual"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:opacity-80"
+              style={{ color: 'var(--riscv-text-2)' }}
+              title="View on GitHub"
+            >
+              <BookOpen size={14} />
+            </a>
+          </div>
+        </footer>
+      </div>
 
-	            <div className="flex-1 overflow-y-auto overscroll-contain p-4 pt-3">
-	              {selectedExt ? (
-	                <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-	                <div className="mb-6 flex items-start justify-between gap-3">
-	                  <div className="min-w-0">
-	                    <a
-	                      href={selectedExt.url || 'https://github.com/riscv/riscv-isa-manual'}
-	                      target="_blank"
-	                      rel="noreferrer"
-	                      className="inline-flex items-start gap-1 text-3xl font-black text-white tracking-tight break-words hover:text-purple-300"
-	                      title="Open reference link"
-	                    >
-	                      <span>{selectedExt.name}</span>
-	                      <ArrowUpRight size={18} className="mt-1 shrink-0 opacity-80" />
-	                    </a>
-                  </div>
+      {encoderValidatorOpen && (
+        <div className="fixed inset-0 z-50">
+          <div
+            className="absolute inset-0"
+            style={{ background: 'rgba(7,7,14,0.85)', backdropFilter: 'blur(4px)' }}
+            onClick={() => setEncoderValidatorOpen(false)}
+            role="presentation"
+          />
 
-                  {selectedExt.discontinued === 1 && (
-                    <span className="shrink-0 px-2 py-1 rounded-md text-[10px] font-mono uppercase tracking-wide border bg-red-950/40 text-red-200 border-red-600/60">
-                      Discontinued
-                    </span>
-                  )}
+          <div className="absolute inset-0 p-3 md:p-8 flex items-start justify-center overflow-y-auto">
+            <div className="animate-scale-in w-full max-w-3xl riscv-card overflow-hidden" style={{ boxShadow: '0 0 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(139,124,248,0.15)' }}>
+              <div className="p-4 flex items-start justify-between gap-3" style={{ borderBottom: '1px solid var(--riscv-border)' }}>
+                <div className="min-w-0">
+                  <h3 className="font-bold flex items-center gap-2" style={{ color: 'var(--riscv-text)', fontSize: '14px' }}>
+                    <ScanSearch size={15} style={{ color: 'var(--riscv-violet)' }} />
+                    <span>Encoder Validator</span>
+                  </h3>
+                  <p className="text-[11px] mt-1" style={{ color: 'var(--riscv-text-3)' }}>
+                    Enter a 32-bit encoding (0/1/-) or Match+Mask (hex). Detects overlaps against the full ISA database.
+                  </p>
                 </div>
 
-                <div className="space-y-6">
+                <button
+                  type="button"
+                  className="riscv-btn p-1.5"
+                  onClick={() => setEncoderValidatorOpen(false)}
+                  title="Close"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+
+              <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
                   <div>
-                    <h4 className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-                      Description
-                    </h4>
-                    <p className="text-slate-200 leading-snug">{selectedExt.desc}</p>
-                  </div>
-
-                  <div className="bg-slate-900 p-3 rounded border border-slate-700">
-                    <h4 className="text-[10px] uppercase tracking-wider text-blue-400 font-bold mb-2 flex items-center gap-1">
-                      <ArrowRight size={10} /> Use Case
-                    </h4>
-                    <p className="text-slate-400 text-sm italic">{selectedExt.use}</p>
-                  </div>
-
-	                  {/* Instruction list, when available */}
-	                  {searchMatches &&
-	                    searchMatches.extId === selectedExt.id &&
-	                    searchMatches.query === searchQuery.trim().toLowerCase() &&
-	                    searchMatches.mnemonics.length > 0 && (
-	                      <div className="bg-slate-900 p-3 rounded border border-slate-700">
-	                        <div className="flex items-center justify-between gap-3">
-	                          <div className="min-w-0">
-	                            <div className="text-[10px] uppercase tracking-wider text-yellow-300 font-bold mb-0.5">
-	                              Search Hits ({searchMatches.mnemonics.length})
-	                            </div>
-	                            <div className="text-[11px] font-mono text-slate-200 truncate">
-	                              {searchMatches.mnemonics[searchMatches.index] || ''}
-	                              <span className="ml-2 text-slate-500">
-	                                ({searchMatches.index + 1}/{searchMatches.mnemonics.length})
-	                              </span>
-	                            </div>
-	                          </div>
-
-	                          <div className="flex items-center gap-2 shrink-0">
-	                            <button
-	                              type="button"
-	                              className="px-2 py-1 rounded border border-slate-600 bg-slate-800 text-[10px] font-mono text-slate-100 disabled:opacity-40"
-	                              onClick={() => {
-	                                setSearchMatches((current) => {
-	                                  if (!current || current.extId !== selectedExt.id) return current;
-	                                  const nextIndex =
-	                                    (current.index - 1 + current.mnemonics.length) % current.mnemonics.length;
-	                                  const mnemonic = current.mnemonics[nextIndex];
-	                                  selectInstructionByMnemonic(selectedExt, mnemonic);
-	                                  return { ...current, index: nextIndex };
-	                                });
-	                              }}
-	                              disabled={searchMatches.mnemonics.length < 2}
-	                            >
-	                              Prev
-	                            </button>
-	                            <button
-	                              type="button"
-	                              className="px-2 py-1 rounded border border-slate-600 bg-slate-800 text-[10px] font-mono text-slate-100 disabled:opacity-40"
-	                              onClick={() => {
-	                                setSearchMatches((current) => {
-	                                  if (!current || current.extId !== selectedExt.id) return current;
-	                                  const nextIndex = (current.index + 1) % current.mnemonics.length;
-	                                  const mnemonic = current.mnemonics[nextIndex];
-	                                  selectInstructionByMnemonic(selectedExt, mnemonic);
-	                                  return { ...current, index: nextIndex };
-	                                });
-	                              }}
-	                              disabled={searchMatches.mnemonics.length < 2}
-	                            >
-	                              Next
-	                            </button>
-	                          </div>
-	                        </div>
-	                      </div>
-	                    )}
-
-	                  {Object.keys(selectedExt.instructions || {}).length > 0 && (
-	                    <div className="bg-slate-900 p-3 rounded border border-slate-700">
-	                      <h4 className="text-[10px] uppercase tracking-wider text-emerald-400 font-bold mb-2">
-	                        Instruction Set Snapshot ({Object.keys(selectedExt.instructions || {}).length})
-	                      </h4>
-	                      <div className="flex flex-wrap gap-1">
-		                        {Object.keys(selectedExt.instructions || {}).map((mnemonic) => {
-		                          const q = searchQuery.trim().toLowerCase();
-		                          const instructionDetails = selectedExt.instructions?.[mnemonic];
-		                          const isHit =
-		                            q.length &&
-		                            (mnemonic.toLowerCase().includes(q) ||
-		                              instructionMatchesQuery(mnemonic, instructionDetails, q));
-		                          const isActive = selectedInstruction?.mnemonic === mnemonic;
-		                          const isClickable = Boolean(instructionDetails);
-		                          const isDeprecated = Boolean(instructionDetails?.deprecated);
-		                          return (
-	                            <button
-	                              key={mnemonic}
-	                              type="button"
-		                              onClick={() => {
-		                                if (!isClickable) return;
-		                                setSelectedInstruction(
-		                                  isActive ? null : { mnemonic, ...instructionDetails }
-		                                );
-		                                setSearchMatches((current) => {
-		                                  if (
-		                                    !current ||
-		                                    current.extId !== selectedExt.id ||
-		                                    current.query !== searchQuery.trim().toLowerCase()
-		                                  ) {
-		                                    return current;
-		                                  }
-		                                  const idx = current.mnemonics.indexOf(mnemonic);
-		                                  if (idx === -1) return current;
-		                                  return { ...current, index: idx };
-		                                });
-		                              }}
-	                              className={`px-1.5 py-0.5 rounded border text-[10px] font-mono tracking-tight ${
-	                                isActive
-	                                  ? isDeprecated
-	                                      ? 'border-red-400 bg-red-500/10 text-red-200'
-	                                      : 'border-emerald-400 bg-emerald-500/10 text-emerald-200'
-	                                  : isHit
-	                                      ? 'border-yellow-400 bg-yellow-500/10 text-yellow-200'
-	                                      : isDeprecated
-	                                          ? 'border-red-500/60 bg-red-500/5 text-red-200'
-	                                          : 'border-slate-700 bg-slate-800/70'
-	                              }`}
-	                              title={
-	                                isClickable
-	                                  ? `View details for ${mnemonic}`
-	                                  : `${mnemonic} (no details yet)`
-	                              }
-	                              disabled={!isClickable}
-	                            >
-	                              {mnemonic}
-	                            </button>
-	                          );
-	                        })}
-	                      </div>
-	                    </div>
-	                  )}
-
-                    {extensionCsrs[selectedExt.id] && (
-                      <div className="bg-slate-900 p-3 rounded border border-slate-700">
-                        <h4 className="text-[10px] uppercase tracking-wider text-sky-300 font-bold mb-2">
-                          {(extensionCsrLabels[selectedExt.id] || 'CSRs')}{' '}
-                          ({extensionCsrs[selectedExt.id].length})
-                        </h4>
-                        <div className="flex flex-wrap gap-1">
-                          {extensionCsrs[selectedExt.id].map((csr) => (
-                            <span
-                              key={csr}
-                              className="px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800/70 text-[10px] font-mono text-slate-200"
-                            >
-                              {csr}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-		                  {selectedInstruction && (
-		                    <div className="bg-slate-900 p-3 rounded border border-slate-700">
-		                      <div className="flex items-start justify-between gap-3 mb-2">
-		                        <h4 className="text-[10px] uppercase tracking-wider text-purple-300 font-bold flex items-center gap-1">
-		                          <ArrowRight size={10} /> Instruction Details
-		                        </h4>
-		                        <div className="flex items-center gap-2">
-		                          <button
-		                            type="button"
-		                            className="inline-flex items-center gap-1 px-2 py-1 rounded border border-slate-600 bg-slate-800 text-[10px] font-mono text-slate-100 hover:border-slate-500"
-		                            onClick={async () => {
-		                              const text = formatInstructionForClipboard(selectedExt, selectedInstruction);
-		                              const ok = await copyTextToClipboard(text);
-		                              setCopyStatus(ok ? 'copied' : 'failed');
-		                              window.setTimeout(() => setCopyStatus(null), 1500);
-		                            }}
-		                            title="Copy extension + instruction details"
-		                          >
-		                            <Copy size={12} />
-		                            {copyStatus === 'copied'
-		                              ? 'Copied'
-		                              : copyStatus === 'failed'
-		                                  ? 'Copy failed'
-		                                  : 'Copy'}
-		                          </button>
-		                          <button
-		                            type="button"
-		                            className="text-[10px] font-mono text-slate-500 hover:text-slate-300"
-		                            onClick={() => setSelectedInstruction(null)}
-		                          >
-		                            Close
-		                          </button>
-		                        </div>
-		                      </div>
-
-	                      <div className="mb-3 flex items-start justify-between gap-2">
-	                        <div className="text-white font-black tracking-tight text-xl">
-	                          {selectedInstruction.mnemonic}
-	                        </div>
-	                        {selectedInstruction.deprecated && (
-	                          <span className="shrink-0 px-2 py-1 rounded-md text-[10px] font-mono uppercase tracking-wide border bg-red-950/40 text-red-200 border-red-600/60">
-	                            Discontinued
-	                          </span>
-	                        )}
-	                      </div>
-
-	                      <div className="space-y-3">
-	                        <div>
-	                          <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-	                            Encoding
-	                          </div>
-	                          <EncodingDiagram encoding={selectedInstruction.encoding} />
-	                          <div className="mt-1 text-[10px] text-slate-500">
-	                            Fixed bits are <span className="font-mono">0/1</span>, variable bits are{' '}
-	                            <span className="font-mono">x</span>.
-	                          </div>
-	                        </div>
-
-	                        <div>
-	                          <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-	                            Variable Fields
-	                          </div>
-	                          <div className="flex flex-wrap gap-1">
-	                            {(selectedInstruction.variable_fields || []).map((field) => (
-	                              <span
-	                                key={field}
-	                                className="px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800/70 text-[10px] font-mono text-slate-200"
-	                              >
-	                                {field}
-	                              </span>
-	                            ))}
-	                          </div>
-	                        </div>
-
-		                        <div className="grid grid-cols-2 gap-2">
-		                          <div>
-		                            <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-		                              Match
-		                            </div>
-		                            <div
-		                              className={`font-mono text-[11px] text-slate-100 bg-slate-800/70 border rounded px-2 py-1 ${
-		                                searchQuery.trim().length &&
-		                                String(selectedInstruction.match || '')
-		                                  .toLowerCase()
-		                                  .includes(searchQuery.trim().toLowerCase())
-		                                  ? 'border-yellow-400 bg-yellow-500/10'
-		                                  : 'border-slate-700'
-		                              }`}
-		                            >
-		                              {selectedInstruction.match}
-		                            </div>
-		                          </div>
-		                          <div>
-		                            <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-		                              Mask
-		                            </div>
-		                            <div
-		                              className={`font-mono text-[11px] text-slate-100 bg-slate-800/70 border rounded px-2 py-1 ${
-		                                searchQuery.trim().length &&
-		                                String(selectedInstruction.mask || '')
-		                                  .toLowerCase()
-		                                  .includes(searchQuery.trim().toLowerCase())
-		                                  ? 'border-yellow-400 bg-yellow-500/10'
-		                                  : 'border-slate-700'
-		                              }`}
-		                            >
-		                              {selectedInstruction.mask}
-		                            </div>
-		                          </div>
-		                        </div>
-
-                        {compressedMapping && (
-                          <div className="rounded border border-slate-700 bg-slate-950/50 p-3">
-                            <div className="text-[10px] uppercase tracking-wider text-cyan-300 font-bold mb-2">
-                              Compressed Mapping
-                            </div>
-                            <div className="space-y-2">
-                              <div>
-                                <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-                                  Compressed
-                                </div>
-                                <div className="font-mono text-[11px] text-slate-100 bg-slate-800/70 border border-slate-700 rounded px-2 py-1">
-                                  {compressedMapping.compressed}
-                                </div>
-                              </div>
-                              <div>
-                                <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-                                  Standard Equivalent
-                                </div>
-                                {hasStandardEquivalent ? (
-                                  <button
-                                    type="button"
-                                    className="w-full text-left font-mono text-[11px] text-slate-100 bg-slate-800/70 border border-slate-700 rounded px-2 py-1 hover:border-cyan-400/60"
-                                    onClick={() => selectStandardEquivalent(standardEquivalentMnemonic)}
-                                    title="Open standard instruction details"
-                                  >
-                                    <span className="inline-flex items-center gap-1">
-                                      {compressedMapping.standard}
-                                      <ArrowUpRight size={12} className="opacity-70" />
-                                    </span>
-                                  </button>
-                                ) : (
-                                  <div className="font-mono text-[11px] text-slate-100 bg-slate-800/70 border border-slate-700 rounded px-2 py-1">
-                                    {compressedMapping.standard}
-                                  </div>
-                                )}
-                              </div>
-                              <div>
-                                <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-                                  Equivalent Instruction
-                                </div>
-                                {standardEquivalentMnemonic ? (
-                                  hasStandardEquivalent ? (
-                                    <button
-                                      type="button"
-                                      className="inline-flex items-center gap-1 text-[11px] font-mono text-cyan-200 hover:text-cyan-100 underline"
-                                      onClick={() => selectStandardEquivalent(standardEquivalentMnemonic)}
-                                      title="Open standard instruction details"
-                                    >
-                                      {standardEquivalentMnemonic}
-                                      <ArrowUpRight size={12} className="opacity-70" />
-                                    </button>
-                                  ) : (
-                                    <div className="text-[11px] text-slate-500 font-mono">
-                                      {standardEquivalentMnemonic}
-                                    </div>
-                                  )
-                                ) : (
-                                  <div className="text-[11px] text-slate-500">Unavailable</div>
-                                )}
-                              </div>
-                              <div>
-                                <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-                                  Description
-                                </div>
-                                <div className="text-[11px] text-slate-200">{compressedMapping.description}</div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {compressedEquivalents.length > 0 && (
-                          <div className="rounded border border-slate-700 bg-slate-950/40 p-3">
-                            <div className="text-[10px] uppercase tracking-wider text-emerald-300 font-bold mb-2">
-                              Compressed Equivalents
-                            </div>
-                            <div className="space-y-2">
-                              {compressedEquivalents.map((entry) => (
-                                <button
-                                  key={entry.mnemonic}
-                                  type="button"
-                                  className="w-full text-left rounded border border-slate-700 bg-slate-900/60 px-2 py-1.5 hover:border-emerald-400/60"
-                                  onClick={() => selectCompressedEquivalent(entry.mnemonic)}
-                                  title={`Open ${entry.mnemonic} details`}
-                                >
-                                  <div className="flex items-center gap-1 text-[11px] font-mono text-emerald-200">
-                                    {normalizeMnemonicKey(entry.mnemonic)}
-                                    <ArrowUpRight size={12} className="opacity-70" />
-                                  </div>
-                                  <div className="text-[10px] font-mono text-slate-400">{entry.compressed}</div>
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-		                      </div>
-		                    </div>
-		                  )}
-
-                  {activeProfile && (
-                    <div
-                      className={`
-                      mt-4 p-3 rounded text-xs flex items-center gap-2 border
-                      ${
-                        isHighlighted(selectedExt.id)
-                          ? 'bg-yellow-900/20 border-yellow-700/30 text-yellow-200'
-                          : 'bg-slate-800 border-slate-700 text-slate-500'
+                    <div className="text-[10px] uppercase tracking-widest font-semibold mb-1.5" style={{ color: 'var(--riscv-text-3)' }}>Proposed Mnemonic <span style={{ fontWeight: 400 }}>(optional)</span></div>
+                    <input
+                      type="text"
+                      value={encoderValidatorInput.mnemonic}
+                      onChange={(e) =>
+                        setEncoderValidatorInput((prev) => ({ ...prev, mnemonic: e.target.value }))
                       }
-                    `}
+                      placeholder="e.g. MYOP"
+                      className="riscv-input w-full px-3 py-2 text-sm font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="text-[10px] uppercase tracking-widest font-semibold mb-1.5" style={{ color: 'var(--riscv-text-3)' }}>Encoding <span style={{ fontWeight: 400 }}>(required if no match/mask)</span></div>
+                    <input
+                      type="text"
+                      value={encoderValidatorInput.encoding}
+                      onChange={(e) =>
+                        setEncoderValidatorInput((prev) => ({ ...prev, encoding: e.target.value }))
+                      }
+                      placeholder="-----------------000-----1100111"
+                      className="riscv-input w-full px-3 py-2 text-sm font-mono"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <div className="text-[10px] uppercase tracking-widest font-semibold mb-1.5" style={{ color: 'var(--riscv-text-3)' }}>Match (hex)</div>
+                      <input
+                        type="text"
+                        value={encoderValidatorInput.match}
+                        onChange={(e) =>
+                          setEncoderValidatorInput((prev) => ({ ...prev, match: e.target.value }))
+                        }
+                        placeholder="0x67"
+                        className="riscv-input w-full px-3 py-2 text-sm font-mono"
+                      />
+                    </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-widest font-semibold mb-1.5" style={{ color: 'var(--riscv-text-3)' }}>Mask (hex)</div>
+                      <input
+                        type="text"
+                        value={encoderValidatorInput.mask}
+                        onChange={(e) =>
+                          setEncoderValidatorInput((prev) => ({ ...prev, mask: e.target.value }))
+                        }
+                        placeholder="0x707f"
+                        className="riscv-input w-full px-3 py-2 text-sm font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={runEncoderValidation}
+                      className="riscv-btn riscv-btn-violet inline-flex items-center gap-2 px-4 py-2 text-[11px]"
                     >
-                      {isHighlighted(selectedExt.id) ? (
-                        <>
-                          <div className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
-                          Required in <strong>{activeProfile}</strong>
-                        </>
-                      ) : (
-                        <>
-                          <div className="w-1.5 h-1.5 rounded-full bg-slate-600" />
-                          Not required in {activeProfile}
-                        </>
-	                      )}
-	                    </div>
-	                  )}
-	                </div>
-	                </div>
-	              ) : (
-	                <div className="h-[300px] flex flex-col items-center justify-center text-slate-600 text-center space-y-4">
-	                  <LayoutGrid size={32} className="opacity-50" />
-	                  <p className="text-xs max-w-[150px]">
-	                    Click any block on the left to view technical specifications and use cases.
-	                  </p>
-	                </div>
-	              )}
-	            </div>
-		          </div>
-		        </div>
-	      </div>
+                      <ScanSearch size={14} />
+                      Validate
+                    </button>
 
-	      {encoderValidatorOpen && (
-	        <div className="fixed inset-0 z-50">
-	          <div
-	            className="absolute inset-0 bg-black/60"
-	            onClick={() => setEncoderValidatorOpen(false)}
-	            role="presentation"
-	          />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEncoderValidatorInput({ mnemonic: '', encoding: '', match: '', mask: '' });
+                        setEncoderValidatorResult(null);
+                        setEncoderValidatorCopyStatus(null);
+                      }}
+                      className="riscv-btn px-3 py-2 text-[11px]"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </div>
 
-	          <div className="absolute inset-0 p-3 md:p-8 flex items-start justify-center overflow-y-auto">
-	            <div className="w-full max-w-3xl bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden">
-	              <div className="p-4 border-b border-slate-700 flex items-start justify-between gap-3">
-	                <div className="min-w-0">
-	                  <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wide flex items-center gap-2">
-	                    <ScanSearch size={16} /> Encoder Validator
-	                  </h3>
-	                  <p className="text-xs text-slate-500 mt-1">
-	                    Provide either a 32-bit Encoding pattern (0/1/-), or Match+Mask (hex). The validator lists any
-	                    existing instructions that overlap.
-	                  </p>
-	                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: 'var(--riscv-text-3)' }}>Results</div>
+                    <button
+                      type="button"
+                      disabled={!encoderValidatorResult?.proposed}
+                      onClick={async () => {
+                        if (!encoderValidatorResult?.proposed) return;
+                        const report = formatEncoderValidatorReport(
+                          encoderValidatorResult.proposed,
+                          encoderValidatorResult
+                        );
+                        const ok = await copyTextToClipboard(report);
+                        setEncoderValidatorCopyStatus(ok ? 'copied' : 'failed');
+                        window.setTimeout(() => setEncoderValidatorCopyStatus(null), 1500);
+                      }}
+                      className="riscv-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] disabled:opacity-30"
+                      title="Copy validation report"
+                    >
+                      <Copy size={12} />
+                      {encoderValidatorCopyStatus === 'copied'
+                        ? 'Copied!'
+                        : encoderValidatorCopyStatus === 'failed'
+                          ? 'Failed'
+                          : 'Copy report'}
+                    </button>
+                  </div>
 
-	                <button
-	                  type="button"
-	                  className="p-2 rounded border border-slate-600 bg-slate-800 text-slate-100 hover:border-slate-500"
-	                  onClick={() => setEncoderValidatorOpen(false)}
-	                  title="Close"
-	                >
-	                  <X size={16} />
-	                </button>
-	              </div>
+                  {!encoderValidatorResult ? (
+                    <div
+                      className="text-[11px] rounded-lg p-3"
+                      style={{ background: 'var(--riscv-surface-2)', border: '1px solid var(--riscv-border-2)', color: 'var(--riscv-text-3)' }}
+                    >
+                      Enter a proposed encoding and click Validate.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {encoderValidatorResult.errors.length > 0 && (
+                        <div className="border border-red-800/40 bg-red-950/30 rounded p-3">
+                          <div className="text-[10px] uppercase tracking-wider text-red-200 font-bold mb-2">
+                            Errors
+                          </div>
+                          <ul className="text-xs text-red-100 space-y-1 list-disc pl-4">
+                            {encoderValidatorResult.errors.map((err) => (
+                              <li key={err}>{err}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
 
-	              <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-	                <div className="space-y-3">
-	                  <div>
-	                    <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-	                      Proposed mnemonic (optional)
-	                    </div>
-	                    <input
-	                      type="text"
-	                      value={encoderValidatorInput.mnemonic}
-	                      onChange={(e) =>
-	                        setEncoderValidatorInput((prev) => ({ ...prev, mnemonic: e.target.value }))
-	                      }
-	                      placeholder="e.g. MYOP"
-	                      className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-sm font-mono text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/60 focus:border-yellow-300"
-	                    />
-	                  </div>
+                      {encoderValidatorResult.proposed && (
+                        <div className="border border-slate-700 rounded p-3 bg-slate-800/50">
+                          <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">
+                            Normalized Proposal
+                          </div>
+                          <div className="space-y-2">
+                            <div className="font-mono text-[11px] text-slate-200 break-all">
+                              Encoding: {encoderValidatorResult.proposed.encoding}
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="font-mono text-[11px] text-slate-200">Match: {encoderValidatorResult.proposed.match}</div>
+                              <div className="font-mono text-[11px] text-slate-200">Mask: {encoderValidatorResult.proposed.mask}</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
-	                  <div>
-	                    <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-	                      Encoding (required if no match/mask)
-	                    </div>
-	                    <input
-	                      type="text"
-	                      value={encoderValidatorInput.encoding}
-	                      onChange={(e) =>
-	                        setEncoderValidatorInput((prev) => ({ ...prev, encoding: e.target.value }))
-	                      }
-	                      placeholder="-----------------000-----1100111"
-	                      className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-sm font-mono text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/60 focus:border-yellow-300"
-	                    />
-	                  </div>
+                      {encoderValidatorResult.proposed && (
+                        <div className="rounded-lg p-3" style={{ border: '1px solid var(--riscv-border-2)', background: 'var(--riscv-surface-2)' }}>
+                          <div className="text-[10px] uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--riscv-text-3)' }}>Conflicts ({encoderValidatorResult.conflicts.length})</div>
+                          {encoderValidatorResult.conflicts.length === 0 ? (
+                            <div className="conflict-none rounded-lg p-3 flex items-center gap-2 border">
+                              <CheckCircle2 size={15} style={{ color: 'var(--riscv-success)', flexShrink: 0 }} />
+                              <span className="text-[12px] font-medium" style={{ color: 'var(--riscv-success)' }}>No overlaps found in ISA database — safe to use.</span>
+                            </div>
+                          ) : (
+                            <div className="space-y-2 max-h-[340px] overflow-y-auto overscroll-contain pr-1">
+                              {encoderValidatorResult.conflicts.map((conflict) => {
+                                const severityCls =
+                                  conflict.type === 'identical' ? 'conflict-identical' :
+                                    conflict.type === 'proposed_subset_of_existing' ? 'conflict-subset-in' :
+                                      conflict.type === 'existing_subset_of_proposed' ? 'conflict-subset-out' :
+                                        'conflict-partial';
+                                const SeverityIcon =
+                                  conflict.type === 'identical' ? XCircle :
+                                    conflict.type === 'partial_overlap' ? AlertCircle : AlertTriangle;
+                                return (
+                                  <div
+                                    key={`${conflict.other.extId}:${conflict.other.mnemonic}:${conflict.type}`}
+                                    className={`rounded-lg p-2.5 border ${severityCls}`}
+                                  >
+                                    <div className="flex items-start justify-between gap-2">
+                                      <div className="min-w-0 flex items-start gap-1.5">
+                                        <SeverityIcon size={13} className="mt-0.5 shrink-0 opacity-80" />
+                                        <div>
+                                          <div className="font-mono text-[11px] font-medium break-words" style={{ color: 'var(--riscv-text)' }}>
+                                            {conflict.other.mnemonic}{' '}
+                                            <span style={{ color: 'var(--riscv-text-3)' }}>({conflict.other.extId})</span>
+                                          </div>
+                                          <div className="text-[10px] mt-0.5" style={{ color: 'var(--riscv-text-3)' }}>{conflict.other.extName}</div>
+                                        </div>
+                                      </div>
+                                      <span
+                                        className="shrink-0 px-1.5 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider border"
+                                        style={{ background: 'rgba(0,0,0,0.2)', color: 'inherit' }}
+                                      >
+                                        {conflict.type.replace(/_/g, ' ')}
+                                      </span>
+                                    </div>
 
-	                  <div className="grid grid-cols-2 gap-3">
-	                    <div>
-	                      <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-	                        Match (hex)
-	                      </div>
-	                      <input
-	                        type="text"
-	                        value={encoderValidatorInput.match}
-	                        onChange={(e) =>
-	                          setEncoderValidatorInput((prev) => ({ ...prev, match: e.target.value }))
-	                        }
-	                        placeholder="0x67"
-	                        className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-sm font-mono text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/60 focus:border-yellow-300"
-	                      />
-	                    </div>
-	                    <div>
-	                      <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-	                        Mask (hex)
-	                      </div>
-	                      <input
-	                        type="text"
-	                        value={encoderValidatorInput.mask}
-	                        onChange={(e) =>
-	                          setEncoderValidatorInput((prev) => ({ ...prev, mask: e.target.value }))
-	                        }
-	                        placeholder="0x707f"
-	                        className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-sm font-mono text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/60 focus:border-yellow-300"
-	                      />
-	                    </div>
-	                  </div>
+                                    <div className="mt-1.5 text-[11px]" style={{ color: 'var(--riscv-text-2)' }}>{conflict.why}</div>
+                                    <div className="mt-1.5 grid grid-cols-2 gap-2">
+                                      <div className="font-mono text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>mask: {conflict.commonMask}</div>
+                                      <div className="font-mono text-[10px]" style={{ color: 'var(--riscv-text-3)' }}>example: {conflict.exampleWord}</div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
-	                  <div className="flex items-center gap-2 pt-1">
-	                    <button
-	                      type="button"
-	                      onClick={runEncoderValidation}
-	                      className="inline-flex items-center gap-2 px-3 py-2 rounded border border-yellow-500/50 bg-yellow-500/10 text-yellow-200 text-xs font-bold hover:border-yellow-400"
-	                    >
-	                      <ScanSearch size={16} />
-	                      Validate
-	                    </button>
+      {/* ── ISA Workspace Panel ────────────────────────────────────────── */}
+      <WorkspacePanel
+        open={workspacePanelOpen}
+        onClose={() => setWorkspacePanelOpen(false)}
+        workspaceIds={workspaceIds}
+        lockedExtensions={lockedExtensions}
+        allExts={allExtsList}
+        onAddId={(id) => addWorkspaceIdsSmart(id)}
+        onRemoveId={(id) =>
+          setWorkspaceIds((prev) => {
+            const next = new Set(prev);
+            // Lock check inside panel removal as well
+            const currentLocked = new Map();
+            for (const ext of Array.from(prev)) {
+              const deps = SMART_DEPENDENCIES[ext] || [];
+              for (const dep of deps) {
+                if (prev.has(dep)) {
+                  if (!currentLocked.has(dep)) currentLocked.set(dep, []);
+                  currentLocked.get(dep).push(ext);
+                }
+              }
+            }
+            if (currentLocked.has(id)) {
+              setWorkspaceNotice(`Cannot remove ${id}: required by ${currentLocked.get(id).join(', ')}`);
+              setTimeout(() => setWorkspaceNotice(null), 4500);
+              return next;
+            }
+            next.delete(id);
+            return next;
+          })
+        }
+        onClear={() => setWorkspaceIds(new Set())}
+        onLoadIds={(ids) => {
+          setWorkspaceIds(new Set()); // clear
+          addWorkspaceIdsSmart(ids);  // smartly add all
+        }}
+        onSelectInstruction={({ extId, mnemonic, encoding, variable_fields, match, mask }) => {
+          // Navigate the main view to the specified extension + instruction
+          const targetExt = allExtsList.find((e) => e.id === extId);
+          if (targetExt) {
+            setSelectedExt(targetExt);
+            setSelectedInstruction({ mnemonic, encoding, variable_fields, match, mask });
+            setWorkspacePanelOpen(false); // close panel to reveal main view
+            // Scroll tile into view
+            requestAnimationFrame(() => {
+              const el = document.getElementById(`ext-${extId}`);
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+          }
+        }}
+      />
 
-	                    <button
-	                      type="button"
-	                      onClick={() => {
-	                        setEncoderValidatorInput({ mnemonic: '', encoding: '', match: '', mask: '' });
-	                        setEncoderValidatorResult(null);
-	                        setEncoderValidatorCopyStatus(null);
-	                      }}
-	                      className="px-3 py-2 rounded border border-slate-600 bg-slate-800 text-xs font-bold text-slate-100 hover:border-slate-500"
-	                    >
-	                      Reset
-	                    </button>
-	                  </div>
-	                </div>
-
-	                <div className="space-y-3">
-	                  <div className="flex items-center justify-between gap-2">
-	                    <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
-	                      Results
-	                    </div>
-	                    <button
-	                      type="button"
-	                      disabled={!encoderValidatorResult?.proposed}
-	                      onClick={async () => {
-	                        if (!encoderValidatorResult?.proposed) return;
-	                        const report = formatEncoderValidatorReport(
-	                          encoderValidatorResult.proposed,
-	                          encoderValidatorResult
-	                        );
-	                        const ok = await copyTextToClipboard(report);
-	                        setEncoderValidatorCopyStatus(ok ? 'copied' : 'failed');
-	                        window.setTimeout(() => setEncoderValidatorCopyStatus(null), 1500);
-	                      }}
-	                      className="inline-flex items-center gap-2 px-3 py-2 rounded border border-slate-600 bg-slate-800 text-xs font-bold text-slate-100 hover:border-slate-500 disabled:opacity-30"
-	                      title="Copy validation report"
-	                    >
-	                      <Copy size={14} />
-	                      {encoderValidatorCopyStatus === 'copied'
-	                        ? 'Copied'
-	                        : encoderValidatorCopyStatus === 'failed'
-	                          ? 'Copy failed'
-	                          : 'Copy report'}
-	                    </button>
-	                  </div>
-
-	                  {!encoderValidatorResult ? (
-	                    <div className="text-xs text-slate-400 border border-slate-700 rounded p-3 bg-slate-800/50">
-	                      Enter a proposed encoding and click Validate.
-	                    </div>
-	                  ) : (
-	                    <div className="space-y-3">
-	                      {encoderValidatorResult.errors.length > 0 && (
-	                        <div className="border border-red-800/40 bg-red-950/30 rounded p-3">
-	                          <div className="text-[10px] uppercase tracking-wider text-red-200 font-bold mb-2">
-	                            Errors
-	                          </div>
-	                          <ul className="text-xs text-red-100 space-y-1 list-disc pl-4">
-	                            {encoderValidatorResult.errors.map((err) => (
-	                              <li key={err}>{err}</li>
-	                            ))}
-	                          </ul>
-	                        </div>
-	                      )}
-
-	                      {encoderValidatorResult.proposed && (
-	                        <div className="border border-slate-700 rounded p-3 bg-slate-800/50">
-	                          <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">
-	                            Normalized Proposal
-	                          </div>
-	                          <div className="space-y-2">
-	                            <div className="font-mono text-[11px] text-slate-200 break-all">
-	                              Encoding: {encoderValidatorResult.proposed.encoding}
-	                            </div>
-	                            <div className="grid grid-cols-2 gap-2">
-	                              <div className="font-mono text-[11px] text-slate-200">Match: {encoderValidatorResult.proposed.match}</div>
-	                              <div className="font-mono text-[11px] text-slate-200">Mask: {encoderValidatorResult.proposed.mask}</div>
-	                            </div>
-	                          </div>
-	                        </div>
-	                      )}
-
-	                      {encoderValidatorResult.proposed && (
-	                        <div className="border border-slate-700 rounded p-3 bg-slate-800/50">
-	                          <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">
-	                            Conflicts ({encoderValidatorResult.conflicts.length})
-	                          </div>
-	                          {encoderValidatorResult.conflicts.length === 0 ? (
-	                            <div className="text-xs text-emerald-200">
-	                              No overlaps found within the current instruction set database.
-	                            </div>
-	                          ) : (
-	                            <div className="space-y-2 max-h-[340px] overflow-y-auto overscroll-contain pr-1">
-	                              {encoderValidatorResult.conflicts.map((conflict) => (
-	                                <div
-	                                  key={`${conflict.other.extId}:${conflict.other.mnemonic}:${conflict.type}`}
-	                                  className="border border-slate-700 rounded p-2 bg-slate-900/50"
-	                                >
-	                                  <div className="flex items-start justify-between gap-2">
-	                                    <div className="min-w-0">
-	                                      <div className="font-mono text-xs text-slate-200 break-words">
-	                                        {conflict.other.mnemonic}{' '}
-	                                        <span className="text-slate-500">({conflict.other.extId})</span>
-	                                      </div>
-	                                      <div className="text-[11px] text-slate-500">{conflict.other.extName}</div>
-	                                    </div>
-	                                    <span className="shrink-0 px-2 py-1 rounded text-[10px] font-mono uppercase tracking-wide border bg-slate-800 text-slate-100 border-slate-600">
-	                                      {conflict.type}
-	                                    </span>
-	                                  </div>
-
-	                                  <div className="mt-2 text-xs text-slate-300">{conflict.why}</div>
-	                                  <div className="mt-2 grid grid-cols-2 gap-2">
-	                                    <div className="font-mono text-[10px] text-slate-400">
-	                                      Common mask: {conflict.commonMask}
-	                                    </div>
-	                                    <div className="font-mono text-[10px] text-slate-400">
-	                                      Example word: {conflict.exampleWord}
-	                                    </div>
-	                                  </div>
-	                                </div>
-	                              ))}
-	                            </div>
-	                          )}
-	                        </div>
-	                      )}
-	                    </div>
-	                  )}
-	                </div>
-	              </div>
-	            </div>
-	          </div>
-	        </div>
-	      )}
-	    </div>
-	  );
-	};
+      {/* ── Workspace Notices Toast ── */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: workspaceNotice ? '32px' : '-100px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'var(--riscv-surface-2)',
+          border: '1px solid var(--riscv-border-2)',
+          color: 'var(--riscv-text)',
+          padding: '10px 16px',
+          borderRadius: '8px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+          transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          opacity: workspaceNotice ? 1 : 0,
+          pointerEvents: workspaceNotice ? 'auto' : 'none',
+          backdropFilter: 'blur(8px)',
+        }}
+      >
+        <Info size={16} style={{ color: '#6366f1' }} />
+        <span style={{ fontSize: '13px', fontWeight: 500 }}>{workspaceNotice}</span>
+      </div>
+    </div>
+  );
+};
 
 export default RISCVExplorer;
