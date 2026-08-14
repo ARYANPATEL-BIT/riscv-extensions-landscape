@@ -12,6 +12,7 @@
  *   Zve/Zvl sub-profile tokens: exact min version unconfirmed; verify with your toolchain.
  *   Base/gc extensions: universally stable.
  *   Full details and CI gap: see marchUtils.js COMPILER VERIFICATION SCOPE.
+ */
 
 import { buildMarchString, BASE_ISA_IDS, BASE_ISA_PREFIX_MAP } from './marchUtils.js';
 import { buildCombinedCatalog } from './marchUtils.js';
