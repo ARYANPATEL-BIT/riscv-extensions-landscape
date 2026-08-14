@@ -335,12 +335,20 @@ try {
   process.exit(1);
 }
 
-// Build a flat index of every catalog entry, keyed by id
+// Build a flat index of every catalog entry, keyed by id.
+// A duplicate id would silently overwrite the earlier entry here, so the
+// shadowed one would never be synced and never reported — warn instead of
+// failing silently. Last-wins is preserved.
 const entryIndex = new Map();
 for (const [category, entries] of Object.entries(catalog)) {
   if (!Array.isArray(entries)) continue;
   for (let i = 0; i < entries.length; i++) {
-    entryIndex.set(entries[i].id, { category, entries, index: i });
+    const id = entries[i].id;
+    if (entryIndex.has(id)) {
+      console.warn('  warning: duplicate catalog id "' + id + '" (in ' +
+        entryIndex.get(id).category + ' and ' + category + ') — only the last occurrence is synced');
+    }
+    entryIndex.set(id, { category, entries, index: i });
   }
 }
 
@@ -457,11 +465,6 @@ for (const [id, loc] of entryIndex) {
 
 console.log('Dependency links written/updated: ' + depUpdated);
 
-// write back only if something changed
-if (updated > 0 || depUpdated > 0) {
-  fs.writeFileSync(catalogPath, JSON.stringify(catalog, null, 2) + '\n');
-}
-
 // report
 console.log('--- Results ---');
 
@@ -496,12 +499,21 @@ if (parseFailures > 0) {
 // Fail the run if parse failures cross the threshold — a burst almost always
 // means UDB restructured its layout and our minimal parser is quietly missing
 // data, which would otherwise be reported as "No new extensions found".
+//
+// This guard runs BEFORE the write: past the threshold, the in-memory catalog is
+// half-synced (real fields silently dropped), so persisting it would corrupt the
+// checked-in data on local runs and stage a bad diff. Abort untouched instead.
 if (parseFailures > PARSE_FAILURE_THRESHOLD) {
   console.error(
     'ERROR: ' + parseFailures + ' YAML parse failures exceed the threshold of ' +
-    PARSE_FAILURE_THRESHOLD + ' — UDB layout may have changed. Failing the run.'
+    PARSE_FAILURE_THRESHOLD + ' — UDB layout may have changed. Aborting without writing.'
   );
   process.exit(1);
+}
+
+// write back only if something changed
+if (updated > 0 || depUpdated > 0) {
+  fs.writeFileSync(catalogPath, JSON.stringify(catalog, null, 2) + '\n');
 }
 
 // Otherwise exit 0 regardless of whether data changed — the workflow checks
