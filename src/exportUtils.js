@@ -149,7 +149,8 @@ export function buildIsaConfigYaml(selectedIds, allExts, includeInstructions = t
   lines.push(`vendor: ""   # Optional — your organization name (e.g. "SiFive", "Qualcomm")`);
   lines.push(`device: ""   # Optional — your core/chip name  (e.g. "U74", "Oryon")`);
   lines.push(``);
-  lines.push(`isa_string: ${isaString}   # Full assembled ISA string (base + all selected extensions)`);
+  lines.push(`base_isa: ${basePrefix}   # Base ISA only (e.g. RV64I, RV32E)`);
+  lines.push(`isa_string: ${isaString}   # Full ISA descriptor (base + all selected extensions)`);
   lines.push(`xlen: ${baseInfo.xlen}`);
   lines.push(``);
   lines.push(`# Compiler -march flag. Toolchain compatibility varies by extension family:`);
