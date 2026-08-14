@@ -159,6 +159,15 @@ export const SMART_DEPENDENCIES = {
   'B': ['Zba', 'Zbb', 'Zbs'], // ISA Manual
 };
 
+/**
+ * Architecturally invalid combinations.
+ * Evaluated bidirectionally: e.g. RV32E excludes F, and F excludes RV32E.
+ */
+export const INCOMPATIBLE_WITH = {
+  'RV32E': ['F'], // E-base (16 integer regs) cannot support F (requires 32 float regs)
+  'RV64E': ['F']
+};
+
 // ============================================================================
 // Architectural tags that are not -march ISA options
 // ============================================================================

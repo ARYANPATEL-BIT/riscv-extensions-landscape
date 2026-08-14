@@ -42,7 +42,7 @@ import {
 } from 'lucide-react';
 import extensions from './riscv_extensions.json';
 import WorkspacePanel from './WorkspacePanel.jsx';
-import { BASE_ISA_IDS, SMART_DEPENDENCIES, buildMarchString, buildCombinedCatalog } from './marchUtils.js';
+import { BASE_ISA_IDS, SMART_DEPENDENCIES, INCOMPATIBLE_WITH, buildMarchString, buildCombinedCatalog } from './marchUtils.js';
 import { buildIsaConfigYaml } from './exportUtils.js';
 
 const BIT_WIDTH = 32n;
@@ -745,6 +745,20 @@ const RISCVExplorer = () => {
               next.add(dep);
               autoAdded.push(dep);
             }
+          }
+        }
+      }
+
+      // 3. Incompatibility Check (e.g. RV32E excludes F)
+      // Evaluate bidirectionally for all items currently in the 'next' set
+      for (const ext1 of next) {
+        const incompat = INCOMPATIBLE_WITH[ext1] || [];
+        for (const blocked of incompat) {
+          if (next.has(blocked)) {
+            // Revert the entire addition batch if it creates an invalid architectural state
+            setWorkspaceNotice(`Architecturally Invalid: ${ext1} is incompatible with ${blocked}`);
+            setTimeout(() => setWorkspaceNotice(null), 4500);
+            return prev;
           }
         }
       }
