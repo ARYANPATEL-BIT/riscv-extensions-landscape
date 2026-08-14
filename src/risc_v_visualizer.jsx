@@ -2232,7 +2232,7 @@ const RISCVExplorer = () => {
                                 <div style={{
                                   width: 15, height: 15, borderRadius: '50%',
                                   background: quickExportIncludeInstr ? '#1a1206' : '#475569',
-                                  position: 'absolute', top: 2,
+                              position: 'absolute', top: 2,
                                   left: quickExportIncludeInstr ? 19 : 2,
                                   transition: 'all 0.25s',
                                   boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
@@ -2253,8 +2253,10 @@ const RISCVExplorer = () => {
                                 const marchRes = buildMarchString(Array.from(workspaceIds), allExtsList);
                                 const base = marchRes.march ? marchRes.march.split('_')[0] : 'core';
                                 a.download = `riscv_${base}_config.yaml`;
+                                document.body.appendChild(a);
                                 a.click();
-                                URL.revokeObjectURL(url);
+                                document.body.removeChild(a);
+                                setTimeout(() => URL.revokeObjectURL(url), 1000);
                                 setQuickExportOpen(false);
                               }}
                               style={{

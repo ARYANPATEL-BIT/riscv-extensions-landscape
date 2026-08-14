@@ -133,8 +133,12 @@ export default function WorkspacePanel({
     a.href = url;
     const baseProfile = encodeResult?.march ? encodeResult.march.split('_')[0] : 'core';
     a.download = `riscv_${baseProfile}_config.yaml`;
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    // Defer revocation — revoking synchronously cancels the download before
+    // the browser has had time to start reading the object URL.
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
     setShowExportOptions(false);
   }
 
