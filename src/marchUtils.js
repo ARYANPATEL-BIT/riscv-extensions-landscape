@@ -457,19 +457,17 @@ export function buildMarchString(selectedIds, allExts) {
 /**
  * Build a deduplicated instruction catalog for the selected extensions.
  *
+ * ATTRIBUTION RULE (True Owner Algorithm):
+ *   Instructions in riscv_extensions.json are often nested inside parent
+ *   extensions for legacy "browsing convenience" (e.g. Zicsr instructions
+ *   are duplicated inside RV32E/RV32I/RV64I). However, each instruction
+ *   carries an `extension` tag (e.g. "rv_zicsr").
+ *   This algorithm statically resolves the "True Owner" of every tag across
+ *   the entire catalog (e.g. rv_zicsr belongs to Zicsr, rv_i belongs to the
+ *   selected base ISA). An instruction is ONLY included if its True Owner
+ *   was explicitly selected, and it is strictly attributed to that True Owner.
+ *
  * DEDUPLICATION KEY: uppercase(mnemonic) + "||" + normalized encoding
- *
- * Rationale [DATA]: Inspecting riscv_extensions.json reveals:
- *   - 411 mnemonics appear in more than one extension
- *   - 408 have identical encodings (ADD, SUB, … shared across RV32I/RV64I/RV32E/…)
- *   - 3 have genuinely different encodings (SLLI, SRLI, SRAI: mask width differs
- *     between 32-bit and 64-bit base ISAs)
- *   Deduplicating by mnemonic alone would collapse those 3 cases into one row,
- *   silently discarding the encoding difference. The composite key prevents this.
- *
- * Result:
- *   - Same mnemonic + same encoding → one row, 'sources' lists all extensions
- *   - Same mnemonic + different encoding → separate rows
  *
  * @param {string[]} selectedIds
  * @param {Array}    allExts
@@ -488,21 +486,68 @@ export function buildCombinedCatalog(selectedIds, allExts) {
   if (!selectedIds || selectedIds.length === 0) return [];
 
   const lookup = buildLookup(allExts);
+  const selectedBaseId = selectedIds.find(id => BASE_ISA_IDS.has(id));
+
+  // 1. Determine the True Owner for each tag in the catalog
+  const tagToTrueOwner = new Map();
+  for (const ext of allExts) {
+    if (!ext.tags) continue;
+    for (const tag of ext.tags) {
+      const t = tag.toLowerCase();
+      
+      // Base ISA tags belong to whichever base ISA the user actually selected
+      if (['rv_i', 'rv64_i', 'rv32_e', 'rv64_e'].includes(t)) {
+        if (selectedBaseId) tagToTrueOwner.set(t, lookup.get(selectedBaseId.toLowerCase()));
+        continue;
+      }
+      
+      // For standard extensions, the True Owner is the extension whose ID matches the tag natively
+      const stripped = t.replace(/^rv(32|64)?_/, '');
+      if (ext.id.toLowerCase() === stripped) {
+        tagToTrueOwner.set(t, ext);
+      } else if (!tagToTrueOwner.has(t)) {
+        // Fallback if no exact match is found
+        tagToTrueOwner.set(t, ext);
+      }
+    }
+  }
+
   const byKey = new Map();
 
+  // 2. Iterate over selected extensions and process their nested instructions
   for (const id of selectedIds) {
     const ext = lookup.get(id.toLowerCase());
     if (!ext?.instructions) continue;
 
     for (const [mnemonic, details] of Object.entries(ext.instructions)) {
+      const instrTags = Array.isArray(details?.extension) ? details.extension : [];
+      
+      // Resolve the True Owner of this specific instruction
+      let trueOwner = null;
+      for (const tag of instrTags) {
+        const owner = tagToTrueOwner.get(tag.toLowerCase());
+        if (owner) {
+          trueOwner = owner;
+          break;
+        }
+      }
+      // If we somehow couldn't resolve a true owner, fallback to the extension it was nested inside
+      if (!trueOwner) trueOwner = ext;
+
+      // CRITICAL: If the True Owner wasn't explicitly selected by the user, EXCLUDE IT.
+      // This prevents "ghost" Zicsr instructions from appearing when only RV32I is selected.
+      if (!selectedIds.some(sel => sel.toLowerCase() === trueOwner.id.toLowerCase())) {
+        continue;
+      }
+
       const upperMnem = mnemonic.toUpperCase();
       const normEncoding = (details?.encoding || '').replace(/\s+/g, '');
       const dedupKey = `${upperMnem}||${normEncoding}`;
 
       if (byKey.has(dedupKey)) {
         const entry = byKey.get(dedupKey);
-        if (!entry.sources.some(s => s.extId === ext.id)) {
-          entry.sources.push({ extId: ext.id, extName: ext.name || ext.id });
+        if (!entry.sources.some(s => s.extId === trueOwner.id)) {
+          entry.sources.push({ extId: trueOwner.id, extName: trueOwner.name || trueOwner.id });
         }
       } else {
         byKey.set(dedupKey, {
@@ -512,8 +557,8 @@ export function buildCombinedCatalog(selectedIds, allExts) {
           variable_fields: Array.isArray(details?.variable_fields) ? details.variable_fields : [],
           match: details?.match || '',
           mask: details?.mask || '',
-          sources: [{ extId: ext.id, extName: ext.name || ext.id }],
-          primaryExtId: ext.id,
+          sources: [{ extId: trueOwner.id, extName: trueOwner.name || trueOwner.id }],
+          primaryExtId: trueOwner.id,
         });
       }
     }
