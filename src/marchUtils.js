@@ -457,21 +457,6 @@ export function buildMarchString(selectedIds, allExts) {
 /**
  * Build a deduplicated instruction catalog for the selected extensions.
  *
- * ATTRIBUTION RULE:
- *   Each instruction in riscv_extensions.json carries its own `extension` field
- *   (e.g. `"extension": ["rv_zicsr"]` on CSRRW). Some instructions are nested
- *   inside a parent extension's `instructions` object for browsing convenience
- *   (e.g. Zicsr instructions appear under RV32I because nearly every real core
- *   includes both). For the Configuration Builder, we use the instruction's own
- *   `extension` field as the authoritative source of truth — not the nesting
- *   position. An instruction is included only if at least one of its `extension`
- *   tags maps to an extension the user actually selected.
- *
- *   Tag-to-ID mapping: each extension object in riscv_extensions.json carries a
- *   `tags` array (e.g. ["rv_zicsr"]) that directly corresponds to the `extension`
- *   field on individual instructions. We build this reverse map at call time.
- *   [DATA] — verified against riscv_extensions.json schema.
- *
  * DEDUPLICATION KEY: uppercase(mnemonic) + "||" + normalized encoding
  *
  * Rationale [DATA]: Inspecting riscv_extensions.json reveals:
@@ -503,18 +488,6 @@ export function buildCombinedCatalog(selectedIds, allExts) {
   if (!selectedIds || selectedIds.length === 0) return [];
 
   const lookup = buildLookup(allExts);
-
-  // Build a Set of all rv_* tags that belong to the selected extensions.
-  // Each extension carries a `tags` array mirroring the `extension` fields
-  // used on individual instructions (e.g. Zicsr has tags: ["rv_zicsr"]).
-  const selectedTags = new Set();
-  for (const id of selectedIds) {
-    const ext = lookup.get(id.toLowerCase());
-    if (ext?.tags) {
-      for (const tag of ext.tags) selectedTags.add(tag.toLowerCase());
-    }
-  }
-
   const byKey = new Map();
 
   for (const id of selectedIds) {
@@ -522,28 +495,14 @@ export function buildCombinedCatalog(selectedIds, allExts) {
     if (!ext?.instructions) continue;
 
     for (const [mnemonic, details] of Object.entries(ext.instructions)) {
-      // Check the instruction's own `extension` field against the selected tags.
-      // This prevents instructions nested for browsing convenience (e.g. Zicsr
-      // instructions inside RV32I) from being attributed to the wrong extension.
-      const instrTags = Array.isArray(details?.extension) ? details.extension : [];
-      const ownedBySelected = instrTags.some(t => selectedTags.has(t.toLowerCase()));
-      if (!ownedBySelected) continue;
-
       const upperMnem = mnemonic.toUpperCase();
       const normEncoding = (details?.encoding || '').replace(/\s+/g, '');
       const dedupKey = `${upperMnem}||${normEncoding}`;
 
-      // Attribute to the extension whose tag actually owns this instruction,
-      // not necessarily the extension object it was nested under.
-      const ownerTag  = instrTags.find(t => selectedTags.has(t.toLowerCase()));
-      const ownerExt  = ownerTag
-        ? (allExts.find(e => e.tags?.some(t => t.toLowerCase() === ownerTag.toLowerCase())) || ext)
-        : ext;
-
       if (byKey.has(dedupKey)) {
         const entry = byKey.get(dedupKey);
-        if (!entry.sources.some(s => s.extId === ownerExt.id)) {
-          entry.sources.push({ extId: ownerExt.id, extName: ownerExt.name || ownerExt.id });
+        if (!entry.sources.some(s => s.extId === ext.id)) {
+          entry.sources.push({ extId: ext.id, extName: ext.name || ext.id });
         }
       } else {
         byKey.set(dedupKey, {
@@ -553,8 +512,8 @@ export function buildCombinedCatalog(selectedIds, allExts) {
           variable_fields: Array.isArray(details?.variable_fields) ? details.variable_fields : [],
           match: details?.match || '',
           mask: details?.mask || '',
-          sources: [{ extId: ownerExt.id, extName: ownerExt.name || ownerExt.id }],
-          primaryExtId: ownerExt.id,
+          sources: [{ extId: ext.id, extName: ext.name || ext.id }],
+          primaryExtId: ext.id,
         });
       }
     }
