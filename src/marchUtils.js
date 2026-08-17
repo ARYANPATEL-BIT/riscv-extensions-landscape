@@ -117,6 +117,9 @@ export const SMART_DEPENDENCIES = {
   // Zfbfmin → F: UDB Zfbfmin.yaml — BF16 converts operate on F registers
   // Zdinx → Zfinx: ISA Manual "Zdinx uses integer regs for double; requires Zfinx"
   // Zhinx, Zhinxmin → Zfinx: ISA Manual §12, parallel to Zdinx reasoning
+  // F → Zicsr: F defines the fcsr/frm/fflags CSRs, so it cannot be used without
+  // Zicsr. GCC's riscv_ext_info encodes the same implication.
+  'F': ['Zicsr'], // ISA Manual Vol.I §12
   'D': ['F'], // UDB-confirmed
   'Q': ['D', 'F'], // ISA Manual Vol.I §14.1
   'Zfh': ['F'], // ISA Manual Vol.I §12.2
@@ -254,6 +257,21 @@ function buildLookup(allExts) {
     if (ext?.id) m.set(ext.id.toLowerCase(), ext);
   }
   return m;
+}
+
+/**
+ * Is `extId` architecturally invalid alongside `otherId`?
+ *
+ * INCOMPATIBLE_WITH is evaluated in both directions, so a single entry
+ * (RV32E -> F) covers both "E base excludes F" and "F excludes E base".
+ *
+ * @param {string} a
+ * @param {string} b
+ * @returns {boolean}
+ */
+function isIncompatible(a, b) {
+  return (INCOMPATIBLE_WITH[a] || []).includes(b)
+      || (INCOMPATIBLE_WITH[b] || []).includes(a);
 }
 
 // ============================================================================
@@ -435,6 +453,36 @@ export function buildMarchString(selectedIds, allExts) {
     }
     if (id === 'B') {
       out.excluded.push({ id, reason: 'Ratified but pending broad toolchain support for single-letter "b". Explicit Zba_Zbb_Zbs emitted instead.' });
+      continue;
+    }
+
+    // 'i' and 'e' name base ISAs, not extensions. The selected base's letter is
+    // already in the rv{xlen}{base} prefix; the other one is mutually exclusive
+    // with it (RV32E/RV64E and RVxxI cannot be combined).
+    const baseLetter = id.toLowerCase();
+    if (baseLetter === 'i' || baseLetter === 'e') {
+      if (baseLetter !== baseInfo.base) {
+        out.excluded.push({
+          id,
+          reason: `Mutually exclusive with base ISA ${baseInfo.id} — the I and E base ISAs cannot be combined`,
+        });
+        out.warnings.push(
+          `"${id}" was dropped: it names a base ISA that is mutually exclusive with ${baseInfo.id}.`
+        );
+      }
+      continue;
+    }
+
+    // Architecturally invalid alongside the selected base. [SPEC]
+    if (isIncompatible(baseInfo.id, id)) {
+      out.excluded.push({
+        id,
+        reason: `Architecturally incompatible with base ISA ${baseInfo.id}`,
+      });
+      out.warnings.push(
+        `"${id}" is not architecturally valid with ${baseInfo.id} and has been excluded ` +
+        `from the generated -march string.`
+      );
       continue;
     }
 
