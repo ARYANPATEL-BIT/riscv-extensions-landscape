@@ -122,12 +122,12 @@ export const SMART_DEPENDENCIES = {
   'F': ['Zicsr'], // ISA Manual Vol.I §12
   'D': ['F'], // UDB-confirmed
   'Q': ['D', 'F'], // ISA Manual Vol.I §14.1
-  'Zfh': ['F'], // ISA Manual Vol.I §12.2
+  'Zfh': ['F', 'Zfhmin'], // ISA Manual Vol.I §12.2 — Zfh is a superset of Zfhmin
   'Zfhmin': ['F'], // ISA Manual Vol.I §12.2
   'Zfbfmin': ['F'], // UDB-confirmed
-  'Zdinx': ['Zfinx'], // ISA Manual Vol.I §12
-  'Zhinx': ['Zfinx'], // ISA Manual Vol.I §12
-  'Zhinxmin': ['Zfinx'], // ISA Manual Vol.I §12
+  'Zdinx': ['Zfinx', 'Zicsr'], // ISA Manual Vol.I §12
+  'Zhinx': ['Zfinx', 'Zhinxmin', 'Zicsr'], // ISA Manual Vol.I §12 — superset of Zhinxmin
+  'Zhinxmin': ['Zfinx', 'Zicsr'], // ISA Manual Vol.I §12
 
   // --- Vector family ---
   // Source: ISA Manual Vol.I §33.18.2 "Zve* profiles" + kernel dt-bindings
@@ -272,6 +272,27 @@ function buildLookup(allExts) {
 function isIncompatible(a, b) {
   return (INCOMPATIBLE_WITH[a] || []).includes(b)
       || (INCOMPATIBLE_WITH[b] || []).includes(a);
+}
+
+/**
+ * Does `extId` transitively depend on something incompatible with `baseId`?
+ *
+ * Walks SMART_DEPENDENCIES so that excluding a prerequisite also excludes
+ * everything built on it: with an E base, F is incompatible, so D (which
+ * requires F) and Q (which requires D) must be excluded too.
+ *
+ * @param {string} baseId
+ * @param {string} extId
+ * @returns {boolean}
+ */
+function dependsOnIncompatible(baseId, extId, seen = new Set()) {
+  if (seen.has(extId)) return false;
+  seen.add(extId);
+  for (const dep of SMART_DEPENDENCIES[extId] || []) {
+    if (isIncompatible(baseId, dep)) return true;
+    if (dependsOnIncompatible(baseId, dep, seen)) return true;
+  }
+  return false;
 }
 
 // ============================================================================
@@ -473,8 +494,12 @@ export function buildMarchString(selectedIds, allExts) {
       continue;
     }
 
-    // Architecturally invalid alongside the selected base. [SPEC]
-    if (isIncompatible(baseInfo.id, id)) {
+    // Architecturally invalid alongside the selected base, either directly or
+    // because it depends on something that is. Excluding F for an E base while
+    // keeping D would emit a configuration whose dependency is unsatisfied —
+    // clang rejects exactly that ("ILP32E cannot be used with the D ISA
+    // extension"), so the exclusion must cascade through SMART_DEPENDENCIES.
+    if (isIncompatible(baseInfo.id, id) || dependsOnIncompatible(baseInfo.id, id)) {
       out.excluded.push({
         id,
         reason: `Architecturally incompatible with base ISA ${baseInfo.id}`,
