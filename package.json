@@ -8,7 +8,8 @@
   "build": "webpack",
   "predeploy": "npm run build",
   "deploy": "gh-pages -d dist --branch gh-pages --dotfiles",
-  "test": "npm run sync -- --strict",
+  "test": "node --test tests/*.test.mjs",
+  "sync:check": "npm run sync -- --strict",
   "sync": "node scripts/sync_instructions.mjs"
 },
   "keywords": [],
