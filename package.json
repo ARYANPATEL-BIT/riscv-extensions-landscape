@@ -6,12 +6,13 @@
   "homepage": "https://rpsene.github.io/riscv-extensions-landscape/",
   "scripts": {
     "build": "webpack",
-    "predeploy": "npm run build",
     "deploy": "gh-pages -d dist --branch gh-pages --dotfiles",
-    "test": "node --test tests/*.test.mjs",
-    "sync:check": "npm run sync -- --strict",
+    "graph:check": "node scripts/seed-dependency-graph.mjs --check --udb",
+    "predeploy": "npm run build",
     "sync": "node scripts/sync_instructions.mjs",
-    "graph:check": "node scripts/seed-dependency-graph.mjs --check --udb"
+    "sync:check": "npm run sync -- --strict",
+    "sync:udb": "node scripts/sync_udb_extensions.cjs",
+    "test": "node --test tests/*.test.mjs"
   },
   "keywords": [],
   "author": "",
