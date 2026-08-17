@@ -122,12 +122,12 @@ export const SMART_DEPENDENCIES = {
   'F': ['Zicsr'], // ISA Manual Vol.I §12
   'D': ['F'], // UDB-confirmed
   'Q': ['D', 'F'], // ISA Manual Vol.I §14.1
-  'Zfh': ['F'], // ISA Manual Vol.I §12.2
+  'Zfh': ['F', 'Zfhmin'], // ISA Manual Vol.I §12.2 — Zfh is a superset of Zfhmin
   'Zfhmin': ['F'], // ISA Manual Vol.I §12.2
   'Zfbfmin': ['F'], // UDB-confirmed
-  'Zdinx': ['Zfinx'], // ISA Manual Vol.I §12
-  'Zhinx': ['Zfinx'], // ISA Manual Vol.I §12
-  'Zhinxmin': ['Zfinx'], // ISA Manual Vol.I §12
+  'Zdinx': ['Zfinx', 'Zicsr'], // ISA Manual Vol.I §12
+  'Zhinx': ['Zfinx', 'Zhinxmin', 'Zicsr'], // ISA Manual Vol.I §12 — superset of Zhinxmin
+  'Zhinxmin': ['Zfinx', 'Zicsr'], // ISA Manual Vol.I §12
 
   // --- Vector family ---
   // Source: ISA Manual Vol.I §33.18.2 "Zve* profiles" + kernel dt-bindings
