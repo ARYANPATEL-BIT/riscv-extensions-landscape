@@ -10,6 +10,14 @@
 //
 // If no UDB path is given, defaults to ../riscv-unified-db relative to the
 // workspace root.
+//
+// SCOPE: metadata only — CSRs, long_name, type, state, ratification_date and
+// behavior. It deliberately does NOT write dependencies. Those live in
+// src/isa-dependency-graph.json, produced by scripts/seed-dependency-graph.mjs,
+// which distinguishes the four shapes UDB actually uses (allOf, anyOf/oneOf,
+// if/then, not:). Flattening them into one list inverts meaning — it yields
+// "Zfinx requires F" when UDB says `not: F` — so there is exactly one parser
+// for dependencies, and it is not this file. The sync workflow runs both.
 
 const fs = require('fs');
 const path = require('path');
@@ -89,24 +97,12 @@ function parseYaml(filepath) {
       continue;
     }
 
-    // requirements — pick out extension names, skip params
+    // requirements — skipped entirely. Dependencies are the graph's job (see
+    // the SCOPE note at the top); reading them here would create a second,
+    // weaker parser competing with seed-dependency-graph.mjs.
     if (key === 'requirements') {
-      const deps = [];
       i++;
-      while (i < lines.length && lines[i].startsWith('  ')) {
-        const dm = lines[i].match(/name:\s*(\S+)/);
-        if (dm) {
-          let name = dm[1].replace(/,$/, '');
-          // skip implementation params — all-caps names like SXLEN/UXLEN/MXLEN
-          // or FOO_BAR. The length>=2 guard keeps single-letter extensions
-          // (F, D, S, U) which are all-caps but are real dependencies.
-          if (!(/^[A-Z0-9_]+$/.test(name) && name.length >= 2)) {
-            deps.push(name);
-          }
-        }
-        i++;
-      }
-      if (deps.length) result.requires = deps;
+      while (i < lines.length && lines[i].startsWith('  ')) i++;
       continue;
     }
 
@@ -127,55 +123,6 @@ function pickVersion(versions) {
   const ratified = versions.filter(v => v.state === 'ratified');
   const pool = ratified.length ? ratified : versions;
   return pool[pool.length - 1];
-}
-
-// ---- dependency extraction ----
-// Extract the flat list of extension dependencies from an extension YAML.
-//
-// This is intentionally independent of parseYaml/pickVersion. A `requirements:`
-// block can live either at the top level (F, Zve32f) or nested inside a version
-// entry under `versions:` (D puts its F requirement there). The minimal version
-// parser flattens version entries and even corrupts the version string when it
-// sees the nested `version:` constraint, so we cannot rely on it to locate the
-// nested block. Instead we scan the raw text for every `requirements:` block and
-// collect names directly, which reads from both places by construction.
-//
-// allOf/anyOf/oneOf are flattened into one array — no AND/OR structure is kept.
-// Version constraints are dropped (`name: F` -> "F", never "F 2.2.0"), and the
-// `name:` anchor means a sibling `version:` line can never be read as a name.
-function extractDependencies(filepath) {
-  const content = fs.readFileSync(filepath, 'utf8').replace(/\r/g, '');
-  const lines = content.split('\n');
-  const deps = [];
-  const seen = new Set();
-
-  for (let i = 0; i < lines.length; i++) {
-    const rm = lines[i].match(/^(\s*)requirements:\s*(.*)$/);
-    if (!rm) continue;
-    const reqIndent = rm[1].length;
-
-    // walk the block indented under this requirements: line
-    for (let j = i + 1; j < lines.length; j++) {
-      if (lines[j].trim() === '') continue;
-      const indent = lines[j].match(/^(\s*)/)[1].length;
-      if (indent <= reqIndent) break; // dedented out of the requirements block
-
-      // only lines whose key is exactly `name:` (optionally a `- name:` list
-      // item) — anchoring keeps `version:` and `long_name:` from matching
-      const nm = lines[j].match(/^\s*(?:-\s*)?name:\s*(\S+)/);
-      if (!nm) continue;
-      const name = nm[1].replace(/,$/, '').replace(/^["']|["']$/g, '');
-
-      // skip implementation params — all-caps names (SXLEN, VLEN, MUTABLE_MISA_D).
-      // Same rule as the `requires` filter above; the length>=2 guard keeps
-      // single-letter extensions (F, D, S, U).
-      if (/^[A-Z0-9_]+$/.test(name) && name.length >= 2) continue;
-
-      if (!seen.has(name)) { seen.add(name); deps.push(name); }
-    }
-  }
-
-  return deps;
 }
 
 // Truncate to at most `max` characters without cutting a word in half.
@@ -407,7 +354,6 @@ for (const id of gaps) {
     }
     if (ver.url && !entry.url) entry.url = ver.url;
   }
-  if (ext.requires) entry.requires = ext.requires;
 
   if (hasCsrs) {
     entry.csrs = csrs;
@@ -432,38 +378,6 @@ for (const id of gaps) {
     hasBehavior: !hasCsrs && !!entry.behavior
   });
 }
-
-// ---- dependency pass ----
-// A SEPARATE pass over EVERY catalog entry (not just supervisor gaps): attach an
-// architectural dependency list generated from UDB. This exists only to produce
-// the `dependencies` field for the ISA Configuration Builder; it never touches
-// the csrs/behavior/desc/requires fields the supervisor sync above manages.
-//
-// The key is always emitted for entries that map to a UDB YAML — extensions with
-// no requirements get [] so the frontend never has to guard against undefined.
-// Ids with no YAML (RV32I/RV64I/RV128I and landscape-only composite ids) are
-// skipped silently.
-let depUpdated = 0;
-for (const [id, loc] of entryIndex) {
-  const yamlPath = path.join(UDB_EXT_DIR, id + '.yaml');
-  if (!fs.existsSync(yamlPath)) continue;
-
-  let deps;
-  try {
-    deps = extractDependencies(yamlPath);
-  } catch (err) {
-    parseFailures++;
-    console.warn('  warning: could not read requirements from ' + yamlPath + ': ' + err.message);
-    continue;
-  }
-
-  const entry = loc.entries[loc.index];
-  const prev = JSON.stringify(entry.dependencies);
-  entry.dependencies = deps;
-  if (JSON.stringify(deps) !== prev) depUpdated++;
-}
-
-console.log('Dependency links written/updated: ' + depUpdated);
 
 // report
 console.log('--- Results ---');
@@ -512,7 +426,7 @@ if (parseFailures > PARSE_FAILURE_THRESHOLD) {
 }
 
 // write back only if something changed
-if (updated > 0 || depUpdated > 0) {
+if (updated > 0) {
   fs.writeFileSync(catalogPath, JSON.stringify(catalog, null, 2) + '\n');
 }
 
