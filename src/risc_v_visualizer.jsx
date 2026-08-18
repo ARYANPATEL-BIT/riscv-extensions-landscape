@@ -1800,7 +1800,9 @@ const RISCVExplorer = () => {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--riscv-bg)', color: 'var(--riscv-text)' }}>
+    <div className="min-h-screen relative overflow-x-hidden" style={{ background: 'var(--riscv-bg)', color: 'var(--riscv-text)' }}>
+
+
       {/* Gradient top border */}
       <div className="riscv-top-border" />
       <div className="px-3 md:px-6 py-4 md:py-6 max-w-[1700px] mx-auto">
@@ -1808,7 +1810,7 @@ const RISCVExplorer = () => {
           {/* ─── Header ───────────────────────────────────────────────────── */}
           <div className="lg:col-span-12 pb-5 mb-2" style={{ borderBottom: '1px solid var(--riscv-border)' }}>
             {/* Title row */}
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4">
               <div>
                 <div className="flex items-center gap-3 mb-1">
                   <CircuitBoard size={22} style={{ color: 'var(--riscv-gold)' }} />
@@ -1842,9 +1844,11 @@ const RISCVExplorer = () => {
                 </div>
               </div>
 
-              {/* Controls - Single Row Design 1 */}
-              <div className="flex flex-wrap xl:flex-nowrap items-center justify-start lg:justify-end gap-x-3 gap-y-3 shrink-0">
-                {/* Grouped Filters Container */}
+              {/* Controls Area */}
+              <div className="flex flex-col items-end gap-3 shrink-0">
+                {/* Controls - Row 1 */}
+                <div className="flex flex-wrap items-center justify-start xl:justify-end gap-x-3 gap-y-3">
+                  {/* Grouped Filters Container */}
                 <div className="flex items-center gap-3 px-3.5 py-2 rounded-xl border shadow-lg backdrop-blur-md" style={{ background: 'var(--riscv-plate)', borderColor: 'rgba(255,255,255,0.08)' }}>
                   
                   {/* Profiles */}
@@ -1922,22 +1926,7 @@ const RISCVExplorer = () => {
                   <span className="whitespace-nowrap">Encoder Validator</span>
                 </button>
 
-                {/* Theme toggle */}
-                <button
-                  type="button"
-                  onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
-                  title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-                  aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-                  className="group inline-flex items-center justify-center rounded-xl transition-all duration-300"
-                  style={{
-                    width: 34, height: 34,
-                    border: '1px solid var(--riscv-border-2)',
-                    background: 'var(--riscv-surface)',
-                    color: 'var(--riscv-text-2)',
-                  }}
-                >
-                  {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
-                </button>
+                {/* Theme toggle relocated to header */}
 
                 {/* ISA Configuration Builder — fused action group */}
                 <div className="relative inline-flex items-stretch rounded-xl">
@@ -1951,15 +1940,16 @@ const RISCVExplorer = () => {
                       It deliberately does NOT open the panel: the panel is a
                       full-screen overlay, so opening it on activation would
                       immediately cover the tiles the user is meant to click. */}
-                  <button
+                  <div className="relative flex flex-col">
+                    <button
                     type="button"
                     aria-pressed={builderMode}
                     onClick={() => setBuilderMode(v => !v)}
                     className={[
-                      'relative z-10 inline-flex items-center gap-2 pl-3.5 pr-3 py-2 text-xs font-bold transition-all duration-300 whitespace-nowrap',
+                      'relative z-10 inline-flex items-center gap-2 px-3 py-2 text-xs font-bold transition-all duration-300 whitespace-nowrap',
                       builderMode
-                        ? 'bg-gradient-to-b from-amber-400 to-amber-500 text-slate-900 hover:from-amber-300 hover:to-amber-400 rounded-l-xl'
-                        : 'bg-slate-800/80 text-amber-300/90 border border-amber-400/30 hover:bg-slate-700/80 hover:text-amber-200 rounded-xl',
+                        ? 'bg-gradient-to-b from-amber-400 to-amber-500 text-slate-900 hover:from-amber-300 hover:to-amber-400 rounded-xl'
+                        : 'builder-btn-off bg-slate-800/80 text-amber-300/90 border border-amber-400/30 hover:bg-slate-700/80 hover:text-amber-200 rounded-xl',
                     ].join(' ')}
                     style={{ boxShadow: builderMode ? '0 4px 18px rgba(251,191,36,0.4)' : '0 2px 10px rgba(0,0,0,0.2)' }}
                     title={
@@ -1969,65 +1959,52 @@ const RISCVExplorer = () => {
                     }
                   >
                     <Cpu size={14} className="opacity-80 flex-shrink-0" />
-                    <span className="whitespace-nowrap">ISA Configuration Builder</span>
+                    <span className="whitespace-nowrap hidden sm:inline">ISA Configuration Builder</span>
+                    <span className="whitespace-nowrap sm:hidden">ISA Builder</span>
                     <span
                       className={[
                         'inline-flex items-center justify-center px-1.5 h-[16px] rounded-full text-[10px] font-black tracking-wide',
-                        builderMode ? 'bg-slate-900/75 text-amber-400' : 'bg-slate-900/60 text-slate-400',
+                        builderMode ? 'builder-badge-on bg-slate-900/75 text-amber-400' : 'builder-badge-off bg-slate-900/60 text-slate-400',
                       ].join(' ')}
                     >
                       {builderMode ? 'ON' : 'OFF'}
                     </span>
                     {workspaceIds.size > 0 && (
-                      <span className="inline-flex items-center justify-center min-w-[18px] px-1 h-[18px] rounded-full text-[10px] font-black bg-slate-900/75 text-amber-400">
+                      <span className="builder-badge-on inline-flex items-center justify-center min-w-[18px] px-1 h-[18px] rounded-full text-[10px] font-black bg-slate-900/75 text-amber-400">
                         {workspaceIds.size}
                       </span>
                     )}
-                  </button>
-
-                  {/* Fused action icons — available while the builder is on */}
-                  {builderMode && (<>
-                    {/* Hairline divider */}
-                    <div className="relative z-10 w-px self-stretch bg-amber-600/60" />
-
-                    {/* Open the full panel */}
-                    <button
-                      type="button"
-                      title="Open the builder panel (-march string, export, conflicts)"
-                      onClick={() => setWorkspacePanelOpen(true)}
-                      className="group relative z-10 inline-flex items-center justify-center px-3 bg-gradient-to-b from-amber-400 to-amber-500 text-slate-800 hover:from-amber-300 hover:to-amber-400 transition-all duration-300 z-20"
-                    >
-                      <Maximize2 size={13} className="transition-transform group-hover:scale-110" />
                     </button>
 
-                    {/* Hairline divider */}
-                    <div className="relative z-10 w-px self-stretch bg-amber-600/60" />
+                    {/* Builder Contextual Actions Toolbar */}
+                    {builderMode && (
+                      <div className="builder-toolbar absolute top-[calc(100%+6px)] left-0 right-0 flex items-center justify-between p-1 bg-slate-800/90 border border-amber-500/40 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl z-50 animate-fade-in-up gap-1">
+                        
+                        {/* Open the full panel */}
+                        <button
+                          type="button"
+                          title="Open the builder panel (-march string, export, conflicts)"
+                          onClick={() => setWorkspacePanelOpen(true)}
+                          className={`builder-action-amber ${workspaceIds.size === 0 ? "flex-none px-4" : "flex-1"} flex items-center justify-center py-1.5 text-amber-300 hover:bg-amber-500/30 hover:text-amber-100 transition-all duration-300 rounded-lg hover:shadow-[0_0_12px_rgba(251,191,36,0.3)]`}
+                        >
+                          <Maximize2 size={14} className="transition-transform hover:scale-110" />
+                        </button>
 
-                    {/* Start from a profile.
-                        A configuration can begin two ways: pick a base ISA tile
-                        and build up (what the tiles below afford), or start from
-                        a ratified profile and adjust. Only the first was
-                        reachable before. While the workspace is empty this
-                        carries a text label, because that is exactly when the
-                        user needs to know the second option exists. */}
-                    <div className="relative z-10 flex">
-                      <button
-                        type="button"
-                        onClick={() => setProfileMenuOpen(v => !v)}
-                        title="Start the configuration from a ratified profile"
-                        className={[
-                          'group inline-flex items-center gap-1.5 justify-center px-3 transition-all duration-300 z-20 whitespace-nowrap',
-                          workspaceIds.size === 0 ? 'rounded-r-xl' : '',
-                          profileMenuOpen
-                            ? 'bg-indigo-500 text-white shadow-inner'
-                            : 'bg-gradient-to-b from-amber-400 to-amber-500 text-slate-800 hover:from-indigo-500 hover:to-indigo-600 hover:text-white',
-                        ].join(' ')}
-                      >
-                        <Layers size={13} className="transition-transform group-hover:scale-110" />
-                        {workspaceIds.size === 0 && (
-                          <span className="text-[12px] font-bold">Start from profile</span>
-                        )}
-                      </button>
+                        {/* Profile Menu */}
+                        <div className="relative flex-1 flex">
+                          <button
+                            type="button"
+                            onClick={() => setProfileMenuOpen(v => !v)}
+                            title="Start the configuration from a ratified profile"
+                            className={`builder-action-indigo w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-semibold transition-all duration-300 rounded-lg ${
+                              profileMenuOpen
+                                ? 'bg-indigo-500 text-white shadow-inner'
+                                : 'text-indigo-300 hover:bg-indigo-500/30 hover:text-indigo-100 hover:shadow-[0_0_12px_rgba(99,102,241,0.3)]'
+                            }`}
+                          >
+                            <Layers size={14} className="transition-transform hover:scale-110" />
+                            {workspaceIds.size === 0 && <span className="whitespace-nowrap">Start from profile</span>}
+                          </button>
 
                       {profileMenuOpen && (
                         <div style={{
@@ -2084,40 +2061,31 @@ const RISCVExplorer = () => {
                         </div>
                       )}
                     </div>
-                  </>)}
 
-                  {/* Clear and export — only meaningful once something is picked */}
-                  {builderMode && workspaceIds.size > 0 && (<>
-                    {/* Hairline divider */}
-                    <div className="relative z-10 w-px self-stretch bg-amber-600/60" />
+                        {workspaceIds.size > 0 && (
+                          <>
+                            <button
+                              type="button"
+                              title="Clear all extensions"
+                              onClick={() => setWorkspaceIds(new Set())}
+                              className="builder-action-rose flex-1 flex items-center justify-center py-1.5 text-rose-300 hover:bg-rose-500/30 hover:text-rose-100 hover:shadow-[0_0_12px_rgba(244,63,94,0.3)] transition-all duration-300 rounded-lg"
+                            >
+                              <Trash2 size={14} className="transition-transform hover:scale-110" />
+                            </button>
 
-                    {/* Clear */}
-                    <button
-                      type="button"
-                      title="Clear all extensions"
-                      onClick={() => setWorkspaceIds(new Set())}
-                      className="group relative z-10 inline-flex items-center justify-center px-3 bg-gradient-to-b from-amber-400 to-amber-500 text-slate-800 hover:from-rose-500 hover:to-rose-600 hover:text-white transition-all duration-300 hover:shadow-[0_0_14px_rgba(225,29,72,0.5)] z-20"
-                    >
-                      <Trash2 size={13} className="transition-transform group-hover:scale-110" />
-                    </button>
-
-                    {/* Hairline divider */}
-                    <div className="relative z-10 w-px self-stretch bg-amber-600/60" />
-
-                    {/* Export */}
-                    <div className="relative z-10 flex">
-                      <button
-                        type="button"
-                        title="Export configuration YAML"
-                        onClick={() => setQuickExportOpen(v => !v)}
-                        className={`group inline-flex items-center justify-center px-3 rounded-r-xl transition-all duration-300 z-20 ${
-                          quickExportOpen 
-                            ? 'bg-emerald-500 text-white shadow-inner' 
-                            : 'bg-gradient-to-b from-amber-400 to-amber-500 text-slate-800 hover:from-emerald-500 hover:to-emerald-600 hover:text-white hover:shadow-[0_0_14px_rgba(16,185,129,0.5)]'
-                        }`}
-                      >
-                        <Download size={13} className="transition-transform group-hover:scale-110" />
-                      </button>
+                            <div className="relative flex-1 flex">
+                              <button
+                                type="button"
+                                title="Export configuration YAML"
+                                onClick={() => setQuickExportOpen(v => !v)}
+                                className={`builder-action-emerald w-full flex items-center justify-center py-1.5 transition-all duration-300 rounded-lg ${
+                                  quickExportOpen 
+                                    ? 'bg-emerald-500 text-white shadow-inner' 
+                                    : 'text-emerald-300 hover:bg-emerald-500/30 hover:text-emerald-100 hover:shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+                                }`}
+                              >
+                                <Download size={14} className="transition-transform hover:scale-110" />
+                              </button>
 
                       {quickExportOpen && (
                         <div style={{
@@ -2246,17 +2214,22 @@ const RISCVExplorer = () => {
                           </div>
                         </div>
                       )}
-                    </div>
-                  </>)}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          {/* ─── Main Grid ───────────────────────────────────────────────── */}
+        </div>
+        {/* ─── Main Grid ───────────────────────────────────────────────── */}
           <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-min">
             {/* Search Bar */}
-            <div className="col-span-full mb-2">
-              <div className="relative">
+            <div className="col-span-full mb-2 flex items-center gap-3">
+              <div className="relative flex-1">
                 <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--riscv-text-3)' }} />
                 <input
                   ref={searchInputRef}
@@ -2278,14 +2251,28 @@ const RISCVExplorer = () => {
                       <X size={13} />
                     </button>
                   )}
-                  <kbd
-                    className="hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-mono"
-                    style={{ background: 'var(--riscv-muted)', color: 'var(--riscv-text-3)', border: '1px solid var(--riscv-border-2)' }}
-                  >
-                    <span className="text-[10px]">⌘</span>K
+                  <kbd className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ background: 'var(--riscv-surface)', color: 'var(--riscv-text-3)', border: '1px solid var(--riscv-border-2)' }}>
+                    <span className="text-[10px]">⌘</span> K
                   </kbd>
                 </div>
               </div>
+
+              {/* Theme Toggle - Perfectly positioned next to Search for max visibility */}
+              <button
+                type="button"
+                onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+                title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+                aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+                className="group flex items-center justify-center rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 border flex-shrink-0"
+                style={{
+                  width: 42, height: 42,
+                  background: 'var(--riscv-plate)',
+                  borderColor: 'rgba(128,128,128,0.2)',
+                  color: 'var(--riscv-text-2)',
+                }}
+              >
+                {theme === 'dark' ? <Sun size={18} className="group-hover:text-amber-400 transition-colors" /> : <Moon size={18} className="group-hover:text-indigo-500 transition-colors" />}
+              </button>
             </div>
 
             {/* 1. Base ISA */}

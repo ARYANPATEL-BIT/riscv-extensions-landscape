@@ -556,6 +556,9 @@ pre,
 :root[data-theme='light'] .text-slate-100 { color: var(--riscv-text) !important; }
 :root[data-theme='light'] .text-slate-200 { color: var(--riscv-text) !important; }
 :root[data-theme='light'] .text-slate-300 { color: var(--riscv-text-2) !important; }
+:root[data-theme='light'] .text-slate-400 { color: var(--riscv-text-2) !important; }
+:root[data-theme='light'] .text-slate-500 { color: var(--riscv-text-3) !important; }
+:root[data-theme='light'] .text-white { color: var(--riscv-text) !important; }
 
 /* Panels and toolbars that painted a dark plate inline keep their own colour;
    these are the containers that read as holes on light. */
@@ -564,3 +567,90 @@ pre,
   background: var(--riscv-surface);
   border-color: var(--riscv-border);
 }
+
+/* Sidebar Details Panel explicit Tailwind overrides for light theme */
+:root[data-theme='light'] .bg-slate-900 { background: var(--riscv-surface-2) !important; }
+:root[data-theme='light'] .bg-slate-800,
+:root[data-theme='light'] .bg-slate-800\/70 { background: var(--riscv-surface) !important; }
+:root[data-theme='light'] .border-slate-700 { border-color: var(--riscv-border-2) !important; }
+:root[data-theme='light'] .border-slate-600 { border-color: var(--riscv-border) !important; }
+:root[data-theme='light'] .hover\:border-slate-500:hover { border-color: var(--riscv-muted) !important; }
+
+/* Instruction Set Snapshot buttons & headings for light theme */
+:root[data-theme='light'] .text-emerald-400 { color: var(--riscv-success) !important; }
+:root[data-theme='light'] .text-emerald-200 { color: #12603f !important; }
+:root[data-theme='light'] .border-emerald-400 { border-color: #b8e3cd !important; }
+:root[data-theme='light'] .bg-emerald-500\/10 { background: #e4f6ec !important; }
+
+:root[data-theme='light'] .text-yellow-300 { color: var(--riscv-warn) !important; }
+:root[data-theme='light'] .text-yellow-200 { color: #8a4a08 !important; }
+:root[data-theme='light'] .border-yellow-400 { border-color: #f2d4b6 !important; }
+:root[data-theme='light'] .bg-yellow-500\/10 { background: #fdefe1 !important; }
+
+:root[data-theme='light'] .text-red-200 { color: #8c2230 !important; }
+:root[data-theme='light'] .border-red-400,
+:root[data-theme='light'] .border-red-500\/60 { border-color: #f3c3c3 !important; }
+:root[data-theme='light'] .bg-red-500\/10,
+:root[data-theme='light'] .bg-red-500\/5 { background: #fdeaea !important; }
+
+:root[data-theme='light'] .text-sky-300 { color: #1d4f80 !important; }
+:root[data-theme='light'] .text-purple-300 { color: var(--riscv-violet) !important; }
+
+/* Grouped Filters Container buttons (Profile/Volume) */
+:root[data-theme='light'] .hover\:text-slate-200:hover { color: #3730a3 !important; }
+:root[data-theme='light'] .hover\:bg-slate-800\/50:hover { background: #e0e7ff !important; }
+:root[data-theme='light'] .bg-slate-700\/50 { background: #4f46e5 !important; color: #ffffff !important; border-color: #4338ca !important; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important; }
+
+/* Encoder Validator button */
+:root[data-theme='light'] .text-indigo-300,
+:root[data-theme='light'] .text-indigo-300\/70 { color: #4338ca !important; }
+:root[data-theme='light'] .hover\:text-indigo-300:hover { color: #312e81 !important; }
+:root[data-theme='light'] .bg-indigo-500\/20 { background: #e0e7ff !important; }
+:root[data-theme='light'] .hover\:bg-indigo-500\/10:hover { background: #c7d2fe !important; }
+:root[data-theme='light'] .border-indigo-500\/20,
+:root[data-theme='light'] .border-indigo-500\/30 { border-color: #a5b4fc !important; }
+
+/* ISA Configuration Builder button */
+:root[data-theme='light'] .builder-btn-off {
+  background: #1e293b !important; /* slate-800 */
+  color: #fbbf24 !important; /* bright amber-400 */
+  border-color: rgba(245, 158, 11, 0.5) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+:root[data-theme='light'] .builder-btn-off:hover {
+  background: #334155 !important; /* slate-700 */
+  color: #fcd34d !important; /* bright amber-300 */
+}
+
+:root[data-theme='light'] .builder-badge-off {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #fbbf24 !important; /* match text */
+}
+:root[data-theme='light'] .builder-badge-on {
+  background: rgba(0, 0, 0, 0.3) !important;
+  color: #fef3c7 !important;
+}
+
+/* Builder Toolbar Container */
+:root[data-theme='light'] .builder-toolbar {
+  background: #ffffff !important;
+  border-color: #fcd34d !important;
+  box-shadow: 0 8px 32px rgba(245, 197, 66, 0.2) !important;
+}
+
+/* Toolbar Action Button - Amber (Open Panel) */
+:root[data-theme='light'] .builder-action-amber.text-amber-300 { color: #d97706 !important; }
+:root[data-theme='light'] .builder-action-amber:hover { background: #fef3c7 !important; color: #b45309 !important; box-shadow: none !important; }
+
+/* Toolbar Action Button - Indigo (Profile Menu) */
+:root[data-theme='light'] .builder-action-indigo.text-indigo-300 { color: #4338ca !important; }
+:root[data-theme='light'] .builder-action-indigo:hover { background: #e0e7ff !important; color: #3730a3 !important; box-shadow: none !important; }
+
+/* Toolbar Action Button - Rose (Clear) */
+:root[data-theme='light'] .builder-action-rose.text-rose-300 { color: #e11d48 !important; }
+:root[data-theme='light'] .builder-action-rose:hover { background: #ffe4e6 !important; color: #be123c !important; box-shadow: none !important; }
+
+/* Toolbar Action Button - Emerald (Export) */
+:root[data-theme='light'] .builder-action-emerald.text-emerald-300 { color: #059669 !important; }
+:root[data-theme='light'] .builder-action-emerald:hover { background: #d1fae5 !important; color: #047857 !important; box-shadow: none !important; }
+
