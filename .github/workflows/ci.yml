@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    # The default is 6 hours. A hung step burned two full runs before this.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -25,24 +27,38 @@ jobs:
       # against our own model of the spec. This caught a case the unit tests
       # missed: excluding F for an E base while keeping D produced a string
       # clang rejects ("ILP32E cannot be used with the D ISA extension").
-      # The toolchain has to be recent enough to know the extensions we emit.
-      # ubuntu-24.04 ships clang 18, which rejects Ssccptr outright and treats
-      # Zcmop as experimental — both are ratified and both appear in the RVA23
-      # and RVB23 profiles. Validating against clang 18 would assert our strings
-      # against a two-year-old view of the ISA and fail on correct output.
+      #
+      # The distro clang only. Pulling clang-20 from apt.llvm.org was tried and
+      # reverted: the step hung to the 6-hour job limit, twice. `timeout` did not
+      # save it, because the `sudo` child survives the signal and keeps the
+      # step's stdout pipe open, so the runner waits regardless. A validation
+      # step is not worth a third-party host on the critical path.
+      #
+      # The cost is that ubuntu-24.04 ships clang 18, which rejects Ssccptr and
+      # calls Zcmop experimental — both ratified, both in RVA23/RVB23. Those four
+      # profile strings are tagged `modern` in the matrix and skipped here. Their
+      # shape is covered by tests/profiles.test.mjs, which asserts no satp mode
+      # is emitted, and they were checked against clang 21 by hand.
       - name: Install clang
         run: |
           set -euo pipefail
-          wget -qO /tmp/llvm.sh https://apt.llvm.org/llvm.sh
-          chmod +x /tmp/llvm.sh
-          sudo /tmp/llvm.sh 20
-          echo "CLANG=clang-20" >> "$GITHUB_ENV"
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq clang
+          echo "CLANG=clang" >> "$GITHUB_ENV"
+          echo "CLANG_TIER=core" >> "$GITHUB_ENV"
       - name: Validate -march strings with clang
         run: |
           set -uo pipefail
           "$CLANG" --version | head -1
-          fail=0
-          while IFS=$'\t' read -r target march; do
+          echo "tier: $CLANG_TIER"
+          fail=0 checked=0 skipped=0
+          while IFS=$'\t' read -r target march tier; do
+            if [ "$tier" = modern ] && [ "$CLANG_TIER" != modern ]; then
+              echo "skip  $march  <- needs a newer clang than this job has"
+              skipped=$((skipped+1))
+              continue
+            fi
+            checked=$((checked+1))
             if "$CLANG" --target="$target" -march="$march" -x c /dev/null -fsyntax-only 2>/tmp/err; then
               echo "ok    $march"
             else
@@ -50,6 +66,12 @@ jobs:
               fail=1
             fi
           done < <(node scripts/emit-march-matrix.mjs)
+          echo "checked=$checked skipped=$skipped"
+          # Skipping everything would make this step pass while testing nothing.
+          if [ "$checked" -lt 30 ]; then
+            echo "::error::only $checked strings were checked; the matrix or the tier gate is broken"
+            fail=1
+          fi
           exit $fail
 
   # Publishes to the gh-pages branch, which is what Pages serves. Gated on
@@ -57,6 +79,7 @@ jobs:
   # pushes on main so pull requests never publish.
   deploy:
     needs: build-and-test
+    timeout-minutes: 10
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
