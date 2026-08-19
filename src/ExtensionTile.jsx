@@ -122,7 +122,7 @@ function ExtensionTile({
               transition: 'all 0.15s',
               padding: 0,
             }}
-            title={isLocked
+            data-tooltip={isLocked
               ? `Required by ${lockedBy.join(', ')} — remove dependent first`
               : (inWorkspace
                 ? `Remove ${data.id} from ISA Configuration Builder`
@@ -134,7 +134,7 @@ function ExtensionTile({
                   <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )
-              : <Plus size={9} />
+              : <Plus size={11} strokeWidth={2.5} />
             }
           </button>
         );
