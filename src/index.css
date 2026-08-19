@@ -618,9 +618,15 @@ pre,
 /* Panels and toolbars that painted a dark plate inline keep their own colour;
    these are the containers that read as holes on light. */
 :root[data-theme='light'] .riscv-card,
+:root[data-theme='light'] .bg-slate-900\/50,
+:root[data-theme='light'] .bg-slate-950\/50,
 :root[data-theme='light'] .riscv-card-2 {
   background: var(--riscv-surface);
   border-color: var(--riscv-border);
+}
+
+:root[data-theme='light'] .text-cyan-300 {
+  color: #0f5a68 !important; /* Matches ext-tile cyan- text for consistency */
 }
 
 /* Sidebar Details Panel explicit Tailwind overrides for light theme */
