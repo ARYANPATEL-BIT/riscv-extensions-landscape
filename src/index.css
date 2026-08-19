@@ -432,7 +432,13 @@ pre,
   --riscv-border-2: #d5cfe8;
   --riscv-muted: #c3bcdd;
 
-  --riscv-gold: #a8760a;
+  /* Darker than it looks like it should be, and deliberately so. Gold is an
+     inherently light hue, so at #a8760a it measured 3.69:1 against the header
+     plate and 3.99:1 on white, both under the 4.5:1 floor. Luminance has to
+     drop to about 0.166 to clear 4.5:1 on a near-white surface; this sits at
+     0.152. Only the text colour moved, so the dim and glow tints below keep
+     the original warmth for borders and halos. */
+  --riscv-gold: #8f6408;
   --riscv-gold-dim: rgba(168, 118, 10, 0.10);
   --riscv-gold-glow: rgba(168, 118, 10, 0.18);
 
@@ -636,6 +642,41 @@ pre,
   background: #ffffff !important;
   border-color: #fcd34d !important;
   box-shadow: 0 8px 32px rgba(245, 197, 66, 0.2) !important;
+}
+
+/* Section heading accents.
+   The 15 group headings ("Base ISA", "Atomics (Za/Zic*)", ...) carry their
+   accent as an inline hex, picked as a 400-level Tailwind tone for a dark
+   background. On the pastel surface every one of them measured between
+   1.54:1 and 2.76:1, so the whole set was failing the 4.5:1 floor.
+
+   A filter rather than 15 hand-picked replacements, for two reasons: an inline
+   style outranks any colour rule we could write here, and darkening in place
+   keeps each hue distinguishable, which is the entire point of colour-coding
+   the groups. Measured across all 15: min 5.17:1, max 7.81:1.
+
+   :has() lets one rule catch the icon alongside its heading, so the two do not
+   drift apart. New sections inherit this automatically. */
+:root[data-theme='light'] div:has(> h3.uppercase.tracking-widest) {
+  filter: brightness(0.5) saturate(1.5);
+}
+
+/* Builder popover menus (profile picker, quick export).
+   These live in a class rather than inline styles specifically so the light
+   override below can reach them: an inline style outranks a stylesheet rule,
+   which is why both menus stayed dark when the rest of the toolbar went light. */
+.builder-menu {
+  background: linear-gradient(145deg, #1a1f2e 0%, #141824 100%);
+  border: 1px solid rgba(245, 197, 66, 0.25);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--riscv-tint-2) inset;
+}
+
+:root[data-theme='light'] .builder-menu {
+  background: #ffffff;
+  border-color: #fcd34d;
+  /* Matches the toolbar's warm lift. A black drop shadow reads as grime
+     against the pastel background. */
+  box-shadow: 0 12px 32px rgba(245, 197, 66, 0.22), 0 0 0 1px rgba(45, 40, 80, 0.04) inset;
 }
 
 /* Toolbar Action Button - Amber (Open Panel) */

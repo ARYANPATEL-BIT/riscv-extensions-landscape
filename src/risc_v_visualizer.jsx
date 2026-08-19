@@ -2011,13 +2011,10 @@ const RISCVExplorer = () => {
                           </button>
 
                       {profileMenuOpen && (
-                        <div style={{
+                        <div className="builder-menu" style={{
                           position: 'absolute', top: 'calc(100% + 8px)', right: 0,
                           zIndex: 50, display: 'flex', flexDirection: 'column',
                           borderRadius: 10,
-                          background: 'linear-gradient(145deg, #1a1f2e 0%, #141824 100%)',
-                          border: '1px solid rgba(245,197,66,0.25)',
-                          boxShadow: '0 12px 32px rgba(0,0,0,0.55)',
                           minWidth: 300, overflow: 'hidden',
                         }}>
                           <div style={{
@@ -2092,14 +2089,11 @@ const RISCVExplorer = () => {
                               </button>
 
                       {quickExportOpen && (
-                        <div style={{
+                        <div className="builder-menu" style={{
                           position: 'absolute', top: 'calc(100% + 8px)', right: 0,
                           zIndex: 50,
                           display: 'flex', flexDirection: 'column', gap: 0,
                           borderRadius: 10,
-                          background: 'linear-gradient(145deg, #1a1f2e 0%, #141824 100%)',
-                          border: '1px solid rgba(245,197,66,0.25)',
-                          boxShadow: '0 12px 32px rgba(0,0,0,0.55), 0 0 0 1px var(--riscv-tint-2) inset',
                           minWidth: 280, overflow: 'hidden',
                         }}>
                           {/* Header strip */}
