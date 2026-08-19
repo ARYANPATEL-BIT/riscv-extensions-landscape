@@ -1825,11 +1825,13 @@ const RISCVExplorer = () => {
                     RISC-V Extension Landscape
                   </h1>
                 </div>
-                <p className="text-xs ml-9 whitespace-nowrap" style={{ color: 'var(--riscv-text-2)' }}>
+                {/* nowrap only once there is room for it: on a phone it pushed the
+                    line past the viewport, and the root clips overflow. */}
+                <p className="text-xs ml-9 sm:whitespace-nowrap" style={{ color: 'var(--riscv-text-2)' }}>
                   Reference for extensions, profiles &amp; per-instruction encoding.
                 </p>
                 {/* Stat bar */}
-                <div className="flex items-center gap-4 mt-3 ml-9">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-3 ml-9">
                   {[
                     { label: 'Extensions', value: totalExtensions },
                     { label: 'Profiles', value: Object.keys(profiles).length },
@@ -1844,17 +1846,27 @@ const RISCVExplorer = () => {
                 </div>
               </div>
 
-              {/* Controls Area */}
-              <div className="flex flex-col items-end gap-3 shrink-0">
+              {/* Controls Area.
+                  items-end right-aligns children, so a child wider than this
+                  column is pushed off the LEFT edge rather than overflowing the
+                  right. At 390px that put the controls at left:-179 inside an
+                  overflow-x-hidden root, which clips rather than scrolls, so the
+                  profile buttons and the builder toggle could not be reached at
+                  all. Stretch until there is room to right-align.
+                  min-w-0 because a flex item defaults to min-width:auto and
+                  refuses to shrink below its content. */}
+              <div className="flex flex-col items-stretch xl:items-end gap-3 min-w-0 xl:shrink-0">
                 {/* Controls - Row 1 */}
                 <div className="flex flex-wrap items-center justify-start xl:justify-end gap-x-3 gap-y-3">
-                  {/* Grouped Filters Container */}
-                <div className="flex items-center gap-3 px-3.5 py-2 rounded-xl border shadow-lg backdrop-blur-md" style={{ background: 'var(--riscv-plate)', borderColor: 'rgba(255,255,255,0.08)' }}>
+                  {/* Grouped Filters Container. Wraps on narrow screens; without
+                      it this row stays one 557px line that cannot shrink. */}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3.5 py-2 rounded-xl border shadow-lg backdrop-blur-md" style={{ background: 'var(--riscv-plate)', borderColor: 'rgba(255,255,255,0.08)' }}>
                   
-                  {/* Profiles */}
-                  <div className="flex items-center gap-2">
+                  {/* Profiles. Wraps at 320px, where the label plus four buttons
+                      measured 338px and ran past the edge. */}
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[11px] uppercase tracking-widest font-semibold" style={{ color: 'var(--riscv-text-3)' }}>Profile</span>
-                    <div className="flex gap-1.5">
+                    <div className="flex flex-wrap gap-1.5">
                       {Object.keys(profiles).map((profile) => (
                         <button
                           key={profile}

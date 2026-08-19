@@ -202,15 +202,21 @@ export default function WorkspacePanel({
         {/* =========================================================================
             HEADER
             ========================================================================= */}
+        {/* flexWrap here is load-bearing, not cosmetic. Once a configuration is
+            loaded this row also carries Export and Clear, which needed 507px
+            against the 389px available on a phone. Without wrapping, the close
+            button was pushed to x=486 and became unreachable, so the panel could
+            be opened and then never closed. */}
         <div style={{
-          display: 'flex', alignItems: 'center', gap: 12,
+          display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
           padding: '14px 18px',
           borderBottom: '1px solid var(--riscv-tint-3)',
           background: 'linear-gradient(180deg, rgba(245,197,66,0.04) 0%, transparent 100%)',
           flexShrink: 0,
         }}>
-          {/* Icon + title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+          {/* Icon + title. minWidth:0 because a flex item will not shrink below
+              its own content otherwise, which is what forced the overflow. */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0, flexWrap: 'wrap' }}>
             <div style={{
               width: 28, height: 28, borderRadius: 7,
               background: 'rgba(245,197,66,0.12)',
@@ -430,16 +436,20 @@ export default function WorkspacePanel({
             )}
             <button
               onClick={onClose}
+              aria-label="Close the ISA Configuration Builder"
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 width: 28, height: 28, borderRadius: 6,
                 background: 'var(--riscv-tint-2)',
                 border: '1px solid rgba(255,255,255,0.08)',
-                color: '#64748b', cursor: 'pointer',
+                // The one control that must never be squeezed away: this is the
+                // only way out of a full-screen panel.
+                flexShrink: 0, marginLeft: 'auto',
+                color: 'var(--riscv-text-3)', cursor: 'pointer',
                 transition: 'all 0.15s',
               }}
               onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'var(--riscv-text)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'var(--riscv-tint-2)'; e.currentTarget.style.color = '#64748b'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'var(--riscv-tint-2)'; e.currentTarget.style.color = 'var(--riscv-text-3)'; }}
             >
               <X size={13} />
             </button>
