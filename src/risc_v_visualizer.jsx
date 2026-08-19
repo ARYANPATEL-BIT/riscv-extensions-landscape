@@ -1976,8 +1976,12 @@ const RISCVExplorer = () => {
                     )}
                     </button>
 
-                    {/* Builder Contextual Actions Toolbar */}
-                    {builderMode && (
+                    {/* Builder Contextual Actions Toolbar.
+                        Hidden while the full panel is open: this toolbar belongs to the
+                        header, but it sits at z-50 against the panel's z-40, so leaving it
+                        mounted floats it on top of the modal. Its actions are redundant
+                        there too, one of them being "open the panel". */}
+                    {builderMode && !workspacePanelOpen && (
                       <div className="builder-toolbar absolute top-[calc(100%+6px)] left-0 right-0 flex items-center justify-between p-1 bg-slate-800/90 border border-amber-500/40 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl z-50 animate-fade-in-up gap-1">
                         
                         {/* Open the full panel */}
