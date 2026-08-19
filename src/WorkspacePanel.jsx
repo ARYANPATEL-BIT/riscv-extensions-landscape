@@ -193,7 +193,7 @@ export default function WorkspacePanel({
           width: 'min(640px, 100vw)',
           height: '100%',
           display: 'flex', flexDirection: 'column',
-          background: '#0b0b16',
+          background: 'var(--riscv-panel)',
           borderLeft: '1px solid var(--riscv-tint-3)',
           boxShadow: '-32px 0 80px rgba(0,0,0,0.8), -1px 0 0 rgba(245,197,66,0.06)',
           animation: 'wsSlideIn 0.2s cubic-bezier(0.22,1,0.36,1)',
@@ -237,19 +237,19 @@ export default function WorkspacePanel({
                   fontSize: 11, fontWeight: 700, color: 'var(--riscv-gold)',
                   letterSpacing: '0.03em', minWidth: 52, justifyContent: 'center',
                 }}>
-                  <span style={{ color: '#fff', fontVariantNumeric: 'tabular-nums' }}>{workspaceIds.size}</span>
+                  <span style={{ color: 'var(--riscv-text)', fontVariantNumeric: 'tabular-nums' }}>{workspaceIds.size}</span>
                   <span style={{ opacity: 0.65, fontWeight: 500 }}>ext</span>
                 </span>
-                <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: 10 }}>·</span>
+                <span style={{ color: 'var(--riscv-text-3)', fontSize: 10 }}>·</span>
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 4,
                   padding: '3px 8px', borderRadius: 6,
                   background: 'rgba(99,179,237,0.08)',
                   border: '1px solid rgba(99,179,237,0.18)',
-                  fontSize: 11, fontWeight: 700, color: '#7ec8e3',
+                  fontSize: 11, fontWeight: 700, color: 'var(--riscv-info)',
                   letterSpacing: '0.03em', minWidth: 68, justifyContent: 'center',
                 }}>
-                  <span style={{ color: '#bee3f8', fontVariantNumeric: 'tabular-nums' }}>{totalInstructions.toLocaleString()}</span>
+                  <span style={{ color: 'var(--riscv-text)', fontVariantNumeric: 'tabular-nums' }}>{totalInstructions.toLocaleString()}</span>
                   <span style={{ opacity: 0.65, fontWeight: 500 }}>instr</span>
                 </span>
               </div>
@@ -314,9 +314,9 @@ export default function WorkspacePanel({
                       </div>
                       <button
                         onClick={() => setShowExportOptions(false)}
-                        style={{ background: 'none', border: 'none', color: '#6f7f95', cursor: 'pointer', padding: 2, lineHeight: 0, borderRadius: 4 }}
-                        onMouseEnter={e => e.currentTarget.style.color = '#94a3b8'}
-                        onMouseLeave={e => e.currentTarget.style.color = '#6f7f95'}
+                        style={{ background: 'none', border: 'none', color: 'var(--riscv-text-3)', cursor: 'pointer', padding: 2, lineHeight: 0, borderRadius: 4 }}
+                        onMouseEnter={e => e.currentTarget.style.color = 'var(--riscv-text-2)'}
+                        onMouseLeave={e => e.currentTarget.style.color = 'var(--riscv-text-3)'}
                       ><X size={13} /></button>
                     </div>
 
@@ -336,7 +336,7 @@ export default function WorkspacePanel({
                         <div style={{ flex: 1 }}>
                           <span style={{
                             fontSize: 12.5, fontWeight: 600,
-                            color: includeInstructions ? 'var(--riscv-text)' : '#94a3b8',
+                            color: includeInstructions ? 'var(--riscv-text)' : 'var(--riscv-text-2)',
                             display: 'block', lineHeight: 1.35, transition: 'color 0.2s',
                           }}>
                             Include instruction catalog
@@ -362,7 +362,7 @@ export default function WorkspacePanel({
                         }}>
                           <div style={{
                             width: 15, height: 15, borderRadius: '50%',
-                            background: includeInstructions ? '#1a1206' : '#6f7f95',
+                            background: includeInstructions ? '#1a1206' : 'var(--riscv-text-3)',
                             position: 'absolute', top: 2,
                             left: includeInstructions ? 19 : 2,
                             transition: 'all 0.25s',
@@ -468,12 +468,12 @@ export default function WorkspacePanel({
                 <Package size={28} style={{ color: 'rgba(245,197,66,0.4)' }} />
               </div>
               <div>
-                <p style={{ fontSize: 15, fontWeight: 600, color: '#94a3b8', marginBottom: 6 }}>
+                <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--riscv-text-2)', marginBottom: 6 }}>
                   No extensions selected
                 </p>
-                <p style={{ fontSize: 13, color: '#6f7f95', maxWidth: 260, lineHeight: 1.6 }}>
+                <p style={{ fontSize: 13, color: 'var(--riscv-text-3)', maxWidth: 260, lineHeight: 1.6 }}>
                   Hover any extension tile and click the <strong style={{ color: 'var(--riscv-gold)' }}>+</strong> badge to add it here. Or paste a{' '}
-                  <code style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#94a3b8' }}>-march</code> string in the decode tab.
+                  <code style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: 'var(--riscv-text-2)' }}>-march</code> string in the decode tab.
                 </p>
               </div>
               {/* Show decode input when empty too */}
@@ -531,7 +531,7 @@ export default function WorkspacePanel({
                     } : {
                       background: 'var(--riscv-tint-2)',
                       border: '1px solid var(--riscv-tint-3)',
-                      color: '#6f7f95',
+                      color: 'var(--riscv-text-3)',
                     }),
                   }}
                 >
@@ -554,7 +554,7 @@ export default function WorkspacePanel({
                       <code style={{
                         flex: 1, padding: '11px 14px',
                         fontFamily: 'JetBrains Mono, monospace',
-                        fontSize: 13.5, color: '#f5c542',
+                        fontSize: 13.5, color: 'var(--riscv-gold)',
                         wordBreak: 'break-all', letterSpacing: '0.01em',
                       }}>
                         {encodeResult.march}
@@ -567,11 +567,11 @@ export default function WorkspacePanel({
                           width: 44, alignSelf: 'stretch',
                           borderLeft: '1px solid rgba(245,197,66,0.15)',
                           background: copiedMarch ? 'rgba(32,217,160,0.1)' : 'transparent',
-                          color: copiedMarch ? '#20d9a0' : '#6f7f95',
+                          color: copiedMarch ? '#20d9a0' : 'var(--riscv-text-3)',
                           cursor: 'pointer', transition: 'all 0.15s',
                         }}
                         onMouseEnter={e => { if (!copiedMarch) { e.currentTarget.style.background = 'rgba(245,197,66,0.1)'; e.currentTarget.style.color = 'var(--riscv-gold)'; } }}
-                        onMouseLeave={e => { if (!copiedMarch) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#6f7f95'; } }}
+                        onMouseLeave={e => { if (!copiedMarch) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--riscv-text-3)'; } }}
                         title="Copy -march string"
                       >
                         {copiedMarch
@@ -600,7 +600,7 @@ export default function WorkspacePanel({
                               }}>
                                 {ex.id}
                               </span>
-                              <span style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.4 }}>{ex.reason}</span>
+                              <span style={{ fontSize: 12, color: 'var(--riscv-text-2)', lineHeight: 1.4 }}>{ex.reason}</span>
                             </div>
                           ))}
                         </div>
@@ -613,7 +613,7 @@ export default function WorkspacePanel({
                     background: 'var(--riscv-tint-1)',
                     border: '1px solid var(--riscv-tint-3)',
                     textAlign: 'center',
-                    fontSize: 13, color: '#6f7f95',
+                    fontSize: 13, color: 'var(--riscv-text-3)',
                   }}>
                     {isEmpty
                       ? 'Select extensions from the tile view to generate a -march string.'
@@ -731,7 +731,7 @@ export default function WorkspacePanel({
                         </p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                           {parseResult.warnings.map((warn, i) => (
-                            <div key={i} style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.4 }}>
+                            <div key={i} style={{ fontSize: 12, color: 'var(--riscv-text-2)', lineHeight: 1.4 }}>
                               • {warn}
                             </div>
                           ))}
@@ -850,7 +850,7 @@ export default function WorkspacePanel({
                   background: 'rgba(255,255,255,0.025)',
                   marginBottom: 10,
                 }}>
-                  <Search size={13} style={{ color: '#6f7f95', flexShrink: 0 }} />
+                  <Search size={13} style={{ color: 'var(--riscv-text-3)', flexShrink: 0 }} />
                   <input
                     type="text"
                     value={catalogQuery}
@@ -866,7 +866,7 @@ export default function WorkspacePanel({
                   {catalogQuery && (
                     <button
                       onClick={() => setCatalogQuery('')}
-                      style={{ color: '#6f7f95', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      style={{ color: 'var(--riscv-text-3)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                     >
                       <X size={12} />
                     </button>
@@ -900,11 +900,11 @@ export default function WorkspacePanel({
                           background: 'none', border: 'none', cursor: 'pointer', padding: 0,
                           fontSize: 11, fontWeight: 700,
                           textTransform: 'uppercase', letterSpacing: '0.07em',
-                          color: catalogSort.col === col ? '#94a3b8' : '#334155',
+                          color: catalogSort.col === col ? 'var(--riscv-text-2)' : 'var(--riscv-text-3)',
                           transition: 'color 0.15s',
                         }}
                         onMouseEnter={e => e.currentTarget.style.color = '#64748b'}
-                        onMouseLeave={e => e.currentTarget.style.color = catalogSort.col === col ? '#94a3b8' : '#334155'}
+                        onMouseLeave={e => e.currentTarget.style.color = catalogSort.col === col ? 'var(--riscv-text-2)' : 'var(--riscv-text-3)'}
                       >
                         {label} <SortIcon sort={catalogSort} col={col} />
                       </button>
@@ -916,7 +916,7 @@ export default function WorkspacePanel({
                     {filteredCatalog.length === 0 ? (
                       <div style={{
                         padding: '24px', textAlign: 'center',
-                        fontSize: 13, color: '#334155',
+                        fontSize: 13, color: 'var(--riscv-text-3)',
                       }}>
                         {catalogQuery ? 'No instructions match the filter.' : 'No instructions in selected extensions.'}
                       </div>
@@ -937,7 +937,7 @@ export default function WorkspacePanel({
                         padding: '10px 14px',
                         background: 'var(--riscv-tint-1)',
                         borderTop: '1px solid var(--riscv-tint-3)',
-                        fontSize: 11, color: '#334155', textAlign: 'center',
+                        fontSize: 11, color: 'var(--riscv-text-3)', textAlign: 'center',
                       }}>
                         Showing first 300 of {filteredCatalog.length.toLocaleString()}. Use filter to narrow results.
                       </div>
@@ -945,7 +945,7 @@ export default function WorkspacePanel({
                   </div>
                 </div>
 
-                <p style={{ fontSize: 11, color: '#334155', marginTop: 6 }}>
+                <p style={{ fontSize: 11, color: 'var(--riscv-text-3)', marginTop: 6 }}>
                   Deduplicated by mnemonic + encoding.
                   Same instruction shared across extensions → shown once, all sources listed.
                 </p>
@@ -965,14 +965,14 @@ export default function WorkspacePanel({
           }}>
             <p style={{
               fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
-              letterSpacing: '0.1em', color: '#334155', marginBottom: 9,
+              letterSpacing: '0.1em', color: 'var(--riscv-text-3)', marginBottom: 9,
             }}>
               Data Sources
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {DATA_PROVENANCE.map(p => (
                 <div key={p.label} style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                  <span style={{ fontSize: 11, color: '#6f7f95', flexShrink: 0 }}>{p.label}</span>
+                  <span style={{ fontSize: 11, color: 'var(--riscv-text-3)', flexShrink: 0 }}>{p.label}</span>
                   <span style={{ height: 1, flex: 1, background: 'var(--riscv-tint-2)', alignSelf: 'center' }} />
                   <a
                     href={p.url} target="_blank" rel="noreferrer"
@@ -1011,16 +1011,16 @@ function Section({ label, icon, count, total, children }) {
   return (
     <div style={{ padding: '14px 18px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
-        <span style={{ color: '#334155' }}>{icon}</span>
+        <span style={{ color: 'var(--riscv-text-3)' }}>{icon}</span>
         <span style={{
           fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
-          letterSpacing: '0.08em', color: '#6f7f95',
+          letterSpacing: '0.08em', color: 'var(--riscv-text-3)',
         }}>
           {label}
         </span>
         {count !== undefined && (
           <span style={{
-            fontSize: 11, color: '#334155', fontFamily: 'JetBrains Mono, monospace',
+            fontSize: 11, color: 'var(--riscv-text-3)', fontFamily: 'JetBrains Mono, monospace',
           }}>
             {total !== undefined && count !== total
               ? `${count.toLocaleString()} / ${total.toLocaleString()}`
@@ -1051,7 +1051,7 @@ function InfoPill({ icon, children }) {
       border: '1px solid var(--riscv-tint-3)',
       fontSize: 12, color: '#64748b',
     }}>
-      <span style={{ flexShrink: 0, marginTop: 1, color: '#6f7f95' }}>{icon}</span>
+      <span style={{ flexShrink: 0, marginTop: 1, color: 'var(--riscv-text-3)' }}>{icon}</span>
       {children}
     </div>
   );
@@ -1082,7 +1082,7 @@ function ExtChip({ ext, lockedBy, onRemove }) {
       <span style={{
         fontFamily: 'JetBrains Mono, monospace',
         fontSize: 12, fontWeight: 600,
-        color: isLocked ? 'rgba(245,197,66,0.6)' : 'var(--riscv-gold)',
+        color: isLocked ? 'var(--riscv-gold-locked)' : 'var(--riscv-gold)',
         letterSpacing: '0.02em',
       }}>
         {ext.id}
@@ -1095,7 +1095,9 @@ function ExtChip({ ext, lockedBy, onRemove }) {
           width: 16, height: 16, borderRadius: 4,
           background: (hovered && !isLocked) ? 'rgba(255,255,255,0.08)' : 'transparent',
           border: 'none', cursor: isLocked ? 'not-allowed' : 'pointer',
-          color: isLocked ? 'rgba(255,255,255,0.15)' : (hovered ? '#94a3b8' : '#6f7f95'),
+          // Tinted rather than white: a disabled control should read as equally
+          // faint in both themes, and white-on-white simply vanished.
+          color: isLocked ? 'var(--riscv-tint-4)' : (hovered ? 'var(--riscv-text-2)' : 'var(--riscv-text-3)'),
           transition: 'all 0.12s',
           padding: 0,
         }}
@@ -1122,9 +1124,13 @@ function CatalogRowInner({ row, isEven, isHovered, onHover, onSelect }) {
 
   // Assign a color per source extension (deterministic, based on first char)
   function srcColor(extId) {
+    // Tokens rather than literals: these render as text on the panel ground,
+    // and the dark palette measured under 2:1 against the light theme's white.
+    // The order is load-bearing, since the chip is picked by hashing the id.
     const palette = [
-      '#8b7cf8', '#f472b6', '#2dd4bf', '#60a5fa', '#f5c542',
-      '#34d399', '#fb923c', '#a78bfa', '#f87171',
+      'var(--riscv-accent-1)', 'var(--riscv-accent-2)', 'var(--riscv-accent-3)',
+      'var(--riscv-accent-4)', 'var(--riscv-accent-5)', 'var(--riscv-accent-6)',
+      'var(--riscv-accent-7)', 'var(--riscv-accent-8)', 'var(--riscv-accent-9)',
     ];
     let h = 0;
     for (const c of extId) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
@@ -1188,7 +1194,7 @@ function CatalogRowInner({ row, isEven, isHovered, onHover, onSelect }) {
       {/* Match */}
       <span style={{
         fontFamily: 'JetBrains Mono, monospace',
-        fontSize: 12, color: '#6f7f95',
+        fontSize: 12, color: 'var(--riscv-text-3)',
         letterSpacing: '0.01em',
       }}>
         {row.match || '—'}

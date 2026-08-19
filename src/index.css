@@ -7,6 +7,9 @@
 /* ─── Design Tokens ──────────────────────────────────────────────────────── */
 :root {
   --riscv-bg: #14141e;
+  /* The builder panel's own ground. Deeper than --riscv-surface so the sliding
+     panel reads as sitting above the page rather than continuous with it. */
+  --riscv-panel: #0b0b16;
   --riscv-surface: #1b1b27;
   --riscv-surface-2: #21212f;
   --riscv-border: #2c2c3d;
@@ -52,6 +55,26 @@
   --riscv-check: #22c55e;
   --riscv-check-fill: rgba(34, 197, 94, 0.20);
   --riscv-check-edge: rgba(34, 197, 94, 0.55);
+
+  /* Source-chip accents in the builder's catalogue. Assigned by hashing the
+     extension id, so the set has to stay stable and ordered. These are read as
+     text on the panel ground, which is why they get a light variant: the dark
+     tones below are 400-level and measure under 2:1 on white. */
+  /* Instruction-count badge, and extension ids that are locked in place by a
+     dependency. The locked tone has to stay legible while reading as inactive,
+     so it desaturates rather than fading out. */
+  --riscv-info: #7ec8e3;
+  --riscv-gold-locked: rgba(245, 197, 66, 0.6);
+
+  --riscv-accent-1: #8b7cf8;
+  --riscv-accent-2: #f472b6;
+  --riscv-accent-3: #2dd4bf;
+  --riscv-accent-4: #60a5fa;
+  --riscv-accent-5: #f5c542;
+  --riscv-accent-6: #34d399;
+  --riscv-accent-7: #fb923c;
+  --riscv-accent-8: #a78bfa;
+  --riscv-accent-9: #f87171;
 
   /* Field colors for encoding diagram */
   --field-opcode: #f5c542;
@@ -420,12 +443,35 @@ pre,
    Contrast measured against the ground, not eyeballed:
      text    #2b2a3d  12.93:1   AAA
      text-2  #5c5a72   6.14:1   AA body
-     text-3  #807ea0   3.59:1   AA large / UI
+     text-3  #6b6a87   4.81:1   AA body
      violet  #6d5bd0   4.78:1   AA body
-     gold    #a8760a   3.6:1    AA large / UI
+     gold    #8f6408   4.86:1   AA body
    ────────────────────────────────────────────────────────────────────────── */
 :root[data-theme='light'] {
   --riscv-bg: #f7f5fb;
+  /* Catalogue chip accents, one step down the ramp from their dark
+     counterparts. Measured on white: 4.75:1 (orange) through 6.55:1 (violet),
+     so the least legible of them still clears body text. Hue order is preserved
+     because the chip colour is chosen by hashing the extension id. */
+  /* 5.53:1 and 5.30:1 on white. The locked gold goes olive rather than pale,
+     because fading it toward the ground is what made it unreadable at 1.34:1. */
+  --riscv-info: #0369a1;
+  --riscv-gold-locked: #7a6a3d;
+
+  --riscv-accent-1: #7c3aed;
+  --riscv-accent-2: #be185d;
+  --riscv-accent-3: #0f766e;
+  --riscv-accent-4: #1d4ed8;
+  --riscv-accent-5: #8f6408;
+  --riscv-accent-6: #047857;
+  --riscv-accent-7: #c2410c;
+  --riscv-accent-8: #6d28d9;
+  --riscv-accent-9: #b91c1c;
+
+  /* Pure white, so the panel lifts off the warm ground the same way cards do.
+     Left dark, it kept every token-coloured label dark-on-dark: the panel title
+     measured 1.4:1. */
+  --riscv-panel: #ffffff;
   --riscv-surface: #ffffff;
   --riscv-surface-2: #f2eff9;
   --riscv-border: #e4dff1;
@@ -454,7 +500,10 @@ pre,
 
   --riscv-text: #2b2a3d;
   --riscv-text-2: #5c5a72;
-  --riscv-text-3: #807ea0;
+  /* Was #807ea0, which is fine for the large, incidental text this token was
+     scoped to but fails at the 11px labels the builder panel uses it for
+     (3.88:1 on white). Darkened to clear 4.5:1 as body text. */
+  --riscv-text-3: #6b6a87;
 
   --riscv-tint-1: rgba(45, 40, 80, 0.02);
   --riscv-tint-2: rgba(45, 40, 80, 0.035);
