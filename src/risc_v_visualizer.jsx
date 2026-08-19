@@ -2811,11 +2811,7 @@ const RISCVExplorer = () => {
                                         ? 'border-red-500/60 bg-red-500/5 text-red-200'
                                         : 'border-slate-700 bg-slate-800/70'
                                     }`}
-                                  data-tooltip={
-                                    isClickable
-                                      ? `View details for ${mnemonic}`
-                                      : `${mnemonic} (no details yet)`
-                                  }
+
                                   disabled={!isClickable}
                                 >
                                   {mnemonic}
@@ -2854,7 +2850,7 @@ const RISCVExplorer = () => {
                             <div className="flex items-center gap-2">
                               <button
                                 type="button"
-                                className="inline-flex items-center justify-center p-1.5 rounded-md text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition-colors"
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded border border-slate-600 bg-slate-800 text-[11px] font-mono text-slate-100 hover:border-slate-500"
                                 onClick={async () => {
                                   const text = formatInstructionForClipboard(selectedExt, selectedInstruction);
                                   const ok = await copyTextToClipboard(text);
@@ -2864,7 +2860,12 @@ const RISCVExplorer = () => {
                                 }}
                                 data-tooltip="Copy extension + instruction details"
                               >
-                                {copyStatus === 'copied' ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                                <Copy size={12} />
+                                {copyStatus === 'copied'
+                                  ? 'Copied'
+                                  : copyStatus === 'failed'
+                                    ? 'Copy failed'
+                                    : 'Copy'}
                               </button>
                               <button
                                 type="button"
@@ -3246,10 +3247,15 @@ const RISCVExplorer = () => {
                         if (ok) showToast('Copied validation report!');
                         window.setTimeout(() => setEncoderValidatorCopyStatus(null), 1500);
                       }}
-                      className="inline-flex items-center justify-center p-1.5 rounded-md text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition-colors disabled:opacity-30"
+                      className="riscv-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] disabled:opacity-30"
                       data-tooltip="Copy validation report"
                     >
-                      {encoderValidatorCopyStatus === 'copied' ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                      <Copy size={12} />
+                      {encoderValidatorCopyStatus === 'copied'
+                        ? 'Copied!'
+                        : encoderValidatorCopyStatus === 'failed'
+                          ? 'Failed'
+                          : 'Copy report'}
                     </button>
                   </div>
 

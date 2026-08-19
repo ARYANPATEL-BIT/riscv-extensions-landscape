@@ -97,14 +97,16 @@ function ExtensionTile({
         return (
           <button
             type="button"
-            data-in-workspace={inWorkspace ? 'true' : 'false'}
             onClick={(e) => {
               e.stopPropagation();
               // The handler reports lock rejections itself.
               onToggleWorkspace(data.id);
             }}
-            className="workspace-tile-btn absolute top-1.5 right-1.5"
             style={{
+              position: 'absolute',
+              top: 6,
+              right: 6,
+              zIndex: 10,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: 18, height: 18,
               borderRadius: 5,
@@ -122,7 +124,7 @@ function ExtensionTile({
               transition: 'all 0.15s',
               padding: 0,
             }}
-            data-tooltip={isLocked
+            title={isLocked
               ? `Required by ${lockedBy.join(', ')} — remove dependent first`
               : (inWorkspace
                 ? `Remove ${data.id} from ISA Configuration Builder`
@@ -134,7 +136,7 @@ function ExtensionTile({
                   <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )
-              : <Plus size={11} strokeWidth={2.5} />
+              : <Plus size={9} />
             }
           </button>
         );
