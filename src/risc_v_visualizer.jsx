@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  LayoutGrid,
   Info,
   ScanSearch,
   X,
@@ -22,7 +21,6 @@ import {
   Network,
   Activity,
   BookOpen,
-  Gem,
   AlertTriangle,
   CheckCircle2,
   XCircle,
@@ -35,10 +33,8 @@ import {
   Timer,
   ServerCrash,
   KeyRound,
-  Plus,
   Trash2,
   Download,
-  ChevronDown,
   Maximize2,
   Sun,
   Moon,
@@ -707,7 +703,6 @@ const RISCVExplorer = () => {
   const [builderMode, setBuilderMode] = useState(false);
   const [workspacePanelOpen, setWorkspacePanelOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  const [workspaceQuickOpen, setWorkspaceQuickOpen] = useState(false);
   const [quickExportOpen, setQuickExportOpen] = useState(false);
   const [quickExportIncludeInstr, setQuickExportIncludeInstr] = useState(true);
 
@@ -844,6 +839,17 @@ const RISCVExplorer = () => {
   // so focus can be handed back on close.
   const encoderDialogRef = React.useRef(null);
   const encoderTriggerRef = React.useRef(null);
+
+  // "Copied" badges reset themselves on a timer. Holding the handles lets a
+  // second copy replace the first rather than race it, and lets unmount cancel
+  // a pending reset instead of leaving it to fire into a dead component.
+  const copyStatusTimerRef = React.useRef(null);
+  const encoderCopyTimerRef = React.useRef(null);
+
+  React.useEffect(() => () => {
+    if (copyStatusTimerRef.current) window.clearTimeout(copyStatusTimerRef.current);
+    if (encoderCopyTimerRef.current) window.clearTimeout(encoderCopyTimerRef.current);
+  }, []);
   const searchInputRef = React.useRef(null);
 
   // Encoder Validator dialog keyboard behaviour.
@@ -2936,7 +2942,11 @@ const RISCVExplorer = () => {
                                   const text = formatInstructionForClipboard(selectedExt, selectedInstruction);
                                   const ok = await copyTextToClipboard(text);
                                   setCopyStatus(ok ? 'copied' : 'failed');
-                                  window.setTimeout(() => setCopyStatus(null), 1500);
+                                  if (copyStatusTimerRef.current) window.clearTimeout(copyStatusTimerRef.current);
+                                  copyStatusTimerRef.current = window.setTimeout(() => {
+                                    copyStatusTimerRef.current = null;
+                                    setCopyStatus(null);
+                                  }, 1500);
                                 }}
                                 title="Copy extension + instruction details"
                               >
@@ -3332,7 +3342,11 @@ const RISCVExplorer = () => {
                         );
                         const ok = await copyTextToClipboard(report);
                         setEncoderValidatorCopyStatus(ok ? 'copied' : 'failed');
-                        window.setTimeout(() => setEncoderValidatorCopyStatus(null), 1500);
+                        if (encoderCopyTimerRef.current) window.clearTimeout(encoderCopyTimerRef.current);
+                        encoderCopyTimerRef.current = window.setTimeout(() => {
+                          encoderCopyTimerRef.current = null;
+                          setEncoderValidatorCopyStatus(null);
+                        }, 1500);
                       }}
                       className="riscv-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] disabled:opacity-30"
                       title="Copy validation report"

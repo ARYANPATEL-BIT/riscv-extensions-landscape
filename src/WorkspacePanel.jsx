@@ -1130,7 +1130,6 @@ function ExtChip({ ext, lockedBy, onRemove }) {
  * reported when clicking around the builder.
  */
 function CatalogRowInner({ row, isEven, isHovered, onHover, onSelect }) {
-  const multiSource = row.sources.length > 1;
 
   // Assign a color per source extension (deterministic, based on first char)
   function srcColor(extId) {
