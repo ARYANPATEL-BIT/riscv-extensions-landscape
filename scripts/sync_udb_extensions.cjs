@@ -67,7 +67,7 @@ function parseYaml(filepath) {
       i++;
       let block = '';
       while (i < lines.length && (lines[i].startsWith('  ') || lines[i] === '')) {
-        block += lines[i].replace(/^  /, '') + '\n';
+        block += lines[i].replace(/^ {2}/, '') + '\n';
         i++;
       }
       result[key] = block.trim();

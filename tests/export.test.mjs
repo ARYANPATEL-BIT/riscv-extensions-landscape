@@ -72,7 +72,7 @@ test('the riscv-config format carries its required fields', () => {
 
 test('the riscv-config ISA string follows their spelling, not ours', () => {
   const { yaml } = buildIsaConfigYaml(resolve(['RV64I', 'M', 'A', 'F', 'D', 'C']), ALL, { format: 'riscv-config' });
-  const isa = yaml.match(/^  ISA: (\S+)/m)[1];
+  const isa = yaml.match(/^ {2}ISA: (\S+)/m)[1];
   // First sub-extension attaches directly; theirs is not an underscore-led list.
   assert.match(isa, /^RV64I[A-Z]*Z[a-z]/, `first sub-extension must attach directly: ${isa}`);
   assert.ok(!/^RV64[A-Z]+_/.test(isa), 'no underscore before the first sub-extension');
@@ -82,7 +82,7 @@ test('V absorbs its vector members in the riscv-config format', () => {
   // riscv-config: "V and Zve* cannot exist together". clang tolerates the
   // redundant form, so only this format has to fold them in.
   const { yaml } = buildIsaConfigYaml(resolve(['RV64I', 'V']), ALL, { format: 'riscv-config' });
-  const isa = yaml.match(/^  ISA: (\S+)/m)[1];
+  const isa = yaml.match(/^ {2}ISA: (\S+)/m)[1];
   assert.ok(!/Zve|Zvl/i.test(isa), `V should absorb the vector sub-extensions: ${isa}`);
   assert.match(yaml, /folded into V/, 'the omission should be stated in the file');
 });

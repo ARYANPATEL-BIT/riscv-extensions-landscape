@@ -3722,6 +3722,18 @@
           "mask": "0xfc00707f",
           "deprecated": true
         },
+        "REV8": {
+          "encoding": "011010111000-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv64_zbb"
+          ],
+          "match": "0x6b805013",
+          "mask": "0xfff0707f"
+        },
         "ANDN": {
           "encoding": "0100000----------111-----0110011",
           "variable_fields": [
@@ -3958,6 +3970,18 @@
           ],
           "match": "0x40004033",
           "mask": "0xfe00707f"
+        },
+        "ORC.B": {
+          "encoding": "001010000111-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv_zbb"
+          ],
+          "match": "0x28705013",
+          "mask": "0xfff0707f"
         },
         "BCLRI": {
           "encoding": "010010-----------001-----0010011",
@@ -15143,6 +15167,18 @@
           "mask": "0xfc00707f",
           "deprecated": true
         },
+        "REV8": {
+          "encoding": "011010111000-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv64_zbb"
+          ],
+          "match": "0x6b805013",
+          "mask": "0xfff0707f"
+        },
         "ANDN": {
           "encoding": "0100000----------111-----0110011",
           "variable_fields": [
@@ -15379,6 +15415,18 @@
           ],
           "match": "0x40004033",
           "mask": "0xfe00707f"
+        },
+        "ORC.B": {
+          "encoding": "001010000111-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv_zbb"
+          ],
+          "match": "0x28705013",
+          "mask": "0xfff0707f"
         }
       },
       "url": "https://docs.riscv.org/reference/isa/unpriv/b-st-ext.html"
@@ -21522,7 +21570,8 @@
       "name": "Zbkb",
       "tags": [
         "rv64_zbkb",
-        "rv_zbkb"
+        "rv_zbkb",
+        "rv32_zbkb"
       ],
       "desc": "Crypto Bitmanip (byte)",
       "use": "Byte-wise crypto bit ops",
@@ -21728,6 +21777,54 @@
           ],
           "match": "0x40004033",
           "mask": "0xfe00707f"
+        },
+        "BREV8": {
+          "encoding": "011010000111-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv_zbkb"
+          ],
+          "match": "0x68705013",
+          "mask": "0xfff0707f"
+        },
+        "ZIP": {
+          "encoding": "000010001111-----001-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv32_zbkb"
+          ],
+          "match": "0x08f01013",
+          "mask": "0xfff0707f"
+        },
+        "UNZIP": {
+          "encoding": "000010001111-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv32_zbkb"
+          ],
+          "match": "0x08f05013",
+          "mask": "0xfff0707f"
+        },
+        "REV8.RV32": {
+          "encoding": "011010011000-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv32_zbkb"
+          ],
+          "match": "0x69805013",
+          "mask": "0xfff0707f"
         }
       }
     },
@@ -22033,6 +22130,54 @@
           ],
           "match": "0x40004033",
           "mask": "0xfe00707f"
+        },
+        "BREV8": {
+          "encoding": "011010000111-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv_zbkb"
+          ],
+          "match": "0x68705013",
+          "mask": "0xfff0707f"
+        },
+        "ZIP": {
+          "encoding": "000010001111-----001-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv32_zbkb"
+          ],
+          "match": "0x08f01013",
+          "mask": "0xfff0707f"
+        },
+        "UNZIP": {
+          "encoding": "000010001111-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv32_zbkb"
+          ],
+          "match": "0x08f05013",
+          "mask": "0xfff0707f"
+        },
+        "REV8.RV32": {
+          "encoding": "011010011000-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv32_zbkb"
+          ],
+          "match": "0x69805013",
+          "mask": "0xfff0707f"
         },
         "CLMUL": {
           "encoding": "0000101----------001-----0110011",
@@ -22770,6 +22915,54 @@
           ],
           "match": "0x40004033",
           "mask": "0xfe00707f"
+        },
+        "BREV8": {
+          "encoding": "011010000111-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv_zbkb"
+          ],
+          "match": "0x68705013",
+          "mask": "0xfff0707f"
+        },
+        "ZIP": {
+          "encoding": "000010001111-----001-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv32_zbkb"
+          ],
+          "match": "0x08f01013",
+          "mask": "0xfff0707f"
+        },
+        "UNZIP": {
+          "encoding": "000010001111-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv32_zbkb"
+          ],
+          "match": "0x08f05013",
+          "mask": "0xfff0707f"
+        },
+        "REV8.RV32": {
+          "encoding": "011010011000-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv32_zbkb"
+          ],
+          "match": "0x69805013",
+          "mask": "0xfff0707f"
         },
         "CLMUL": {
           "encoding": "0000101----------001-----0110011",
@@ -23909,6 +24102,54 @@
           ],
           "match": "0x40004033",
           "mask": "0xfe00707f"
+        },
+        "BREV8": {
+          "encoding": "011010000111-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv_zbkb"
+          ],
+          "match": "0x68705013",
+          "mask": "0xfff0707f"
+        },
+        "ZIP": {
+          "encoding": "000010001111-----001-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv32_zbkb"
+          ],
+          "match": "0x08f01013",
+          "mask": "0xfff0707f"
+        },
+        "UNZIP": {
+          "encoding": "000010001111-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv32_zbkb"
+          ],
+          "match": "0x08f05013",
+          "mask": "0xfff0707f"
+        },
+        "REV8.RV32": {
+          "encoding": "011010011000-----101-----0010011",
+          "variable_fields": [
+            "rd",
+            "rs1"
+          ],
+          "extension": [
+            "rv32_zbkb"
+          ],
+          "match": "0x69805013",
+          "mask": "0xfff0707f"
         },
         "CLMUL": {
           "encoding": "0000101----------001-----0110011",
