@@ -414,6 +414,104 @@ if (parseFailures > 0) {
 // means UDB restructured its layout and our minimal parser is quietly missing
 // data, which would otherwise be reported as "No new extensions found".
 //
+// ---- Pass 2: CSR coverage across the whole catalog ----
+//
+// The pass above is deliberately narrow: supervisor-prefixed extensions with no
+// structured data at all. That left CSRs missing everywhere else, so Zicntr,
+// Zihpm, F, H, S, U and V carried none, and searching "mstatus" or "mcycle"
+// found nothing even though UDB describes all of them.
+//
+// findCsrs() rescans the entire CSR directory per extension. That is fine for a
+// handful of gaps but becomes 227 x 396 reads across the full catalog, so this
+// builds the index in a single pass instead.
+//
+// Ownership follows our catalog, not UDB's. UDB attributes vector CSRs to
+// Zvl32b, the minimum VLEN extension, because any V implementation has
+// VLEN >= 32. We file vector content under V, exactly as we already do for
+// vector instructions, so VL and VTYPE appear where a reader looks for them.
+const CSR_EXT_REMAP = { Zvl32b: 'V' };
+
+// A real YAML parse, not the text matcher csrDefinedBy() uses above.
+//
+// That matcher scans the indented block under definedBy for any `name:`, which
+// is fine for the simple supervisor entries it was written for and wrong at
+// catalog scale. mstatus declares a conditional dependence on V and F because
+// it carries VS and FS fields, so a text scan files mstatus, misa and sstatus
+// under both V and F, while Zihpm's 58 counters match nothing at all. Reading
+// the structure instead gives F its three FP CSRs and Zihpm its counters.
+//
+// The shape to respect: definedBy nests under an `extension` key, as
+// `definedBy: {extension: {name: Zicntr}}`, and may carry anyOf/allOf/oneOf.
+// Reading definedBy.name alone silently yields nothing, which reads as "UDB has
+// no CSR data" rather than as a bug.
+const YAML = require('yaml');
+
+function csrOwners(node, out = new Set()) {
+  if (node == null) return out;
+  if (typeof node === 'string') { out.add(node); return out; }
+  if (Array.isArray(node)) { node.forEach(n => csrOwners(n, out)); return out; }
+  if (typeof node !== 'object') return out;
+  if (node.extension) csrOwners(node.extension, out);
+  else if (typeof node.name === 'string') out.add(node.name);
+  for (const key of ['anyOf', 'allOf', 'oneOf']) if (node[key]) csrOwners(node[key], out);
+  return out;
+}
+
+// csr/ is not flat. Alongside ~85 loose files it holds per-extension
+// subdirectories (F, V, H, Zicntr, ...), which is where the FP, vector and
+// counter CSRs live. Reading only the top level sees 85 of 396 files and
+// reports F, V and Zihpm as having no CSRs at all.
+function walkCsrFiles(dir) {
+  const found = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) found.push(...walkCsrFiles(full));
+    else if (entry.name.endsWith('.yaml')) found.push(full);
+  }
+  return found;
+}
+
+const csrIndex = new Map();
+for (const filepath of walkCsrFiles(UDB_CSR_DIR)) {
+  let doc;
+  try {
+    doc = YAML.parse(fs.readFileSync(filepath, 'utf8'));
+  } catch (err) {
+    parseFailures++;
+    console.warn('  warning: could not parse ' + filepath + ': ' + err.message);
+    continue;
+  }
+  if (!doc || !doc.name) continue;
+
+  const entry = buildCsrEntry(doc);
+  for (const owner of csrOwners(doc.definedBy)) {
+    const id = CSR_EXT_REMAP[owner] || owner;
+    if (!entryIndex.has(id)) continue;
+    if (!csrIndex.has(id)) csrIndex.set(id, {});
+    csrIndex.get(id)[doc.name] = entry;
+  }
+}
+
+let csrsAdded = 0;
+let extsGainedCsrs = 0;
+for (const [id, found] of csrIndex) {
+  const loc = entryIndex.get(id);
+  if (!loc) continue;
+  const entry = loc.entries[loc.index];
+  // Fill gaps only. An entry that already carries CSRs was curated or synced
+  // earlier, and replacing it silently would discard that work.
+  if (entry.csrs && Object.keys(entry.csrs).length) continue;
+  const names = Object.keys(found);
+  if (!names.length) continue;
+  entry.csrs = Object.fromEntries(names.sort().map(n => [n, found[n]]));
+  extsGainedCsrs++;
+  csrsAdded += names.length;
+  updated++;
+}
+
+console.log('');
+console.log('CSR coverage pass: ' + extsGainedCsrs + ' extension(s) gained ' + csrsAdded + ' CSR(s)');
+
 // This guard runs BEFORE the write: past the threshold, the in-memory catalog is
 // half-synced (real fields silently dropped), so persisting it would corrupt the
 // checked-in data on local runs and stage a bad diff. Abort untouched instead.

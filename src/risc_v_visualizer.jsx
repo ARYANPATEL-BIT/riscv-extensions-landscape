@@ -659,30 +659,6 @@ const EncodingDiagram = ({ encoding }) => {
   );
 };
 
-// CSR lookups for the details sidebar. Module scope so they are allocated
-// once rather than rebuilt on every render of the explorer.
-const extensionCsrs = {
-  S: [
-    'SSTATUS',
-    'SIE', 'SIP',
-    'STVEC',
-    'SSCRATCH',
-    'SEPC',
-    'SCAUSE',
-    'STVAL',
-    'SATP',
-  ],
-  U: [
-    'USTATUS',
-    'UIE', 'UIP',
-    'UTVEC',
-    'USCRATCH',
-    'UEPC',
-    'UCAUSE',
-    'UTVAL',
-  ],
-};
-
 const extensionCsrLabels = {
   S: 'Supervisor CSRs',
   U: 'User CSRs',
@@ -1367,9 +1343,16 @@ const RISCVExplorer = () => {
       if (mnemonicList.length) {
         parts.push(mnemonicList.join(' '));
       }
-      const csrList = extensionCsrs[ext.id];
-      if (Array.isArray(csrList) && csrList.length) {
-        parts.push(csrList.join(' '));
+      // CSRs now come from the catalogue entry, populated from
+      // riscv-unified-db, rather than a hand-written table covering S and U.
+      // Names and descriptions are both indexed, so 'mstatus' and 'machine
+      // status' both find their extension.
+      if (ext.csrs && typeof ext.csrs === 'object') {
+        const names = Object.keys(ext.csrs);
+        if (names.length) {
+          parts.push(names.join(' '));
+          parts.push(names.map((n) => ext.csrs[n]?.desc).filter(Boolean).join(' '));
+        }
       }
 
       const instructions = ext.instructions;
@@ -2598,21 +2581,29 @@ const RISCVExplorer = () => {
                         </div>
                       )}
 
-                      {extensionCsrs[selectedExt.id] && (
+                      {selectedExt.csrs && Object.keys(selectedExt.csrs).length > 0 && (
                         <div className="bg-slate-900 p-3 rounded border border-slate-700">
                           <h4 className="text-[11px] uppercase tracking-wider text-sky-300 font-bold mb-2">
                             {(extensionCsrLabels[selectedExt.id] || 'CSRs')}{' '}
-                            ({extensionCsrs[selectedExt.id].length})
+                            ({Object.keys(selectedExt.csrs).length})
                           </h4>
                           <div className="flex flex-wrap gap-1">
-                            {extensionCsrs[selectedExt.id].map((csr) => (
-                              <span
-                                key={csr}
-                                className="px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800/70 text-[11px] font-mono text-slate-200"
-                              >
-                                {csr}
-                              </span>
-                            ))}
+                            {Object.keys(selectedExt.csrs).sort().map((name) => {
+                              const csr = selectedExt.csrs[name] || {};
+                              // Address and description are what identify a CSR;
+                              // both ride along in the catalogue entry.
+                              const tip = [csr.desc, csr.address, csr.priv_mode && `${csr.priv_mode}-mode`]
+                                .filter(Boolean).join(' · ');
+                              return (
+                                <span
+                                  key={name}
+                                  title={tip || undefined}
+                                  className="px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800/70 text-[11px] font-mono text-slate-200"
+                                >
+                                  {name.toUpperCase()}
+                                </span>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
