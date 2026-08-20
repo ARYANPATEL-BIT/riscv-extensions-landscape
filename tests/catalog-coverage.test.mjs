@@ -123,6 +123,39 @@ test('CSRs land on the extension a reader would look under', () => {
   }
 });
 
+test('no unratified draft instructions are published', () => {
+  // Wrong data is worse than missing data in a reference: a fabricated encoding
+  // can be implemented against. These are draft bitmanip operations that were
+  // dropped before ratification, and our vendored instr_dict still tagged the
+  // first four rv_zbb / rv64_zbb, so they appeared inside a ratified extension.
+  // Zbp was never ratified at all: it is 404 upstream and absent from UDB.
+  const withdrawn = [
+    'SLO', 'SLOI', 'SRO', 'SROI',                       // draft Zbb shift-ones
+    'GORCI', 'GREVI', 'SHFLI', 'UNSHFLI',               // draft Zbp
+    'XPERM16', 'XPERM32',                               // draft Zbp
+  ];
+  const published = [];
+  for (const e of entries) {
+    for (const m of Object.keys(e.instructions || {})) {
+      if (withdrawn.includes(m.toUpperCase())) published.push(`${e.id}.${m}`);
+    }
+  }
+  assert.deepEqual(
+    published, [],
+    `these instructions were withdrawn before ratification and must not ship:\n  ${published.join('\n  ')}`,
+  );
+});
+
+test('Zbb matches the ratified instruction set', () => {
+  // The concrete symptom of the above: Zbb read 28 instructions instead of 24.
+  const zbb = entries.find((e) => e.id === 'Zbb');
+  assert.ok(zbb, 'Zbb is missing from the catalogue');
+  assert.equal(
+    Object.keys(zbb.instructions || {}).length, 24,
+    'ratified Zbb has 24 instructions across RV32 and RV64',
+  );
+});
+
 test('extension ids are unique', () => {
   const seen = new Set();
   const dupes = [];
