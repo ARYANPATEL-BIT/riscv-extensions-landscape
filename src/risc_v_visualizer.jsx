@@ -539,6 +539,7 @@ const EncodingDiagram = ({ encoding }) => {
             onClick={() => scrollRef.current?.scrollBy({ left: -220, behavior: 'smooth' })}
             disabled={!canScroll || atLeft}
             data-tooltip="Scroll left"
+            aria-label="Scroll left"
           >
             <ChevronLeft size={13} />
           </button>
@@ -548,6 +549,7 @@ const EncodingDiagram = ({ encoding }) => {
             onClick={() => scrollRef.current?.scrollBy({ left: 220, behavior: 'smooth' })}
             disabled={!canScroll || atRight}
             data-tooltip="Scroll right"
+            aria-label="Scroll right"
           >
             <ChevronRight size={13} />
           </button>
@@ -684,9 +686,11 @@ const RISCVExplorer = () => {
   // ── ISA Workspace state ────────────────────────────────────────────────────
   const [workspaceIds, setWorkspaceIds] = useState(new Set());
   const [workspaceNotice, setWorkspaceNotice] = useState(null);
+  const toastTimerRef = React.useRef(null);
   const showToast = React.useCallback((msg) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setWorkspaceNotice(msg);
-    setTimeout(() => setWorkspaceNotice(null), 3500);
+    toastTimerRef.current = setTimeout(() => setWorkspaceNotice(null), 3500);
   }, []);
   // Builder mode. The per-tile "+" affordances only exist while this is on.
   // Previously they were always rendered, in a low-contrast grey, with nothing
@@ -1998,6 +2002,7 @@ const RISCVExplorer = () => {
                         <button
                           type="button"
                           data-tooltip="Open the builder panel (-march string, export, conflicts)"
+                          aria-label="Open the builder panel"
                           onClick={() => setWorkspacePanelOpen(true)}
                           className={`builder-action-amber ${workspaceIds.size === 0 ? "flex-none px-4" : "flex-1"} flex items-center justify-center py-1.5 text-amber-300 hover:bg-amber-500/30 hover:text-amber-100 transition-all duration-300 rounded-lg hover:shadow-[0_0_12px_rgba(251,191,36,0.3)]`}
                         >
@@ -2078,6 +2083,7 @@ const RISCVExplorer = () => {
                             <button
                               type="button"
                               data-tooltip="Clear all extensions"
+                              aria-label="Clear all extensions"
                               onClick={() => setWorkspaceIds(new Set())}
                               className="builder-action-rose flex-1 flex items-center justify-center py-1.5 text-rose-300 hover:bg-rose-500/30 hover:text-rose-100 hover:shadow-[0_0_12px_rgba(244,63,94,0.3)] transition-all duration-300 rounded-lg"
                             >
@@ -2088,6 +2094,7 @@ const RISCVExplorer = () => {
                               <button
                                 type="button"
                                 data-tooltip="Export configuration YAML"
+                                aria-label="Export configuration YAML"
                                 onClick={() => setQuickExportOpen(v => !v)}
                                 className={`builder-action-emerald w-full flex items-center justify-center py-1.5 transition-all duration-300 rounded-lg ${
                                   quickExportOpen 
@@ -2256,6 +2263,7 @@ const RISCVExplorer = () => {
                       className="p-0.5 rounded hover:opacity-80"
                       style={{ color: 'var(--riscv-text-3)' }}
                       data-tooltip="Clear search"
+                      aria-label="Clear search"
                     >
                       <X size={13} />
                     </button>
@@ -2661,6 +2669,7 @@ const RISCVExplorer = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedExt(null)}
+                  aria-label="Close details panel"
                   className="lg:hidden p-1 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
                 >
                   <X size={16} />
@@ -2811,7 +2820,11 @@ const RISCVExplorer = () => {
                                         ? 'border-red-500/60 bg-red-500/5 text-red-200'
                                         : 'border-slate-700 bg-slate-800/70'
                                     }`}
-
+                                  title={
+                                    isClickable
+                                      ? `View details for ${mnemonic}`
+                                      : `${mnemonic} (no details yet)`
+                                  }
                                   disabled={!isClickable}
                                 >
                                   {mnemonic}
@@ -3109,9 +3122,10 @@ const RISCVExplorer = () => {
               href="https://github.com/riscv/riscv-isa-manual"
               target="_blank"
               rel="noreferrer"
-              className="hover:opacity-80"
+              className="hover:opacity-80 tooltip-align-right"
               style={{ color: 'var(--riscv-text-2)' }}
               data-tooltip="View on GitHub"
+              aria-label="View on GitHub"
             >
               <BookOpen size={14} />
             </a>
@@ -3146,6 +3160,7 @@ const RISCVExplorer = () => {
                   className="riscv-btn p-1.5"
                   onClick={() => setEncoderValidatorOpen(false)}
                   data-tooltip="Close"
+                  aria-label="Close encoder validator"
                 >
                   <X size={15} />
                 </button>
@@ -3237,6 +3252,7 @@ const RISCVExplorer = () => {
                       type="button"
                       disabled={!encoderValidatorResult?.proposed}
                       onClick={async () => {
+                        if (!encoderValidatorResult?.proposed) return;
                         setEncoderValidatorCopyStatus(null);
                         const report = formatEncoderValidatorReport(
                           encoderValidatorResult.proposed,

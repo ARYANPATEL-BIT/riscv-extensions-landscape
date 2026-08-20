@@ -51,7 +51,22 @@ function ExtensionTile({
   return (
     <div
       id={`ext-${data.id}`}
+      role="button"
+      tabIndex={dimmed ? -1 : 0}
       onClick={() => onSelect(data)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          onSelect(data);
+        } else if (e.key === ' ') {
+          e.preventDefault();
+          if (builderMode && !isDiscontinued) {
+            onToggleWorkspace(data.id);
+          } else {
+            onSelect(data);
+          }
+        }
+      }}
       className={[
         'ext-tile group relative rounded-lg border cursor-pointer select-none',
         isSelected ? 'ext-tile-active' : '',
@@ -97,16 +112,14 @@ function ExtensionTile({
         return (
           <button
             type="button"
+            tabIndex={-1}
             onClick={(e) => {
               e.stopPropagation();
               // The handler reports lock rejections itself.
               onToggleWorkspace(data.id);
             }}
+            className="workspace-tile-btn absolute top-1.5 right-1.5"
             style={{
-              position: 'absolute',
-              top: 6,
-              right: 6,
-              zIndex: 10,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: 18, height: 18,
               borderRadius: 5,
