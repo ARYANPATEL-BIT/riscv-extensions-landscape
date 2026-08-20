@@ -3694,34 +3694,6 @@
           "match": "0x6000503b",
           "mask": "0xfe00707f"
         },
-        "SLOI": {
-          "encoding": "001000-----------001-----0010011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "shamtd"
-          ],
-          "extension": [
-            "rv64_zbb"
-          ],
-          "match": "0x20001013",
-          "mask": "0xfc00707f",
-          "deprecated": true
-        },
-        "SROI": {
-          "encoding": "001000-----------101-----0010011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "shamtd"
-          ],
-          "extension": [
-            "rv64_zbb"
-          ],
-          "match": "0x20005013",
-          "mask": "0xfc00707f",
-          "deprecated": true
-        },
         "REV8": {
           "encoding": "011010111000-----101-----0010011",
           "variable_fields": [
@@ -3925,34 +3897,6 @@
           ],
           "match": "0x60501013",
           "mask": "0xfff0707f"
-        },
-        "SLO": {
-          "encoding": "0010000----------001-----0110011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "rs2"
-          ],
-          "extension": [
-            "rv_zbb"
-          ],
-          "match": "0x20001033",
-          "mask": "0xfe00707f",
-          "deprecated": true
-        },
-        "SRO": {
-          "encoding": "0010000----------101-----0110011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "rs2"
-          ],
-          "extension": [
-            "rv_zbb"
-          ],
-          "match": "0x20005033",
-          "mask": "0xfe00707f",
-          "deprecated": true
         },
         "XNOR": {
           "encoding": "0100000----------100-----0110011",
@@ -15497,34 +15441,6 @@
           "match": "0x6000503b",
           "mask": "0xfe00707f"
         },
-        "SLOI": {
-          "encoding": "001000-----------001-----0010011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "shamtd"
-          ],
-          "extension": [
-            "rv64_zbb"
-          ],
-          "match": "0x20001013",
-          "mask": "0xfc00707f",
-          "deprecated": true
-        },
-        "SROI": {
-          "encoding": "001000-----------101-----0010011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "shamtd"
-          ],
-          "extension": [
-            "rv64_zbb"
-          ],
-          "match": "0x20005013",
-          "mask": "0xfc00707f",
-          "deprecated": true
-        },
         "REV8": {
           "encoding": "011010111000-----101-----0010011",
           "variable_fields": [
@@ -15728,34 +15644,6 @@
           ],
           "match": "0x60501013",
           "mask": "0xfff0707f"
-        },
-        "SLO": {
-          "encoding": "0010000----------001-----0110011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "rs2"
-          ],
-          "extension": [
-            "rv_zbb"
-          ],
-          "match": "0x20001033",
-          "mask": "0xfe00707f",
-          "deprecated": true
-        },
-        "SRO": {
-          "encoding": "0010000----------101-----0110011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "rs2"
-          ],
-          "extension": [
-            "rv_zbb"
-          ],
-          "match": "0x20005033",
-          "mask": "0xfe00707f",
-          "deprecated": true
         },
         "XNOR": {
           "encoding": "0100000----------100-----0110011",
