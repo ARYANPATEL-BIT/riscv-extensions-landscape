@@ -304,8 +304,11 @@ for (const entry of umbrellaEntries) {
   }
 }
 
-assertExtension('B', { count: 42 });
-assertExtension('Zk', { count: 47 }); // Zkn(41) ∪ Zks(20) minus shared Zbkb/Zbkc/Zbkx = 47 unique
+// These counts rose when the ratified bitmanip instructions were added. Zbb
+// gained ORC.B and REV8 (+2), and Zbkb gained BREV8, ZIP, UNZIP and REV8.RV32,
+// which carries +4 into every umbrella that includes Zbkb.
+assertExtension('B', { count: 44 });
+assertExtension('Zk', { count: 51 }); // Zkn(45) ∪ Zks(24) minus shared Zbkb/Zbkc/Zbkx = 51 unique
 
 const zkExt = extMap.get('Zk');
 assert(zkExt?.members?.includes('Zkt'), 'Zk umbrella must include Zkt.');
@@ -326,8 +329,8 @@ for (const id of KNOWN_POPULATED_TAG_EXTS) {
   if (ext) assert(Object.keys(ext.instructions).length > 0, `Core extension ${id} is unexpectedly empty.`);
 }
 
-assertExtension('Zkn', { count: 41 });
-assertExtension('Zks', { count: 20 });
+assertExtension('Zkn', { count: 45 });
+assertExtension('Zks', { count: 24 });
 
 const rv64iExt = extMap.get('RV64I');
 assert(!!rv64iExt, 'RV64I extension entry must exist in catalog');

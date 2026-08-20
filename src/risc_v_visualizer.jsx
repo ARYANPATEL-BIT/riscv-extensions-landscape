@@ -836,7 +836,74 @@ const RISCVExplorer = () => {
   }, [workspaceTotalInstr]);
   // --------------------------------------------------------------------------
   const lastScrolledKeyRef = React.useRef(null);
+  // Whether the open Selected Details panel was opened by the search rather than
+  // by a click. Only a search-driven selection may be cleared when the query
+  // stops matching; a deliberate click must survive.
+  const searchDrivenSelectionRef = React.useRef(false);
+  // Encoder Validator dialog: the panel itself, and the control that opened it,
+  // so focus can be handed back on close.
+  const encoderDialogRef = React.useRef(null);
+  const encoderTriggerRef = React.useRef(null);
   const searchInputRef = React.useRef(null);
+
+  // Encoder Validator dialog keyboard behaviour.
+  //
+  // A dialog that can only be dismissed with the mouse is a trap for anyone
+  // navigating by keyboard, and without a focus trap Tab walks out of the modal
+  // and onto the 227 tiles behind it while the backdrop still blocks the mouse.
+  React.useEffect(() => {
+    if (!encoderValidatorOpen) return undefined;
+
+    // Prefer the trigger element itself over document.activeElement: a mouse
+    // click does not focus a button in every browser, so activeElement can be
+    // <body> here and focus would be dropped on the floor when the dialog closes.
+    const opener = document.activeElement;
+    const fallbackOpener = opener instanceof HTMLElement && opener !== document.body ? opener : null;
+
+    const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
+    const focusable = () => {
+      const root = encoderDialogRef.current;
+      if (!root) return [];
+      return [...root.querySelectorAll(FOCUSABLE)]
+        .filter((el) => el.offsetWidth > 0 || el.offsetHeight > 0);
+    };
+
+    // Start inside the dialog, on the first field rather than the close button.
+    const first = focusable();
+    (first.find((el) => el.tagName === 'INPUT') ?? first[0])?.focus();
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setEncoderValidatorOpen(false);
+        return;
+      }
+      if (e.key !== 'Tab') return;
+
+      const items = focusable();
+      if (!items.length) return;
+      const firstEl = items[0];
+      const lastEl = items[items.length - 1];
+      const active = document.activeElement;
+
+      // Wrap at both ends, and pull focus back in if it has escaped already.
+      if (e.shiftKey && (active === firstEl || !encoderDialogRef.current?.contains(active))) {
+        e.preventDefault();
+        lastEl.focus();
+      } else if (!e.shiftKey && (active === lastEl || !encoderDialogRef.current?.contains(active))) {
+        e.preventDefault();
+        firstEl.focus();
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown, true);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown, true);
+      // Hand focus back to the trigger, so keyboard users resume where they left
+      // off instead of at the top of the document.
+      (encoderTriggerRef.current ?? fallbackOpener)?.focus?.();
+    };
+  }, [encoderValidatorOpen]);
 
   // Ctrl+K / Cmd+K → focus search
   React.useEffect(() => {
@@ -1493,7 +1560,20 @@ const RISCVExplorer = () => {
       if (matchParsed == null) errors.push('Match must be a hex value like 0x1234.');
       if (maskParsed == null) errors.push('Mask must be a hex value like 0x707f.');
 
-      if (matchParsed != null && maskParsed != null) {
+      // Reject oversized input before anything truncates it. Everything below
+      // masks with BIT_MASK_32, so 0x11800202f silently became 0x1800202f and
+      // reported a conflict against SC.W that the user never typed. The check
+      // lives here rather than in parseHexToBigInt because that helper also
+      // parses catalogue match/mask values, which are trusted and already 32-bit.
+      if (matchParsed != null && matchParsed > BIT_MASK_32) {
+        errors.push('Match exceeds 32 bits.');
+      }
+      if (maskParsed != null && maskParsed > BIT_MASK_32) {
+        errors.push('Mask exceeds 32 bits.');
+      }
+
+      if (matchParsed != null && maskParsed != null
+          && matchParsed <= BIT_MASK_32 && maskParsed <= BIT_MASK_32) {
         const matchNorm = matchParsed & BIT_MASK_32;
         const maskNorm = maskParsed & BIT_MASK_32;
         if ((matchNorm & ~maskNorm) !== 0n) {
@@ -1646,11 +1726,16 @@ const RISCVExplorer = () => {
     [isHighlightedByProfile, isHighlightedByVolume],
   );
 
+  // Dim whatever the active filter excludes. The two filters are mutually
+  // exclusive (selecting one clears the other), so at most one branch applies.
+  // This used to return false as soon as a volume was set, which meant picking
+  // a volume while a profile was active un-dimmed the entire grid while both
+  // filters still highlighted, and nothing showed which one was responsible.
   const isDimmed = React.useCallback((id) => {
-    if (activeVolume) return false;
-    if (!activeProfile) return false;
-    return !profiles[activeProfile].includes(id);
-  }, [activeVolume, activeProfile]);
+    if (activeVolume) return !(volumeMembership[activeVolume]?.has(id) ?? false);
+    if (activeProfile) return !profiles[activeProfile].includes(id);
+    return false;
+  }, [activeVolume, activeProfile, volumeMembership]);
 
   // The tile lives in ./ExtensionTile.jsx. It used to be defined here, inside
   // the render body, which meant a new component type on every render and a
@@ -1660,6 +1745,9 @@ const RISCVExplorer = () => {
   // identities for everything shared, and the tile itself asks only whether ITS
   // own id changed membership.
   const handleSelectExt = React.useCallback((data) => {
+    // A deliberate click owns the panel from here on, so a later non-matching
+    // query must not clear it out from under the user.
+    searchDrivenSelectionRef.current = false;
     setSelectedExt((current) => {
       const next = current?.id === data.id ? null : data;
       setSelectedInstruction(null);
@@ -1772,6 +1860,7 @@ const RISCVExplorer = () => {
       matchedDetails = matchedMnemonic ? targetExt?.instructions?.[matchedMnemonic] : null;
 
       // Always open/update the Selected Details panel for the matched extension
+      searchDrivenSelectionRef.current = true;
       setSelectedExt(targetExt);
       setSearchMatches(hits.length ? { extId: targetExt.id, query: q, mnemonics: hits, index: 0 } : null);
       setSelectedInstruction(matchedMnemonic && matchedDetails ? { mnemonic: matchedMnemonic, ...matchedDetails } : null);
@@ -1786,6 +1875,16 @@ const RISCVExplorer = () => {
         }
         lastScrolledKeyRef.current = key;
       }
+    } else if (searchDrivenSelectionRef.current) {
+      // The query is non-empty and matched nothing. Without this branch the
+      // panel kept showing whatever the previous query opened, which read as
+      // though the new query had matched it. Only clear what the search itself
+      // opened; a clicked selection is left alone.
+      searchDrivenSelectionRef.current = false;
+      lastScrolledKeyRef.current = null;
+      setSelectedExt(null);
+      setSelectedInstruction(null);
+      setSearchMatches(null);
     }
   }, [searchQuery, extensionSearchIndexById]);
 
@@ -1872,7 +1971,11 @@ const RISCVExplorer = () => {
                           key={profile}
                           onClick={() =>
                             setActiveProfile((current) => {
-                              setSelectedExt(null);
+                              // Profile and volume are mutually exclusive. With
+                              // both live, highlight matched either one while
+                              // dimming followed only the volume, so the grid
+                              // gave no clue which filter was acting.
+                              setActiveVolume(null);
                               setSelectedInstruction(null);
                               setSearchMatches(null);
                               return current === profile ? null : profile;
@@ -1903,7 +2006,7 @@ const RISCVExplorer = () => {
                           key={vol}
                           onClick={() =>
                             setActiveVolume((current) => {
-                              setSelectedExt(null);
+                              setActiveProfile(null);
                               setSelectedInstruction(null);
                               setSearchMatches(null);
                               return current === vol ? null : vol;
@@ -1931,6 +2034,9 @@ const RISCVExplorer = () => {
                     setEncoderValidatorResult(null);
                     setEncoderValidatorCopyStatus(null);
                   }}
+                  ref={encoderTriggerRef}
+                  aria-haspopup="dialog"
+                  aria-expanded={encoderValidatorOpen}
                   className="group inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-300 whitespace-nowrap border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/15 hover:border-indigo-400 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]"
                   title="Validate a proposed instruction encoding against the existing instruction set"
                 >
@@ -3103,14 +3209,22 @@ const RISCVExplorer = () => {
           />
 
           <div className="absolute inset-0 p-3 md:p-8 flex items-start justify-center overflow-y-auto">
-            <div className="animate-scale-in w-full max-w-3xl riscv-card overflow-hidden" style={{ boxShadow: '0 0 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(139,124,248,0.15)' }}>
+            <div
+              ref={encoderDialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="encoder-validator-title"
+              aria-describedby="encoder-validator-desc"
+              className="animate-scale-in w-full max-w-3xl riscv-card overflow-hidden"
+              style={{ boxShadow: '0 0 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(139,124,248,0.15)' }}
+            >
               <div className="p-4 flex items-start justify-between gap-3" style={{ borderBottom: '1px solid var(--riscv-border)' }}>
                 <div className="min-w-0">
-                  <h3 className="font-bold flex items-center gap-2" style={{ color: 'var(--riscv-text)', fontSize: '14px' }}>
+                  <h3 id="encoder-validator-title" className="font-bold flex items-center gap-2" style={{ color: 'var(--riscv-text)', fontSize: '14px' }}>
                     <ScanSearch size={15} style={{ color: 'var(--riscv-violet)' }} />
                     <span>Encoder Validator</span>
                   </h3>
-                  <p className="text-[12px] mt-1" style={{ color: 'var(--riscv-text-3)' }}>
+                  <p id="encoder-validator-desc" className="text-[12px] mt-1" style={{ color: 'var(--riscv-text-3)' }}>
                     Enter a 32-bit encoding (0/1/-) or Match+Mask (hex). Detects overlaps against the full ISA database.
                   </p>
                 </div>
