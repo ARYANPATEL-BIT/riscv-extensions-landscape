@@ -349,9 +349,24 @@ if (validationErrors > 0) {
 console.log('  All validation checks passed.\n');
 
 // Atomic Write & Report
-const tmpPath = catalogPath + '.tmp';
-fs.writeFileSync(tmpPath, JSON.stringify(extensionsCatalog, null, 2) + '\n', 'utf8');
-fs.renameSync(tmpPath, catalogPath);
+//
+// --dry-run stops here rather than earlier on purpose: everything above,
+// including the validation gate, has already run, so the summary below
+// describes exactly what a real run would produce.
+const dryRun = process.argv.includes('--dry-run');
+
+if (dryRun) {
+  const next = JSON.stringify(extensionsCatalog, null, 2) + '\n';
+  const current = fs.readFileSync(catalogPath, 'utf8');
+  console.log('  DRY RUN: no files were modified.');
+  console.log(current === next
+    ? '  riscv_extensions.json is already up to date.\n'
+    : `  riscv_extensions.json would change (${current.length} -> ${next.length} bytes).\n`);
+} else {
+  const tmpPath = catalogPath + '.tmp';
+  fs.writeFileSync(tmpPath, JSON.stringify(extensionsCatalog, null, 2) + '\n', 'utf8');
+  fs.renameSync(tmpPath, catalogPath);
+}
 
 const totalPopulated = tagsPopulated + splitRulePopulated + umbrellaPopulated;
 const emptyExts = totalExts - totalPopulated;

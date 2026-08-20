@@ -4,6 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RISC-V Extension Landscape</title>
+
+  <!-- Description and social cards. The URLs are absolute on purpose: Open
+       Graph and Twitter consumers do not resolve relative paths, so a relative
+       og:url yields no preview at all. -->
+  <meta name="description" content="Interactive reference for RISC-V extensions, profiles and per-instruction encodings. Build an ISA configuration with dependencies resolved automatically and export a valid -march string.">
+  <link rel="canonical" href="https://rpsene.github.io/riscv-extensions-landscape/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="RISC-V Extension Landscape">
+  <meta property="og:title" content="RISC-V Extension Landscape">
+  <meta property="og:description" content="Interactive reference for RISC-V extensions, profiles and per-instruction encodings, with dependency-resolved ISA configuration and -march export.">
+  <meta property="og:url" content="https://rpsene.github.io/riscv-extensions-landscape/">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="RISC-V Extension Landscape">
+  <meta name="twitter:description" content="Interactive reference for RISC-V extensions, profiles and per-instruction encodings.">
+
+  <!-- Matches the two theme grounds, so mobile browser chrome does not clash. -->
+  <meta name="theme-color" content="#14141e" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f7f5fb" media="(prefers-color-scheme: light)">
   <!-- Favicon: the official RISC-V mark, taken from the logo served by
        docs.riscv.org and cropped to its square leading glyph. The full
        wordmark is 6.3:1 and turns to mush below 128px; the mark alone stays
