@@ -661,6 +661,11 @@ const EncodingDiagram = ({ encoding }) => {
   );
 };
 
+const extensionCsrLabels = {
+  S: 'Supervisor CSRs',
+  U: 'User CSRs',
+};
+
 const RISCVExplorer = () => {
 
   const [activeProfile, setActiveProfile] = useState(null);
@@ -853,10 +858,14 @@ const RISCVExplorer = () => {
   // a pending reset instead of leaving it to fire into a dead component.
   const copyStatusTimerRef = React.useRef(null);
   const encoderCopyTimerRef = React.useRef(null);
+  // Pending auto-scroll from the search effect, so a later keystroke can cancel
+  // one that has not fired yet.
+  const scrollTimerRef = React.useRef(null);
 
   React.useEffect(() => () => {
     if (copyStatusTimerRef.current) window.clearTimeout(copyStatusTimerRef.current);
     if (encoderCopyTimerRef.current) window.clearTimeout(encoderCopyTimerRef.current);
+    if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
   }, []);
   const searchInputRef = React.useRef(null);
 
@@ -935,368 +944,11 @@ const RISCVExplorer = () => {
   // ---------------------------------------------------------------------------
   // Extension Catalog – loaded from `src/riscv_extensions.json`
   // ---------------------------------------------------------------------------
-  /*
-  const extensions = {
-    base: [
-      { id: 'RV32I', name: 'RV32I', desc: 'Standard Integer Base (32-bit)', use: 'Microcontrollers, IoT' },
-      { id: 'RV64I', name: 'RV64I', desc: 'Standard Integer Base (64-bit)', use: 'Servers, Mobile, PC' },
-      { id: 'RV32E', name: 'RV32E', desc: 'Embedded Base (16 regs)', use: 'Tiny cores (Reduced silicon)' },
-      { id: 'RV64E', name: 'RV64E', desc: 'Embedded Base (64-bit, 16 regs)', use: 'Efficient 64-bit controllers' },
-      { id: 'RV128I', name: 'RV128I', desc: '128-bit Address Space', use: 'Experimental/Research' },
-    ],
-
-    // Single-letter + top-level “ISA environment” markers
-    standard: [
-      { id: 'A', name: 'A', desc: 'Atomics', use: 'LR/SC & AMO ops in hardware', discontinued: 0 },
-      { id: 'B', name: 'B', desc: 'Bit-Manip Bundle', use: 'Aggregates Zba/Zbb/Zbc/Zbs', discontinued: 0 },
-      { id: 'C', name: 'C', desc: 'Compressed', use: '16-bit instruction encodings', discontinued: 0 },
-      { id: 'D', name: 'D', desc: 'Double-Precision Float (64-bit)', use: 'General-purpose FP, HPC', discontinued: 0 },
-      { id: 'F', name: 'F', desc: 'Single-Precision Float (32-bit)', use: 'Basic floating-point workloads', discontinued: 0 },
-      { id: 'H', name: 'H', desc: 'Hypervisor', use: 'Virtualization / VMs', discontinued: 0 },
-      { id: 'K', name: 'K', desc: 'Crypto Umbrella (Scalar + Vector)', use: 'Top-level tag signaling bundled Zk* /Zvk* NIST & ShangMi crypto support', discontinued: 0 },
-      { id: 'M', name: 'M', desc: 'Integer Multiply/Divide', use: 'Hardware multiplication and division', discontinued: 0 },
-      { id: 'N', name: 'N', desc: 'User-Level Interrupts', use: 'User-mode interrupt handling', discontinued: 1 },
-      { id: 'P', name: 'P', desc: 'Packed-SIMD', use: 'Packed SIMD / DSP-style operations', discontinued: 0 },
-      { id: 'Q', name: 'Q', desc: 'Quad-Precision Float (128-bit)', use: 'High-precision scientific math', discontinued: 0 },
-      { id: 'S', name: 'S', desc: 'Supervisor ISA', use: 'Supervisor privilege level (Volume II)', discontinued: 0 },
-      { id: 'U', name: 'U', desc: 'User ISA', use: 'User privilege level (Volume II)', discontinued: 0 },
-      { id: 'V', name: 'V', desc: 'Vector (RVV)', use: 'Full RVV 1.0 vector ISA', discontinued: 0 },
-    ],
-
-    // Zb* scalar bit-manip
-    z_bit: [
-      { id: 'Zba', name: 'Zba', desc: 'Address-Generation Bitmanip', use: 'Shift/add address generation' },
-      { id: 'Zbb', name: 'Zbb', desc: 'Basic Bitmanip', use: 'CLZ/CTZ, popcnt, min/max, etc.' },
-      { id: 'Zbc', name: 'Zbc', desc: 'Carry-less Multiply', use: 'CRC, Galois-field crypto' },
-      { id: 'Zbs', name: 'Zbs', desc: 'Single-Bit Ops', use: 'Set/clear/invert bit in word' },
-    ],
-
-    // Zc* compressed
-    z_compress: [
-      { id: 'Zca', name: 'Zca', desc: 'Base Compressed (no FP)', use: 'Compressed base integer ops' },
-      { id: 'Zcb', name: 'Zcb', desc: 'Extra Compressed Integer', use: 'More 16-bit ALU/control ops' },
-      { id: 'Zcd', name: 'Zcd', desc: 'Compressed Double Float', use: '16-bit encodings for 64-bit FP' },
-      { id: 'Zce', name: 'Zce', desc: 'Embedded Compressed', use: 'RV32E/RV64E-focused compressed subset' },
-      { id: 'Zcf', name: 'Zcf', desc: 'Compressed Float Load/Store', use: '16-bit encodings for FP LD/ST' },
-      { id: 'Zcmp', name: 'Zcmp', desc: 'Push/Pop & Reg Save/Restore', use: 'Stack push/pop, frame save' },
-      { id: 'Zcmt', name: 'Zcmt', desc: 'Compressed Table Jumps', use: 'Switch/jumptable compression' },
-      { id: 'Zcmop', name: 'Zcmop', desc: 'Compressed May-Be-Ops', use: 'Reserved 16-bit NOP/future ops' },
-      { id: 'Zclsd', name: 'Zclsd', desc: 'Compressed LS-Pair', use: 'Compressed load/store pairs' },
-      { id: 'Zcmlsd', name: 'Zcmlsd', desc: 'Compressed Mem-Loop', use: 'Compact memcpy/memset-style sequences' },
-    ],
-
-    // Zf* /Za* floating-point & atomics family
-    z_float: [
-      { id: 'Zfh', name: 'Zfh', desc: 'Half-Precision FP (16-bit)', use: 'Low-precision FP (AI/graphics)' },
-      { id: 'Zfhmin', name: 'Zfhmin', desc: 'Minimal Half-Precision FP', use: 'Conversions, no arithmetic' },
-      { id: 'Zfbfmin', name: 'Zfbfmin', desc: 'Minimal BF16 FP', use: 'BFloat16 conversions and storage' },
-      { id: 'Zfa', name: 'Zfa', desc: 'Additional FP Instructions', use: 'Fused ops, sign inject, etc.' },
-      { id: 'Zfinx', name: 'Zfinx', desc: 'FP in Integer Regs (F)', use: 'Single-precision FP in x-regs' },
-      { id: 'Zdinx', name: 'Zdinx', desc: 'FP in Integer Regs (D)', use: 'Double-precision FP in x-regs' },
-      { id: 'Zhinx', name: 'Zhinx', desc: 'FP in Integer Regs (Half)', use: 'Half-precision FP in x-regs' },
-      { id: 'Zhinxmin', name: 'Zhinxmin', desc: 'Minimal Half-in-Int', use: 'Minimal half-precision in x-regs' },
-      { id: 'Zacas', name: 'Zacas', desc: 'Atomic Compare-and-Swap', use: 'Lock-free algorithms (CAS)' },
-      { id: 'Zawrs', name: 'Zawrs', desc: 'Wait-on-Reservation-Set', use: 'Low-power waiting on LR/SC reservations' },
-    ],
-
-    // Vector subsets & capabilities (non-crypto)
-    z_vector: [
-      // Embedded vector base subsets
-      { id: 'Zve', name: 'Zve', desc: 'Embedded Vector Base', use: 'Baseline V subset for MCUs' },
-      { id: 'Zve32x', name: 'Zve32x', desc: 'Vec Int (32-bit, embedded)', use: 'Int-only embedded vectors' },
-      { id: 'Zve32f', name: 'Zve32f', desc: 'Vec FP32 (embedded)', use: 'Embedded FP32 vector compute' },
-      { id: 'Zve64x', name: 'Zve64x', desc: 'Vec Int (64-bit, embedded)', use: '64-bit int embedded vectors' },
-      { id: 'Zve64f', name: 'Zve64f', desc: 'Vec FP32+Int (64-bit, embedded)', use: 'FP32 + 64-bit int vectors' },
-      { id: 'Zve64d', name: 'Zve64d', desc: 'Vec FP64+FP32+Int', use: 'Full FP64 embedded vectors' },
-
-      // Aliases and VLEN capabilities
-      { id: 'Zv', name: 'Zv', desc: 'Vector Alias for V', use: 'ISA alias for full RVV' },
-      { id: 'Zvl32b', name: 'Zvl32b', desc: 'Min VLEN ≥ 32b', use: 'Vector length capability' },
-      { id: 'Zvl64b', name: 'Zvl64b', desc: 'Min VLEN ≥ 64b', use: 'Vector length capability' },
-      { id: 'Zvl128b', name: 'Zvl128b', desc: 'Min VLEN ≥ 128b', use: 'Vector length capability' },
-      { id: 'Zvl256b', name: 'Zvl256b', desc: 'Min VLEN ≥ 256b', use: 'Vector length capability' },
-      { id: 'Zvl512b', name: 'Zvl512b', desc: 'Min VLEN ≥ 512b', use: 'Vector length capability' },
-      { id: 'Zvl1024b', name: 'Zvl1024b', desc: 'Min VLEN ≥ 1024b', use: 'Vector length capability' },
-
-      // Vector FP numerics
-      { id: 'Zvf', name: 'Zvf', desc: 'Vector FP minimal', use: 'Minimal scalar-like vector FP' },
-      { id: 'Zvfh', name: 'Zvfh', desc: 'Vector Half-Precision FP', use: '16-bit FP vector arithmetic' },
-      { id: 'Zvfhmin', name: 'Zvfhmin', desc: 'Vector Half-Precision Minimal', use: 'Conv/storage, minimal Zvfh' },
-      { id: 'Zvfbfmin', name: 'Zvfbfmin', desc: 'Vector BF16 Minimal', use: 'BF16 conversions in vectors' },
-      { id: 'Zvfbfa', name: 'Zvfbfa', desc: 'Vector BF16 Arithmetic', use: 'BF16 arithmetic in vectors' },
-      { id: 'Zvfbfwma', name: 'Zvfbfwma', desc: 'Vector BF16 Widening MAC', use: 'BF16 GEMM-style MAC' },
-      { id: 'Zvfofp8min', name: 'Zvfofp8min', desc: 'Vector FP8 Minimal', use: 'Minimal FP8 vector support' },
-
-      // Non-crypto vector arithmetic helpers
-      { id: 'Zvabd', name: 'Zvabd', desc: 'Vector Abs-Diff', use: 'Absolute-difference operations' },
-      { id: 'Zvbb', name: 'Zvbb', desc: 'Vector Bitmanip Base', use: 'Vectorized scalar Zbb ops' },
-      { id: 'Zvbc', name: 'Zvbc', desc: 'Vector Carryless Multiply', use: 'Vector CRC / GF ops' },
-      { id: 'Zvbc32e', name: 'Zvbc32e', desc: 'Vector CLMUL (32E)', use: 'Carryless multiply for embedded vectors' },
-      { id: 'Zvbdota', name: 'Zvbdota', desc: 'Vector BF16 Dot-Acc', use: 'BF16 dot-product accumulate' },
-      { id: 'Zvdota', name: 'Zvdota', desc: 'Vector Dot-Acc', use: 'Generic FP dot-product accumulate' },
-      { id: 'Zvdot4a', name: 'Zvdot4a', desc: 'Vector 4-way Dot-Acc', use: '4-way dot-product accumulate' },
-
-      { id: 'Zvw', name: 'Zvw', desc: 'Vector Wide Groups', use: 'Wider element/vector width options' },
-    ],
-
-    // Control-flow integrity, hints & “maybe ops”
-    z_security: [
-      { id: 'Zicfilp', name: 'Zicfilp', desc: 'CFI Landing Pads', use: 'Forward-edge CFI for calls' },
-      { id: 'Zicfiss', name: 'Zicfiss', desc: 'CFI Shadow Stacks', use: 'Backward-edge CFI (returns)' },
-      { id: 'Zicond', name: 'Zicond', desc: 'Integer Conditional Ops', use: 'Branchless selects / cmov' },
-      { id: 'Ziccrse', name: 'Ziccrse', desc: 'LR/SC Forward Progress', use: 'Guarantees LR/SC forward progress' },
-      { id: 'Zimop', name: 'Zimop', desc: 'May-Be-Ops (NOP family)', use: 'Reserved NOP encodings for future' },
-    ],
-
-    // Scalar & vector crypto
-    z_crypto: [
-      // Scalar crypto umbrella + splits
-      { id: 'Zk', name: 'Zk', desc: 'Scalar Crypto Base', use: 'Top-level scalar crypto bundle' },
-      { id: 'Zkn', name: 'Zkn', desc: 'NIST Suite (Scalar)', use: 'AES/SHA NIST suite' },
-      { id: 'Zknd', name: 'Zknd', desc: 'NIST AES Decrypt', use: 'AES decryption instructions' },
-      { id: 'Zkne', name: 'Zkne', desc: 'NIST AES Encrypt', use: 'AES encryption instructions' },
-      { id: 'Zknh', name: 'Zknh', desc: 'NIST Hash', use: 'SHA-2 hash instructions' },
-      { id: 'Zkr', name: 'Zkr', desc: 'Entropy Source', use: 'True random source interface' },
-
-      { id: 'Zks', name: 'Zks', desc: 'ShangMi Suite (Scalar)', use: 'Chinese SMx crypto bundle' },
-      { id: 'Zksed', name: 'Zksed', desc: 'SM4 Block Cipher', use: 'SM4 encrypt/decrypt' },
-      { id: 'Zksh', name: 'Zksh', desc: 'SM3 Hash', use: 'SM3 hash operations' },
-
-      { id: 'Zkt', name: 'Zkt', desc: 'Timing-Safe Crypto', use: 'Data-independent latency constraints' },
-
-      // Scalar crypto bitmanip
-      { id: 'Zbkb', name: 'Zbkb', desc: 'Crypto Bitmanip (byte)', use: 'Byte-wise crypto bit ops' },
-      { id: 'Zbkc', name: 'Zbkc', desc: 'Crypto Bitmanip (carryless)', use: 'Carryless ops for crypto' },
-      { id: 'Zbkx', name: 'Zbkx', desc: 'Crypto Bitmanip (crossbar)', use: 'Bit/byte crossbar operations' },
-
-      // Vector crypto umbrella
-      { id: 'Zvk', name: 'Zvk', desc: 'Vector Crypto (umbrella)', use: 'Top-level vector crypto suite' },
-
-      // Vector crypto subsets
-      { id: 'Zvkb', name: 'Zvkb', desc: 'Vector Crypto Bitmanip', use: 'Vector crypto bit ops' },
-      { id: 'Zvkg', name: 'Zvkg', desc: 'Vector GCM/GMAC', use: 'AES-GCM/GMAC acceleration' },
-      { id: 'Zvkgs', name: 'Zvkgs', desc: 'Vector GCM Shim', use: 'Profile-specific GCM subset' },
-      { id: 'Zvkn', name: 'Zvkn', desc: 'Vector NIST Suite', use: 'Vector AES/SHA suite' },
-      { id: 'Zvknc', name: 'Zvknc', desc: 'Vector NIST + CLMUL', use: 'NIST crypto with carryless multiply' },
-      { id: 'Zvkned', name: 'Zvkned', desc: 'Vector AES', use: 'Vector AES-ECB/CTR/GCM cores' },
-      { id: 'Zvknf', name: 'Zvknf', desc: 'Vector AES Finite-field', use: 'Vector AES finite-field helpers' },
-      { id: 'Zvkng', name: 'Zvkng', desc: 'Vector NIST + GCM', use: 'NIST suite + GCM vector bundle' },
-      { id: 'Zvknha', name: 'Zvknha', desc: 'Vector SHA-2 (subset)', use: 'Vector SHA-256 subset' },
-      { id: 'Zvknhb', name: 'Zvknhb', desc: 'Vector SHA-2 (full)', use: 'Vector SHA-256/512' },
-      { id: 'Zvks', name: 'Zvks', desc: 'Vector ShangMi Suite', use: 'Vector SMx algorithms' },
-      { id: 'Zvksc', name: 'Zvksc', desc: 'Vector ShangMi + CLMUL', use: 'SMx with carryless multiply' },
-      { id: 'Zvksed', name: 'Zvksed', desc: 'Vector SM4', use: 'Vector SM4 cipher' },
-      { id: 'Zvksg', name: 'Zvksg', desc: 'Vector ShangMi + GCM', use: 'ShangMi + GCM vectors' },
-      { id: 'Zvksh', name: 'Zvksh', desc: 'Vector SM3 Hash', use: 'Vector SM3' },
-      { id: 'Zvkt', name: 'Zvkt', desc: 'Vector Timing-Safe Crypto', use: 'Vector data-independent latency' },
-    ],
-
-    // System / caches / atomics / load-store utilities
-    z_system: [
-      { id: 'Zicsr', name: 'Zicsr', desc: 'CSR Access', use: 'Explicit CSR read/write' },
-      { id: 'Zifencei', name: 'Zifencei', desc: 'Instruction-Fetch Fence', use: 'Sync I-cache with writes' },
-
-      { id: 'Zicntr', name: 'Zicntr', desc: 'Base Counters/Timers', use: 'cycle/instret + timers' },
-      { id: 'Zihpm', name: 'Zihpm', desc: 'Perf Counters', use: 'Hardware performance monitors' },
-
-      { id: 'Zihintpause', name: 'Zihintpause', desc: 'Pause Hint', use: 'Power-friendly spin-wait' },
-      { id: 'Zihintntl', name: 'Zihintntl', desc: 'Non-Temporal Locality Hints', use: 'NT load/store hints' },
-
-      { id: 'Zicbom', name: 'Zicbom', desc: 'Cache Management Operations', use: 'Invalidate/clean/flush blocks' },
-      { id: 'Zicbop', name: 'Zicbop', desc: 'Cache Prefetch', use: 'Prefetch cache blocks' },
-      { id: 'Zicboz', name: 'Zicboz', desc: 'Cache Block Zero', use: 'Fast memset-to-zero' },
-
-      { id: 'Zmmul', name: 'Zmmul', desc: 'Multiply-Only (no DIV)', use: 'Cheaper M subset (mul only)' },
-
-      { id: 'Zaamo', name: 'Zaamo', desc: 'Atomic Memory Operations', use: 'Defines atomic granularity' },
-      { id: 'Zabha', name: 'Zabha', desc: 'Byte/Halfword AMO', use: 'Subword AMO support' },
-
-      { id: 'Zalrsc', name: 'Zalrsc', desc: 'LR/SC Extension', use: 'Extended LR/SC semantics' },
-      { id: 'Zalasr', name: 'Zalasr', desc: 'LR/SC Alias Rules', use: 'Alias rules for LR/SC sequences' },
-
-      { id: 'Ztso', name: 'Ztso', desc: 'Total Store Ordering', use: 'x86-style TSO memory model' },
-
-      { id: 'Zilsd', name: 'Zilsd', desc: 'Streaming LS (data)', use: 'Streaming loads/stores (data)' },
-      { id: 'Zilsp', name: 'Zilsp', desc: 'Streaming LS (prefetch)', use: 'Streaming prefetch hints' },
-      { id: 'Zilsme', name: 'Zilsme', desc: 'Streaming Stores (exclusive)', use: 'Streaming store hints' },
-      { id: 'Zilsmea', name: 'Zilsmea', desc: 'Streaming Stores (alloc)', use: 'Streaming store + allocate' },
-      { id: 'Zilsm*', name: 'Zilsm*', desc: 'Streaming Mem (pattern)', use: 'Wildcard for Zilsm<x>b family' },
-      { id: 'Zilsm<x>b', name: 'Zilsm<x>b', desc: 'Streaming Mem (x-byte)', use: 'Line-size specific streaming ops' },
-
-      { id: 'Zclsd', name: 'Zclsd', desc: 'Compressed LS Pair', use: 'Compressed LS pairs (RV32)' },
-
-      // PMA / cache-block / reservation set / misc
-      { id: 'Za64rs', name: 'Za64rs', desc: '64B Reservation Set', use: 'Reservation set granularity (64-byte)' },
-      { id: 'Za128rs', name: 'Za128rs', desc: '128B Reservation Set', use: 'Reservation set granularity (128-byte)' },
-      { id: 'Zic64b', name: 'Zic64b', desc: '64B Cache Blocks', use: 'Requires 64B naturally aligned cache lines' },
-      { id: 'Ziccif', name: 'Ziccif', desc: 'Inst-Fetch Atomicity', use: 'Atomic I-fetch in cacheable+coherent regions' },
-      { id: 'Ziccrse', name: 'Ziccrse', desc: 'RsrvEventual', use: 'Reservation-set eventuality guarantees' },
-      { id: 'Ziccamoa', name: 'Ziccamoa', desc: 'Atomics PMA', use: 'PMA guarantees for A-extension atomics' },
-      { id: 'Zicclsm', name: 'Zicclsm', desc: 'Misaligned L/S Support', use: 'Misaligned loads/stores in cacheable+coherent regions' },
-      { id: 'Ziccamoc', name: 'Ziccamoc', desc: 'CAS PMA', use: 'PMA guarantees for CAS-style atomics' },
-
-      { id: 'Zibi', name: 'Zibi', desc: 'Interruptible Mem Ops', use: 'Interruptible load/store semantics' },
-      { id: 'Zicntrpmf', name: 'Zicntrpmf', desc: 'Counter Filtering', use: 'Mode-based filtering for counters' },
-      { id: 'Zimt', name: 'Zimt', desc: 'Time Instructions', use: 'Extended time/TIMECMP instructions' },
-      { id: 'Zitagelide', name: 'Zitagelide', desc: 'Tag & ELIDE', use: 'Tagged-memory / elide behaviors' },
-      { id: 'Zjid', name: 'Zjid', desc: 'ICache Coherence Alt', use: 'Alternative to Zifencei for I-cache coherence' },
-      { id: 'Zjpm', name: 'Zjpm', desc: 'Pointer-Mask Qualifier', use: 'Auxiliary pointer-masking semantics' },
-      { id: 'Zccid', name: 'Zccid', desc: 'Cache-Block ID', use: 'Cache block identity / debugging' },
-      { id: 'Zama16b', name: 'Zama16b', desc: '16B Misaligned Atomicity', use: 'Misaligned atomicity granule (16 bytes)' },
-    ],
-
-    // S / Sv: memory & address-translation
-    s_mem: [
-      { id: 'Sv32', name: 'Sv32', desc: 'Virtual Memory, 32-bit', use: '2-level page tables (RV32 Linux)' },
-      { id: 'Sv39', name: 'Sv39', desc: 'Virtual Memory, 39-bit VA', use: '3-level page tables (RV64 Linux)' },
-      { id: 'Sv48', name: 'Sv48', desc: 'Virtual Memory, 48-bit VA', use: '4-level page tables' },
-      { id: 'Sv57', name: 'Sv57', desc: 'Virtual Memory, 57-bit VA', use: '5-level page tables' },
-
-      { id: 'Svbare', name: 'Svbare', desc: 'Bare Mode', use: 'No address translation (satp bare)' },
-
-      { id: 'Svpbmt', name: 'Svpbmt', desc: 'Page-Based Memory Types', use: 'Per-page memory types / cacheability' },
-      { id: 'Svnapot', name: 'Svnapot', desc: 'NAPOT Mappings', use: 'Hugepages via NAPOT PTEs' },
-      { id: 'Svinval', name: 'Svinval', desc: 'Fine-Grained TLB Invalidate', use: 'Fine-grain TLB shootdown instructions' },
-      { id: 'Svade', name: 'Svade', desc: 'Access/Dirty Exceptions', use: 'Page-fault on A/D bit issues' },
-      { id: 'Svadu', name: 'Svadu', desc: 'Access/Dirty Update', use: 'Hardware A/D-bit updates' },
-      { id: 'Svvptc', name: 'Svvptc', desc: 'Visible PTE Changes', use: 'Bounded-time PTE visibility guarantees' },
-      { id: 'Svrsw60t59b', name: 'Svrsw60t59b', desc: 'PTE RSW Bits', use: 'Standard RSW field behavior' },
-
-      { id: 'Svatag', name: 'Svatag', desc: 'Tagged Translations', use: 'Address-tagged translation behavior' },
-      { id: 'Svukte', name: 'Svukte', desc: 'User-Keyed TLB Entries', use: 'Per-user TLB tagging' },
-
-      // Pointer masking (user/supervisor view)
-      { id: 'Supm', name: 'Supm', desc: 'User Pointer Masking', use: 'Mask user pointers' },
-      { id: 'Ssnpm', name: 'Ssnpm', desc: 'Supervisor Next-Pointer Mask', use: 'Mask next-mode pointers (S)' },
-      { id: 'Sspm', name: 'Sspm', desc: 'Supervisor Pointer Masking', use: 'Supervisor pointer-mask policy' },
-    ],
-
-    // S / Sm / Ss: interrupts, counters, QoS, AIA, etc.
-    s_interrupt: [
-      { id: 'Smaia', name: 'Smaia', desc: 'AIA Machine Extension', use: 'Advanced interrupt arch (M)' },
-      { id: 'Ssaia', name: 'Ssaia', desc: 'AIA Supervisor Extension', use: 'Advanced interrupt arch (S)' },
-
-      { id: 'Smclic', name: 'Smclic', desc: 'Machine CLIC', use: 'Machine-level CLIC interrupt controller' },
-      { id: 'Smclicconfig', name: 'Smclicconfig', desc: 'Machine CLIC Config', use: 'MCLIC configuration CSRs' },
-      { id: 'Smclicshv', name: 'Smclicshv', desc: 'Machine CLIC SHV', use: 'Selective hardware vectored interrupts' },
-
-      { id: 'Ssclic', name: 'Ssclic', desc: 'Supervisor CLIC', use: 'Supervisor-level CLIC interface' },
-      { id: 'Suclic', name: 'Suclic', desc: 'User CLIC', use: 'User-level CLIC interface' },
-
-      { id: 'Sstc', name: 'Sstc', desc: 'Supervisor Timer Compare', use: 'Per-hart timer interrupts' },
-
-      { id: 'Smcdeleg', name: 'Smcdeleg', desc: 'M-Mode Counter Delegation', use: 'Delegates HPM counters to S' },
-      { id: 'Smcntrpmf', name: 'Smcntrpmf', desc: 'M-Mode Counter Filtering', use: 'Filter counters by privilege' },
-      { id: 'Ssccfg', name: 'Ssccfg', desc: 'Counter Configuration (S)', use: 'S-mode control of delegated HPM' },
-      { id: 'Sscntrcfg', name: 'Sscntrcfg', desc: 'S-Mode Counter Config', use: 'Supervisor counter configuration' },
-      { id: 'Sscounterenw', name: 'Sscounterenw', desc: 'Writable scounteren', use: 'Writable enables for HPMs' },
-      { id: 'Sscofpmf', name: 'Sscofpmf', desc: 'Counter Overflow & Filtering', use: 'Overflow + filtering in S-mode' },
-      { id: 'Ssccptr', name: 'Ssccptr', desc: 'S Counter Pointer CSR', use: 'Supervisor counter pointer CSR' },
-
-      { id: 'Ssqosid', name: 'Ssqosid', desc: 'QoS Identifiers', use: 'Per-thread QoS tagging' },
-      { id: 'Sshpmcfg', name: 'Sshpmcfg', desc: 'S-Mode HPM Config', use: 'Supervisor HPM configuration' },
-
-      { id: 'Smrnmi', name: 'Smrnmi', desc: 'Resumable NMI', use: 'Restartable non-maskable interrupts' },
-    ],
-
-    // Traps, debug, state enable, PMP, CSR indirection, profile tags, hypervisor aux
-    s_trap: [
-      // Debug
-      { id: 'Sdext', name: 'Sdext', desc: 'External Debug', use: 'External debug architecture' },
-      { id: 'Sdtrig', name: 'Sdtrig', desc: 'Debug Triggers', use: 'HW breakpoints / watchpoints' },
-      { id: 'Sdtrigepm', name: 'Sdtrigepm', desc: 'Debug Trigger EPM', use: 'Trigger matching for external PM' },
-      { id: 'Sdtrigpend', name: 'Sdtrigpend', desc: 'Debug Trigger Pending', use: 'Pending trigger cause reporting' },
-
-      // Trap / CSR behavior
-      { id: 'Smcsrind', name: 'Smcsrind', desc: 'Indirect CSR Access (M)', use: 'CSR indirection at M-mode' },
-      { id: 'Sscsrind', name: 'Sscsrind', desc: 'Indirect CSR Access (S)', use: 'CSR indirection at S-mode' },
-      { id: 'Smctr', name: 'Smctr', desc: 'Control Transfer Records (M)', use: 'Hardware CFI logs (M)' },
-      { id: 'Ssctr', name: 'Ssctr', desc: 'Control Transfer Records (S)', use: 'Hardware CFI logs (S)' },
-
-      { id: 'Sddbltrp', name: 'Sddbltrp', desc: 'Debug Double Trap', use: 'Debug-level nested traps' },
-      { id: 'Ssdbltrp', name: 'Ssdbltrp', desc: 'Supervisor Double Trap', use: 'Recoverable nested traps (S)' },
-      { id: 'Smdbltrp', name: 'Smdbltrp', desc: 'Machine Double Trap', use: 'Recoverable nested traps (M)' },
-
-      // State enable / PMP / security-ish arch
-      { id: 'Smstateen', name: 'Smstateen', desc: 'M-Mode State Enable', use: 'Gate access to extension CSRs' },
-      { id: 'Ssstateen', name: 'Ssstateen', desc: 'S-Mode State Enable', use: 'State-enable for S/VS/VU' },
-      { id: 'Smepmp', name: 'Smepmp', desc: 'Enhanced PMP', use: 'More flexible PMP rules' },
-      { id: 'Smmpm', name: 'Smmpm', desc: 'Machine PMP Mgmt', use: 'Machine-level PMP management' },
-
-      // Profile-visible architectural tags
-      { id: 'Sm1p11', name: 'Sm1p11', desc: 'Priv Spec M v1.11', use: 'Machine architecture tag' },
-      { id: 'Ss1p11', name: 'Ss1p11', desc: 'Priv Spec S v1.11', use: 'Supervisor architecture tag' },
-      { id: 'Sm1p12', name: 'Sm1p12', desc: 'Priv Spec M v1.12', use: 'Machine architecture tag' },
-      { id: 'Ss1p12', name: 'Ss1p12', desc: 'Priv Spec S v1.12', use: 'Supervisor architecture tag' },
-      { id: 'Sm1p13', name: 'Sm1p13', desc: 'Priv Spec M v1.13', use: 'Machine architecture tag' },
-      { id: 'Ss1p13', name: 'Ss1p13', desc: 'Priv Spec S v1.13', use: 'Supervisor architecture tag' },
-
-      // Trap-behavior niceties
-      { id: 'Sstvala', name: 'Sstvala', desc: 'stval Address Rule', use: 'Precise faulting VA / instruction' },
-      { id: 'Sstvecd', name: 'Sstvecd', desc: 'stvec Direct Mode', use: 'Direct-mode trap vector' },
-      { id: 'Sstvecv', name: 'Sstvecv', desc: 'stvec Vectored Mode', use: 'Vectored trap routing' },
-      { id: 'Ssdtso', name: 'Ssdtso', desc: 'Supervisor TSO Opt-in', use: 'Supervisors opt into TSO behavior' },
-      { id: 'Sstcfg', name: 'Sstcfg', desc: 'Trap Config', use: 'Per-trap configuration controls' },
-      { id: 'Ssstrict', name: 'Ssstrict', desc: 'No Non-Conforming Exts', use: 'Disallows non-conforming extensions' },
-
-      { id: 'Ssu32xl', name: 'Ssu32xl', desc: 'UXL=32 support', use: 'User XLEN=32 capability' },
-      { id: 'Ssu64xl', name: 'Ssu64xl', desc: 'UXL=64 support', use: 'User XLEN=64 capability' },
-      { id: 'Ssube', name: 'Ssube', desc: 'Big-Endian S', use: 'Supervisor big-endian/bi-endian' },
-      { id: 'Ssvxscr', name: 'Ssvxscr', desc: 'VS CSR', use: 'Vector state control at S-mode' },
-
-      { id: 'Ssptead', name: 'Ssptead', desc: 'Sup PTE A/D (legacy)', use: 'Legacy name for Svade-style semantics' },
-
-      // Machine-level trap / debug extras
-      { id: 'Smcfiss', name: 'Smcfiss', desc: 'M-Mode Shadow Stack', use: 'Machine-level shadow stack config' },
-      { id: 'Smdid', name: 'Smdid', desc: 'Debug ID', use: 'Debug/trace identification' },
-      { id: 'Smrnpt', name: 'Smrnpt', desc: 'Non-Precise Traps', use: 'Relaxed trap precision' },
-      { id: 'Smrntt', name: 'Smrntt', desc: 'Non-Taken Traps', use: 'Trap behavior when not taken' },
-      { id: 'Smnpm', name: 'Smnpm', desc: 'Non-Maskable PM', use: 'Power-management/trap interactions' },
-      { id: 'Smpmpmt', name: 'Smpmpmt', desc: 'PMP Machine Trap', use: 'PMP-related trap behavior' },
-      { id: 'Smsdia', name: 'Smsdia', desc: 'Soft Debug/Instr', use: 'Soft-debug / diagnostics assist' },
-      { id: 'Smtdeleg', name: 'Smtdeleg', desc: 'Trap Delegation', use: 'Fine-grain trap delegation controls' },
-      { id: 'Smvatag', name: 'Smvatag', desc: 'VA Tagging (M)', use: 'Machine-level virtual-address tagging' },
-
-      // Non-ISA “spec tags” modeled as tiles too
-      { id: 'RERI', name: 'RERI', desc: 'RAS Error Reporting', use: 'RAS error reporting arch tag' },
-      { id: 'HTI', name: 'HTI', desc: 'Trace & Instrumentation', use: 'Trace / instrumentation spec tag' },
-    ],
-  };
-  */
 
   // Profile definitions live in ./profiles.js so scripts and tests can reach
   // them; see that file for why.
   const profiles = PROFILES;
 
-  // ---------------------------------------------------------------------------
-  // Instruction lists per extension (used in the details sidebar)
-  // ---------------------------------------------------------------------------
-  const extensionCsrs = {
-    S: [
-      'SSTATUS',
-      'SIE', 'SIP',
-      'STVEC',
-      'SSCRATCH',
-      'SEPC',
-      'SCAUSE',
-      'STVAL',
-      'SATP',
-    ],
-    U: [
-      'USTATUS',
-      'UIE', 'UIP',
-      'UTVEC',
-      'USCRATCH',
-      'UEPC',
-      'UCAUSE',
-      'UTVAL',
-    ],
-  };
-
-  const extensionCsrLabels = {
-    S: 'Supervisor CSRs',
-    U: 'User CSRs',
-  };
 
   // ---------------------------------------------------------------------------
   // Derived helpers
@@ -1699,9 +1351,16 @@ const RISCVExplorer = () => {
       if (mnemonicList.length) {
         parts.push(mnemonicList.join(' '));
       }
-      const csrList = extensionCsrs[ext.id];
-      if (Array.isArray(csrList) && csrList.length) {
-        parts.push(csrList.join(' '));
+      // CSRs now come from the catalogue entry, populated from
+      // riscv-unified-db, rather than a hand-written table covering S and U.
+      // Names and descriptions are both indexed, so 'mstatus' and 'machine
+      // status' both find their extension.
+      if (ext.csrs && typeof ext.csrs === 'object') {
+        const names = Object.keys(ext.csrs);
+        if (names.length) {
+          parts.push(names.join(' '));
+          parts.push(names.map((n) => ext.csrs[n]?.desc).filter(Boolean).join(' '));
+        }
       }
 
       const instructions = ext.instructions;
@@ -1885,15 +1544,28 @@ const RISCVExplorer = () => {
       setSearchMatches(hits.length ? { extId: targetExt.id, query: q, mnemonics: hits, index: 0 } : null);
       setSelectedInstruction(matchedMnemonic && matchedDetails ? { mnemonic: matchedMnemonic, ...matchedDetails } : null);
 
-      const key = `${targetExt.id}:${q}`;
+      const key = targetExt.id;
 
-      // Only auto-scroll once per unique (extension, query) pair
+      // Auto-scroll is deferred; matching, highlighting and the details panel
+      // are not. Otherwise typing fires one smooth scroll per keystroke and
+      // each new one interrupts the last: "zicboz" chased B, C, Ziccrse,
+      // Zicbom and Zicboz in turn, and "addi" scrolled four times for only two
+      // distinct targets. Debouncing the whole search instead, as the issue
+      // originally proposed, would have delayed the highlight as well, trading
+      // visible jank for visible lag. This settles on the final target once
+      // typing pauses and leaves every other response immediate.
+      //
+      // The key is the extension id alone. It used to include the query, so a
+      // target that had not actually moved was scrolled to again on every
+      // keystroke.
       if (lastScrolledKeyRef.current !== key) {
-        const el = document.getElementById(`ext-${targetExt.id}`);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        lastScrolledKeyRef.current = key;
+        if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
+        scrollTimerRef.current = window.setTimeout(() => {
+          scrollTimerRef.current = null;
+          document.getElementById(`ext-${targetExt.id}`)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          lastScrolledKeyRef.current = key;
+        }, 180);
       }
     } else if (searchDrivenSelectionRef.current) {
       // The query is non-empty and matched nothing. Without this branch the
@@ -2959,21 +2631,29 @@ const RISCVExplorer = () => {
                         </div>
                       )}
 
-                      {extensionCsrs[selectedExt.id] && (
+                      {selectedExt.csrs && Object.keys(selectedExt.csrs).length > 0 && (
                         <div className="bg-slate-900 p-3 rounded border border-slate-700">
                           <h4 className="text-[11px] uppercase tracking-wider text-sky-300 font-bold mb-2">
                             {(extensionCsrLabels[selectedExt.id] || 'CSRs')}{' '}
-                            ({extensionCsrs[selectedExt.id].length})
+                            ({Object.keys(selectedExt.csrs).length})
                           </h4>
                           <div className="flex flex-wrap gap-1">
-                            {extensionCsrs[selectedExt.id].map((csr) => (
-                              <span
-                                key={csr}
-                                className="px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800/70 text-[11px] font-mono text-slate-200"
-                              >
-                                {csr}
-                              </span>
-                            ))}
+                            {Object.keys(selectedExt.csrs).sort().map((name) => {
+                              const csr = selectedExt.csrs[name] || {};
+                              // Address and description are what identify a CSR;
+                              // both ride along in the catalogue entry.
+                              const tip = [csr.desc, csr.address, csr.priv_mode && `${csr.priv_mode}-mode`]
+                                .filter(Boolean).join(' · ');
+                              return (
+                                <span
+                                  key={name}
+                                  title={tip || undefined}
+                                  className="px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800/70 text-[11px] font-mono text-slate-200"
+                                >
+                                  {name.toUpperCase()}
+                                </span>
+                              );
+                            })}
                           </div>
                         </div>
                       )}

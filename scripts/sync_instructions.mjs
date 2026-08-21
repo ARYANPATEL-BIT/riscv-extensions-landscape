@@ -307,7 +307,14 @@ for (const entry of umbrellaEntries) {
 // These counts rose when the ratified bitmanip instructions were added. Zbb
 // gained ORC.B and REV8 (+2), and Zbkb gained BREV8, ZIP, UNZIP and REV8.RV32,
 // which carries +4 into every umbrella that includes Zbkb.
-assertExtension('B', { count: 44 });
+// B then fell from 44 to 40 when SLO, SRO, SLOI and SROI were removed. Those are
+// draft bitmanip shift-ones operations, dropped before ratification, which our
+// vendored instr_dict still tagged rv_zbb and rv64_zbb, so they surfaced inside
+// a ratified extension.
+assertExtension('B', { count: 40 });
+// Pinned explicitly because this is the count that was wrong: ratified Zbb has
+// 24 instructions across RV32 and RV64, and the four draft ops made it read 28.
+assertExtension('Zbb', { count: 24 });
 assertExtension('Zk', { count: 51 }); // Zkn(45) ∪ Zks(24) minus shared Zbkb/Zbkc/Zbkx = 51 unique
 
 const zkExt = extMap.get('Zk');

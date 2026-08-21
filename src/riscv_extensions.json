@@ -3694,34 +3694,6 @@
           "match": "0x6000503b",
           "mask": "0xfe00707f"
         },
-        "SLOI": {
-          "encoding": "001000-----------001-----0010011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "shamtd"
-          ],
-          "extension": [
-            "rv64_zbb"
-          ],
-          "match": "0x20001013",
-          "mask": "0xfc00707f",
-          "deprecated": true
-        },
-        "SROI": {
-          "encoding": "001000-----------101-----0010011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "shamtd"
-          ],
-          "extension": [
-            "rv64_zbb"
-          ],
-          "match": "0x20005013",
-          "mask": "0xfc00707f",
-          "deprecated": true
-        },
         "REV8": {
           "encoding": "011010111000-----101-----0010011",
           "variable_fields": [
@@ -3925,34 +3897,6 @@
           ],
           "match": "0x60501013",
           "mask": "0xfff0707f"
-        },
-        "SLO": {
-          "encoding": "0010000----------001-----0110011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "rs2"
-          ],
-          "extension": [
-            "rv_zbb"
-          ],
-          "match": "0x20001033",
-          "mask": "0xfe00707f",
-          "deprecated": true
-        },
-        "SRO": {
-          "encoding": "0010000----------101-----0110011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "rs2"
-          ],
-          "extension": [
-            "rv_zbb"
-          ],
-          "match": "0x20005033",
-          "mask": "0xfe00707f",
-          "deprecated": true
         },
         "XNOR": {
           "encoding": "0100000----------100-----0110011",
@@ -5383,7 +5327,27 @@
           "mask": "0x707f"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/f-st-ext.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/f-st-ext.html",
+      "csrs": {
+        "fcsr": {
+          "address": "3",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Floating-point control and status register (`frm` + `fflags`)"
+        },
+        "fflags": {
+          "address": "1",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Floating-Point Accrued Exceptions"
+        },
+        "frm": {
+          "address": "2",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Floating-Point Dynamic Rounding Mode"
+        }
+      }
     },
     {
       "id": "H",
@@ -5612,7 +5576,177 @@
           "mask": "0xfe007fff"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/priv/hypervisor.html"
+      "url": "https://docs.riscv.org/reference/isa/priv/hypervisor.html",
+      "csrs": {
+        "hcontext": {
+          "address": "1704",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Hypervisor Context"
+        },
+        "hcounteren": {
+          "address": "1542",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Hypervisor Counter Enable"
+        },
+        "hedeleg": {
+          "address": "1538",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor Exception Delegation"
+        },
+        "hedelegh": {
+          "address": "1554",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Hypervisor Exception Delegation High"
+        },
+        "henvcfg": {
+          "address": "1546",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor Environment Configuration"
+        },
+        "henvcfgh": {
+          "address": "1562",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "most-significant 32 bits of Hypervisor Environment Configuration"
+        },
+        "hgatp": {
+          "address": "1664",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Hypervisor guest address translation and protection"
+        },
+        "hstateen0": {
+          "address": "1548",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 0 Register"
+        },
+        "hstateen0h": {
+          "address": "1564",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 0 Register"
+        },
+        "hstateen1": {
+          "address": "1549",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 1 Register"
+        },
+        "hstateen1h": {
+          "address": "1565",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 1 Register"
+        },
+        "hstateen2": {
+          "address": "1550",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 2 Register"
+        },
+        "hstateen2h": {
+          "address": "1566",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 2 Register"
+        },
+        "hstateen3": {
+          "address": "1551",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor State Enable 3 Register"
+        },
+        "hstateen3h": {
+          "address": "1567",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Upper 32 bits of Hypervisor State Enable 3 Register"
+        },
+        "hstatus": {
+          "address": "1536",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Hypervisor Status"
+        },
+        "htimedelta": {
+          "address": "1541",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Hypervisor time delta"
+        },
+        "htimedeltah": {
+          "address": "1557",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Hypervisor time delta, upper half"
+        },
+        "htinst": {
+          "address": "1610",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Hypervisor Trap Instruction Register"
+        },
+        "htval": {
+          "address": "1603",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Hypervisor Trap Value Register"
+        },
+        "mtinst": {
+          "address": "842",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine Trap Instruction Register"
+        },
+        "mtval2": {
+          "address": "843",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine Second Trap Value Register"
+        },
+        "vsatp": {
+          "address": "640",
+          "priv_mode": "VS",
+          "length": "MXLEN",
+          "desc": "Virtual Supervisor Address Translation and Protection"
+        },
+        "vscause": {
+          "address": "578",
+          "priv_mode": "VS",
+          "length": "MXLEN",
+          "desc": "Virtual Supervisor Cause"
+        },
+        "vsepc": {
+          "address": "577",
+          "priv_mode": "VS",
+          "length": 64,
+          "desc": "Virtual Supervisor Exception Program Counter"
+        },
+        "vsstatus": {
+          "address": "512",
+          "priv_mode": "VS",
+          "length": "MXLEN",
+          "desc": "Virtual Supervisor Status"
+        },
+        "vstval": {
+          "address": "579",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Virtual supervisor Trap Value"
+        },
+        "vstvec": {
+          "address": "517",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor Trap Vector"
+        }
+      }
     },
     {
       "id": "K",
@@ -6325,7 +6459,105 @@
           "mask": "0xffffffff"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/priv/supervisor.html"
+      "url": "https://docs.riscv.org/reference/isa/priv/supervisor.html",
+      "csrs": {
+        "medeleg": {
+          "address": "770",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine Exception Delegation"
+        },
+        "medelegh": {
+          "address": "786",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Machine Exception Delegation, High bits"
+        },
+        "mideleg": {
+          "address": "771",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine Interrupt Delegation"
+        },
+        "mscontext": {
+          "address": "1962",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Machine Supervisor Context"
+        },
+        "satp": {
+          "address": "384",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Supervisor Address Translation and Protection"
+        },
+        "scause": {
+          "address": "322",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Supervisor Cause"
+        },
+        "scontext": {
+          "address": "1448",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Supervisor Context"
+        },
+        "scounteren": {
+          "address": "262",
+          "priv_mode": "S",
+          "length": 32,
+          "desc": "Supervisor Counter Enable"
+        },
+        "senvcfg": {
+          "address": "266",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor Environment Configuration"
+        },
+        "sepc": {
+          "address": "321",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor Exception Program Counter"
+        },
+        "sie": {
+          "address": "260",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Supervisor interrupt-enable register"
+        },
+        "sip": {
+          "address": "324",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor Interrupt Pending"
+        },
+        "sscratch": {
+          "address": "320",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor Scratch Register"
+        },
+        "sstatus": {
+          "address": "256",
+          "priv_mode": "S",
+          "length": "MXLEN",
+          "desc": "Supervisor Status"
+        },
+        "stval": {
+          "address": "323",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor Trap Value"
+        },
+        "stvec": {
+          "address": "261",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor Trap Vector"
+        }
+      }
     },
     {
       "id": "U",
@@ -6347,7 +6579,33 @@
           "mask": "0xffffffff"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/priv/machine.html"
+      "url": "https://docs.riscv.org/reference/isa/priv/machine.html",
+      "csrs": {
+        "mcounteren": {
+          "address": "774",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Machine Counter Enable"
+        },
+        "menvcfg": {
+          "address": "778",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine Environment Configuration"
+        },
+        "menvcfgh": {
+          "address": "794",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Machine Environment Configuration"
+        },
+        "senvcfg": {
+          "address": "266",
+          "priv_mode": "S",
+          "length": 64,
+          "desc": "Supervisor Environment Configuration"
+        }
+      }
     },
     {
       "id": "V",
@@ -14904,7 +15162,51 @@
           "mask": "0xfc0ff07f"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html",
+      "csrs": {
+        "vcsr": {
+          "address": "15",
+          "priv_mode": "U",
+          "length": "MXLEN",
+          "desc": "Vector Control and Status Register"
+        },
+        "vl": {
+          "address": "3104",
+          "priv_mode": "U",
+          "length": "MXLEN",
+          "desc": "Vector Length"
+        },
+        "vlenb": {
+          "address": "3106",
+          "priv_mode": "U",
+          "length": "MXLEN",
+          "desc": "Vector Byte Length"
+        },
+        "vstart": {
+          "address": "8",
+          "priv_mode": "U",
+          "length": "MXLEN",
+          "desc": "Vector Start Index"
+        },
+        "vtype": {
+          "address": "3105",
+          "priv_mode": "U",
+          "length": "MXLEN",
+          "desc": "Vector Type"
+        },
+        "vxrm": {
+          "address": "10",
+          "priv_mode": "U",
+          "length": "MXLEN",
+          "desc": "Vector Fixed-Point Rounding Mode"
+        },
+        "vxsat": {
+          "address": "9",
+          "priv_mode": "U",
+          "length": "MXLEN",
+          "desc": "Vector Fixed-Point Saturate Flag"
+        }
+      }
     }
   ],
   "z_bit": [
@@ -15139,34 +15441,6 @@
           "match": "0x6000503b",
           "mask": "0xfe00707f"
         },
-        "SLOI": {
-          "encoding": "001000-----------001-----0010011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "shamtd"
-          ],
-          "extension": [
-            "rv64_zbb"
-          ],
-          "match": "0x20001013",
-          "mask": "0xfc00707f",
-          "deprecated": true
-        },
-        "SROI": {
-          "encoding": "001000-----------101-----0010011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "shamtd"
-          ],
-          "extension": [
-            "rv64_zbb"
-          ],
-          "match": "0x20005013",
-          "mask": "0xfc00707f",
-          "deprecated": true
-        },
         "REV8": {
           "encoding": "011010111000-----101-----0010011",
           "variable_fields": [
@@ -15370,34 +15644,6 @@
           ],
           "match": "0x60501013",
           "mask": "0xfff0707f"
-        },
-        "SLO": {
-          "encoding": "0010000----------001-----0110011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "rs2"
-          ],
-          "extension": [
-            "rv_zbb"
-          ],
-          "match": "0x20001033",
-          "mask": "0xfe00707f",
-          "deprecated": true
-        },
-        "SRO": {
-          "encoding": "0010000----------101-----0110011",
-          "variable_fields": [
-            "rd",
-            "rs1",
-            "rs2"
-          ],
-          "extension": [
-            "rv_zbb"
-          ],
-          "match": "0x20005033",
-          "mask": "0xfe00707f",
-          "deprecated": true
         },
         "XNOR": {
           "encoding": "0100000----------100-----0110011",
@@ -17003,6 +17249,14 @@
           ],
           "match": "0xa002",
           "mask": "0xfc03"
+        }
+      },
+      "csrs": {
+        "jvt": {
+          "address": "23",
+          "priv_mode": "U",
+          "length": "MXLEN",
+          "desc": "Table Jump Base Vector and Control Register"
         }
       }
     },
@@ -21477,7 +21731,21 @@
       "desc": "CFI Landing Pads",
       "use": "Forward-edge CFI for calls",
       "url": "https://docs.riscv.org/reference/isa/unpriv/unpriv-cfi.html",
-      "instructions": {}
+      "instructions": {},
+      "csrs": {
+        "mseccfg": {
+          "address": "1863",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine Security Configuration"
+        },
+        "mseccfgh": {
+          "address": "1879",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Most significant 32 bits of Machine Security Configuration"
+        }
+      }
     },
     {
       "id": "Zicfiss",
@@ -21518,6 +21786,14 @@
           ],
           "match": "0x4800202f",
           "mask": "0xf800707f"
+        }
+      },
+      "csrs": {
+        "ssp": {
+          "address": "17",
+          "priv_mode": "U",
+          "length": "MXLEN",
+          "desc": "Shadow Stack Pointer"
         }
       }
     },
@@ -23889,6 +24165,20 @@
           "match": "0x1502073",
           "mask": "0xfffff07f"
         }
+      },
+      "csrs": {
+        "mseccfg": {
+          "address": "1863",
+          "priv_mode": "M",
+          "length": 64,
+          "desc": "Machine Security Configuration"
+        },
+        "mseccfgh": {
+          "address": "1879",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Most significant 32 bits of Machine Security Configuration"
+        }
       }
     },
     {
@@ -25817,7 +26107,51 @@
       "desc": "Base Counters/Timers",
       "use": "cycle/instret + timers",
       "url": "https://docs.riscv.org/reference/isa/unpriv/counters.html",
-      "instructions": {}
+      "instructions": {},
+      "csrs": {
+        "cycle": {
+          "address": "3072",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Cycle counter for RDCYCLE Instruction"
+        },
+        "cycleh": {
+          "address": "3200",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "High-half cycle counter for RDCYCLE Instruction"
+        },
+        "instret": {
+          "address": "3074",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Instructions retired counter for RDINSTRET Instruction"
+        },
+        "instreth": {
+          "address": "3202",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Instructions retired counter, high bits"
+        },
+        "minstreth": {
+          "address": "2946",
+          "priv_mode": "M",
+          "length": 32,
+          "desc": "Machine Instructions Retired Counter"
+        },
+        "time": {
+          "address": "3073",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Timer for RDTIME Instruction"
+        },
+        "timeh": {
+          "address": "3201",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "High-half timer for RDTIME Instruction"
+        }
+      }
     },
     {
       "id": "Zicntrpmf",
@@ -25968,7 +26302,357 @@
       "desc": "Perf Counters",
       "use": "Hardware performance monitors",
       "url": "https://docs.riscv.org/reference/isa/unpriv/counters.html",
-      "instructions": {}
+      "instructions": {},
+      "csrs": {
+        "hpmcounter10": {
+          "address": "3082",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 10"
+        },
+        "hpmcounter10h": {
+          "address": "3210",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 10, high half"
+        },
+        "hpmcounter11": {
+          "address": "3083",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 11"
+        },
+        "hpmcounter11h": {
+          "address": "3211",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 11, high half"
+        },
+        "hpmcounter12": {
+          "address": "3084",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 12"
+        },
+        "hpmcounter12h": {
+          "address": "3212",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 12, high half"
+        },
+        "hpmcounter13": {
+          "address": "3085",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 13"
+        },
+        "hpmcounter13h": {
+          "address": "3213",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 13, high half"
+        },
+        "hpmcounter14": {
+          "address": "3086",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 14"
+        },
+        "hpmcounter14h": {
+          "address": "3214",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 14, high half"
+        },
+        "hpmcounter15": {
+          "address": "3087",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 15"
+        },
+        "hpmcounter15h": {
+          "address": "3215",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 15, high half"
+        },
+        "hpmcounter16": {
+          "address": "3088",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 16"
+        },
+        "hpmcounter16h": {
+          "address": "3216",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 16, high half"
+        },
+        "hpmcounter17": {
+          "address": "3089",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 17"
+        },
+        "hpmcounter17h": {
+          "address": "3217",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 17, high half"
+        },
+        "hpmcounter18": {
+          "address": "3090",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 18"
+        },
+        "hpmcounter18h": {
+          "address": "3218",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 18, high half"
+        },
+        "hpmcounter19": {
+          "address": "3091",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 19"
+        },
+        "hpmcounter19h": {
+          "address": "3219",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 19, high half"
+        },
+        "hpmcounter20": {
+          "address": "3092",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 20"
+        },
+        "hpmcounter20h": {
+          "address": "3220",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 20, high half"
+        },
+        "hpmcounter21": {
+          "address": "3093",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 21"
+        },
+        "hpmcounter21h": {
+          "address": "3221",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 21, high half"
+        },
+        "hpmcounter22": {
+          "address": "3094",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 22"
+        },
+        "hpmcounter22h": {
+          "address": "3222",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 22, high half"
+        },
+        "hpmcounter23": {
+          "address": "3095",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 23"
+        },
+        "hpmcounter23h": {
+          "address": "3223",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 23, high half"
+        },
+        "hpmcounter24": {
+          "address": "3096",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 24"
+        },
+        "hpmcounter24h": {
+          "address": "3224",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 24, high half"
+        },
+        "hpmcounter25": {
+          "address": "3097",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 25"
+        },
+        "hpmcounter25h": {
+          "address": "3225",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 25, high half"
+        },
+        "hpmcounter26": {
+          "address": "3098",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 26"
+        },
+        "hpmcounter26h": {
+          "address": "3226",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 26, high half"
+        },
+        "hpmcounter27": {
+          "address": "3099",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 27"
+        },
+        "hpmcounter27h": {
+          "address": "3227",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 27, high half"
+        },
+        "hpmcounter28": {
+          "address": "3100",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 28"
+        },
+        "hpmcounter28h": {
+          "address": "3228",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 28, high half"
+        },
+        "hpmcounter29": {
+          "address": "3101",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 29"
+        },
+        "hpmcounter29h": {
+          "address": "3229",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 29, high half"
+        },
+        "hpmcounter3": {
+          "address": "3075",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 3"
+        },
+        "hpmcounter30": {
+          "address": "3102",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 30"
+        },
+        "hpmcounter30h": {
+          "address": "3230",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 30, high half"
+        },
+        "hpmcounter31": {
+          "address": "3103",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 31"
+        },
+        "hpmcounter31h": {
+          "address": "3231",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 31, high half"
+        },
+        "hpmcounter3h": {
+          "address": "3203",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 3, high half"
+        },
+        "hpmcounter4": {
+          "address": "3076",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 4"
+        },
+        "hpmcounter4h": {
+          "address": "3204",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 4, high half"
+        },
+        "hpmcounter5": {
+          "address": "3077",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 5"
+        },
+        "hpmcounter5h": {
+          "address": "3205",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 5, high half"
+        },
+        "hpmcounter6": {
+          "address": "3078",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 6"
+        },
+        "hpmcounter6h": {
+          "address": "3206",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 6, high half"
+        },
+        "hpmcounter7": {
+          "address": "3079",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 7"
+        },
+        "hpmcounter7h": {
+          "address": "3207",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 7, high half"
+        },
+        "hpmcounter8": {
+          "address": "3080",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 8"
+        },
+        "hpmcounter8h": {
+          "address": "3208",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 8, high half"
+        },
+        "hpmcounter9": {
+          "address": "3081",
+          "priv_mode": "U",
+          "length": 64,
+          "desc": "Unprivileged Hardware Performance Counter 9"
+        },
+        "hpmcounter9h": {
+          "address": "3209",
+          "priv_mode": "U",
+          "length": 32,
+          "desc": "Unprivileged Hardware Performance Counter 9, high half"
+        }
+      }
     },
     {
       "id": "Zilsm*",
@@ -26772,6 +27456,32 @@
           "match": "0x70200073",
           "mask": "0xffffffff"
         }
+      },
+      "csrs": {
+        "mncause": {
+          "address": "1858",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Resumable NMI cause"
+        },
+        "mnepc": {
+          "address": "1857",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine Exception Program Counter"
+        },
+        "mnscratch": {
+          "address": "1856",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine Scratch Register"
+        },
+        "mnstatus": {
+          "address": "1860",
+          "priv_mode": "M",
+          "length": "MXLEN",
+          "desc": "Machine NMI Status"
+        }
       }
     }
   ],
@@ -26794,6 +27504,32 @@
           ],
           "match": "0x7b200073",
           "mask": "0xffffffff"
+        }
+      },
+      "csrs": {
+        "dcsr": {
+          "address": "1968",
+          "priv_mode": "D",
+          "length": 32,
+          "desc": "Debug Control and Status Register"
+        },
+        "dpc": {
+          "address": "1969",
+          "priv_mode": "D",
+          "length": "MXLEN",
+          "desc": "Debug PC Register"
+        },
+        "dscratch0": {
+          "address": "1970",
+          "priv_mode": "D",
+          "length": "MXLEN",
+          "desc": "Debug scratch register"
+        },
+        "dscratch1": {
+          "address": "1971",
+          "priv_mode": "D",
+          "length": "MXLEN",
+          "desc": "Debug scratch register"
         }
       }
     },
