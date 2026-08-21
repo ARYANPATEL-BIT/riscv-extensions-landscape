@@ -618,9 +618,25 @@ pre,
 /* Panels and toolbars that painted a dark plate inline keep their own colour;
    these are the containers that read as holes on light. */
 :root[data-theme='light'] .riscv-card,
+:root[data-theme='light'] .bg-slate-900\/50,
+:root[data-theme='light'] .bg-slate-900\/60,
+:root[data-theme='light'] .bg-slate-950\/40,
+:root[data-theme='light'] .bg-slate-950\/50,
 :root[data-theme='light'] .riscv-card-2 {
   background: var(--riscv-surface);
   border-color: var(--riscv-border);
+}
+
+:root[data-theme='light'] .text-cyan-300 {
+  color: #0f5a68 !important; /* Matches ext-tile cyan- text for consistency */
+}
+
+:root[data-theme='light'] .text-emerald-300 {
+  color: #065f46 !important; /* Matches ext-tile emerald- text for consistency */
+}
+
+:root[data-theme='light'] .text-emerald-200 {
+  color: #047857 !important; 
 }
 
 /* Sidebar Details Panel explicit Tailwind overrides for light theme */
@@ -743,4 +759,95 @@ pre,
 /* Toolbar Action Button - Emerald (Export) */
 :root[data-theme='light'] .builder-action-emerald.text-emerald-300 { color: #059669 !important; }
 :root[data-theme='light'] .builder-action-emerald:hover { background: #d1fae5 !important; color: #047857 !important; box-shadow: none !important; }
+
+/* ─── Custom UI Enhancements ─────────────────────────────────────────────── */
+
+/* 1. Pure CSS Custom Tooltips */
+[data-tooltip]:not(.absolute):not(.fixed) {
+  position: relative;
+}
+
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  background: var(--riscv-panel);
+  color: var(--riscv-text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid var(--riscv-border-2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 100;
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+  transition-delay: 0.1s;
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.tooltip-align-right[data-tooltip]:hover::after {
+  left: auto;
+  right: 0;
+  transform: translateX(0) translateY(0);
+}
+
+:root[data-theme='light'] [data-tooltip]:hover::after {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: #334155;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* 4. Keyboard Accessibility Focus Rings */
+:focus-visible {
+  outline: 2px solid var(--riscv-gold) !important;
+  outline-offset: 2px;
+}
+.ext-tile:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--riscv-text-3) !important;
+}
+
+:root[data-theme='light'] .ext-tile:focus-visible {
+  box-shadow: 0 0 0 2px var(--riscv-border-2) !important;
+}
+
+/* 5. Mobile Responsive Detail Panel */
+@media (max-width: 1024px) {
+  /* On screens smaller than lg (1024px) */
+  #detail-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 75vh;
+    z-index: 50;
+    border-radius: 20px 20px 0 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    border-top: 1px solid var(--riscv-border);
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  #detail-panel.panel-open {
+    transform: translateY(0);
+  }
+  
+  :root[data-theme='light'] #detail-panel {
+    box-shadow: 0 -8px 32px rgba(45, 40, 80, 0.15);
+  }
+}
+
 

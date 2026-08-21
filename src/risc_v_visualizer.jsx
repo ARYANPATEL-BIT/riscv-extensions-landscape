@@ -534,7 +534,8 @@ const EncodingDiagram = ({ encoding }) => {
             className="riscv-btn p-1 disabled:opacity-30"
             onClick={() => scrollRef.current?.scrollBy({ left: -220, behavior: 'smooth' })}
             disabled={!canScroll || atLeft}
-            title="Scroll left"
+            data-tooltip="Scroll left"
+            aria-label="Scroll left"
           >
             <ChevronLeft size={13} />
           </button>
@@ -543,7 +544,8 @@ const EncodingDiagram = ({ encoding }) => {
             className="riscv-btn p-1 disabled:opacity-30"
             onClick={() => scrollRef.current?.scrollBy({ left: 220, behavior: 'smooth' })}
             disabled={!canScroll || atRight}
-            title="Scroll right"
+            data-tooltip="Scroll right"
+            aria-label="Scroll right"
           >
             <ChevronRight size={13} />
           </button>
@@ -568,7 +570,7 @@ const EncodingDiagram = ({ encoding }) => {
                     fieldCls,
                     i === 31 ? 'border-r-0' : isGroupEnd ? 'border-r-2' : '',
                   ].join(' ')}
-                  title={`bit[${31 - i}] — ${fieldName}`}
+                  data-tooltip={`bit[${31 - i}] — ${fieldName}`}
                 >
                   {value}
                 </div>
@@ -609,7 +611,7 @@ const EncodingDiagram = ({ encoding }) => {
             el.scrollTo({ left: next, behavior: 'smooth' });
           }}
           role="presentation"
-          title="Click to scroll"
+          data-tooltip="Click to scroll"
         >
           <div
             className="absolute top-0 bottom-0 rounded-full cursor-grab active:cursor-grabbing"
@@ -685,6 +687,12 @@ const RISCVExplorer = () => {
   // ── ISA Workspace state ────────────────────────────────────────────────────
   const [workspaceIds, setWorkspaceIds] = useState(new Set());
   const [workspaceNotice, setWorkspaceNotice] = useState(null);
+  const toastTimerRef = React.useRef(null);
+  const showToast = React.useCallback((msg) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setWorkspaceNotice(msg);
+    toastTimerRef.current = setTimeout(() => setWorkspaceNotice(null), 3500);
+  }, []);
   // Builder mode. The per-tile "+" affordances only exist while this is on.
   // Previously they were always rendered, in a low-contrast grey, with nothing
   // explaining what they did — a permanent control for a mode the user had not
@@ -1465,9 +1473,15 @@ const RISCVExplorer = () => {
   }), [searchQuery, selectedExt, workspaceIds, lockedExtensions, builderMode,
        isHighlighted, isDimmed, handleSelectExt, handleToggleWorkspace]);
 
-
-
-
+  // Calculate if search has any matching extensions
+  const hasSearchMatches = React.useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return true;
+    return allExtsList.some(ext => {
+      const indexStr = extensionSearchIndexById.get(ext.id) || '';
+      return indexStr.includes(q);
+    });
+  }, [searchQuery, allExtsList, extensionSearchIndexById]);
 
   // Scroll to extension tile when search matches an extension ID or instruction mnemonic,
   // and automatically open the Selected Details panel. Use a ref to avoid re-scrolling
@@ -1716,7 +1730,7 @@ const RISCVExplorer = () => {
                   aria-haspopup="dialog"
                   aria-expanded={encoderValidatorOpen}
                   className="group inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-300 whitespace-nowrap border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/15 hover:border-indigo-400 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]"
-                  title="Validate a proposed instruction encoding against the existing instruction set"
+                  data-tooltip="Validate a proposed instruction encoding against the existing instruction set"
                 >
                   <ScanSearch size={14} className="text-indigo-400/80 group-hover:text-indigo-300 transition-colors" />
                   <span className="whitespace-nowrap">Encoder Validator</span>
@@ -1748,7 +1762,7 @@ const RISCVExplorer = () => {
                         : 'builder-btn-off bg-slate-800/80 text-amber-300/90 border border-amber-400/30 hover:bg-slate-700/80 hover:text-amber-200 rounded-xl',
                     ].join(' ')}
                     style={{ boxShadow: builderMode ? '0 4px 18px rgba(251,191,36,0.4)' : '0 2px 10px rgba(0,0,0,0.2)' }}
-                    title={
+                    data-tooltip={
                       builderMode
                         ? 'ISA Configuration Builder is ON — click any extension’s + to add it. Click here to turn off.'
                         : 'Turn on the ISA Configuration Builder to start picking extensions'
@@ -1783,7 +1797,8 @@ const RISCVExplorer = () => {
                         {/* Open the full panel */}
                         <button
                           type="button"
-                          title="Open the builder panel (-march string, export, conflicts)"
+                          data-tooltip="Open the builder panel (-march string, export, conflicts)"
+                          aria-label="Open the builder panel"
                           onClick={() => setWorkspacePanelOpen(true)}
                           className={`builder-action-amber ${workspaceIds.size === 0 ? "flex-none px-4" : "flex-1"} flex items-center justify-center py-1.5 text-amber-300 hover:bg-amber-500/30 hover:text-amber-100 transition-all duration-300 rounded-lg hover:shadow-[0_0_12px_rgba(251,191,36,0.3)]`}
                         >
@@ -1795,7 +1810,7 @@ const RISCVExplorer = () => {
                           <button
                             type="button"
                             onClick={() => setProfileMenuOpen(v => !v)}
-                            title="Start the configuration from a ratified profile"
+                            data-tooltip="Start the configuration from a ratified profile"
                             className={`builder-action-indigo w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-semibold transition-all duration-300 rounded-lg ${
                               profileMenuOpen
                                 ? 'bg-indigo-500 text-white shadow-inner'
@@ -1863,7 +1878,8 @@ const RISCVExplorer = () => {
                           <>
                             <button
                               type="button"
-                              title="Clear all extensions"
+                              data-tooltip="Clear all extensions"
+                              aria-label="Clear all extensions"
                               onClick={() => setWorkspaceIds(new Set())}
                               className="builder-action-rose flex-1 flex items-center justify-center py-1.5 text-rose-300 hover:bg-rose-500/30 hover:text-rose-100 hover:shadow-[0_0_12px_rgba(244,63,94,0.3)] transition-all duration-300 rounded-lg"
                             >
@@ -1873,7 +1889,8 @@ const RISCVExplorer = () => {
                             <div className="relative flex-1 flex">
                               <button
                                 type="button"
-                                title="Export configuration YAML"
+                                data-tooltip="Export configuration YAML"
+                                aria-label="Export configuration YAML"
                                 onClick={() => setQuickExportOpen(v => !v)}
                                 className={`builder-action-emerald w-full flex items-center justify-center py-1.5 transition-all duration-300 rounded-lg ${
                                   quickExportOpen 
@@ -1982,6 +1999,7 @@ const RISCVExplorer = () => {
                                 document.body.removeChild(a);
                                 setTimeout(() => URL.revokeObjectURL(url), 1000);
                                 setQuickExportOpen(false);
+                                showToast('Exported YAML configuration!');
                               }}
                               style={{
                                 width: '100%', padding: '9px 14px', borderRadius: 7,
@@ -2040,7 +2058,8 @@ const RISCVExplorer = () => {
                       onClick={() => setSearchQuery('')}
                       className="p-0.5 rounded hover:opacity-80"
                       style={{ color: 'var(--riscv-text-3)' }}
-                      title="Clear search"
+                      data-tooltip="Clear search"
+                      aria-label="Clear search"
                     >
                       <X size={13} />
                     </button>
@@ -2055,7 +2074,7 @@ const RISCVExplorer = () => {
               <button
                 type="button"
                 onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
-                title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+                data-tooltip={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
                 aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
                 className="group flex items-center justify-center rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 border flex-shrink-0"
                 style={{
@@ -2069,7 +2088,9 @@ const RISCVExplorer = () => {
               </button>
             </div>
 
-            {/* 1. Base ISA */}
+            {hasSearchMatches ? (
+              <>
+                {/* 1. Base ISA */}
             <div className="space-y-2.5 col-span-full">
               <div className="flex items-center gap-2">
                 <CircuitBoard size={13} style={{ color: '#60a5fa' }} />
@@ -2409,17 +2430,46 @@ const RISCVExplorer = () => {
                 </div>
               </div>
             </div>
+            </>
+          ) : (
+            <div className="col-span-full flex flex-col items-center justify-center py-20 text-center animate-fade-in-up" style={{ minHeight: '50vh' }}>
+              <div style={{ padding: '20px', background: 'var(--riscv-surface-2)', borderRadius: '50%', marginBottom: '24px' }}>
+                <Search size={40} strokeWidth={1.5} style={{ color: 'var(--riscv-text-3)' }} />
+              </div>
+              <h3 className="text-[16px] font-semibold mb-2" style={{ color: 'var(--riscv-text)' }}>No results found</h3>
+              <p className="text-[13px] max-w-sm" style={{ color: 'var(--riscv-text-2)', lineHeight: 1.5 }}>
+                We couldn't find any extensions, instructions, or encodings matching <strong style={{ color: 'var(--riscv-text)' }}>"{searchQuery}"</strong>.
+              </p>
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="mt-6 riscv-btn px-4 py-2"
+              >
+                Clear Search
+              </button>
+            </div>
+          )}
           </div>
 
           {/* ─── Sidebar ─────────────────────────────────────────────────── */}
-          <div className="lg:col-span-3 mt-6 lg:mt-0">
+          <div id="detail-panel" className={`lg:col-span-3 mt-6 lg:mt-0 ${selectedExt ? 'panel-open' : ''}`}>
             <div
               className="sticky top-6 riscv-card backdrop-blur-sm min-h-[400px] max-h-[calc(100vh-3rem)] flex flex-col overflow-hidden"
               style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.6)' }}
             >
-              <div className="p-4 pb-3 flex items-center gap-2" style={{ borderBottom: '1px solid var(--riscv-border)' }}>
-                <Info size={14} style={{ color: 'var(--riscv-text-3)' }} />
-                <h2 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: 'var(--riscv-text-3)' }}>Selected Details</h2>
+              <div className="p-4 pb-3 flex items-center justify-between" style={{ borderBottom: '1px solid var(--riscv-border)' }}>
+                <div className="flex items-center gap-2">
+                  <Info size={14} style={{ color: 'var(--riscv-text-3)' }} />
+                  <h2 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: 'var(--riscv-text-3)' }}>Selected Details</h2>
+                </div>
+                {/* Mobile Close Button */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedExt(null)}
+                  aria-label="Close details panel"
+                  className="lg:hidden p-1 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+                >
+                  <X size={16} />
+                </button>
               </div>
 
               <div className="flex-1 overflow-y-auto overscroll-contain p-4 pt-3">
@@ -2433,7 +2483,7 @@ const RISCVExplorer = () => {
                           rel="noreferrer"
                           className="inline-flex items-start gap-1 font-black tracking-tight break-words hover:opacity-80"
                           style={{ fontSize: '1.5rem', lineHeight: 1.2, color: 'var(--riscv-gold)' }}
-                          title="Open reference link"
+                          data-tooltip="Open reference link"
                         >
                           <span>{selectedExt.name}</span>
                           <ArrowUpRight size={15} className="mt-1 shrink-0 opacity-70" />
@@ -2622,13 +2672,14 @@ const RISCVExplorer = () => {
                                   const text = formatInstructionForClipboard(selectedExt, selectedInstruction);
                                   const ok = await copyTextToClipboard(text);
                                   setCopyStatus(ok ? 'copied' : 'failed');
+                                  if (ok) showToast('Copied instruction details!');
                                   if (copyStatusTimerRef.current) window.clearTimeout(copyStatusTimerRef.current);
                                   copyStatusTimerRef.current = window.setTimeout(() => {
                                     copyStatusTimerRef.current = null;
                                     setCopyStatus(null);
                                   }, 1500);
                                 }}
-                                title="Copy extension + instruction details"
+                                data-tooltip="Copy extension + instruction details"
                               >
                                 <Copy size={12} />
                                 {copyStatus === 'copied'
@@ -2744,7 +2795,7 @@ const RISCVExplorer = () => {
                                         type="button"
                                         className="w-full text-left font-mono text-[12px] text-slate-100 bg-slate-800/70 border border-slate-700 rounded px-2 py-1 hover:border-cyan-400/60"
                                         onClick={() => selectStandardEquivalent(standardEquivalentMnemonic)}
-                                        title="Open standard instruction details"
+                                        data-tooltip="Open standard instruction details"
                                       >
                                         <span className="inline-flex items-center gap-1">
                                           {compressedMapping.standard}
@@ -2767,7 +2818,7 @@ const RISCVExplorer = () => {
                                           type="button"
                                           className="inline-flex items-center gap-1 text-[12px] font-mono text-cyan-200 hover:text-cyan-100 underline"
                                           onClick={() => selectStandardEquivalent(standardEquivalentMnemonic)}
-                                          title="Open standard instruction details"
+                                          data-tooltip="Open standard instruction details"
                                         >
                                           {standardEquivalentMnemonic}
                                           <ArrowUpRight size={12} className="opacity-70" />
@@ -2803,7 +2854,7 @@ const RISCVExplorer = () => {
                                       type="button"
                                       className="w-full text-left rounded border border-slate-700 bg-slate-900/60 px-2 py-1.5 hover:border-emerald-400/60"
                                       onClick={() => selectCompressedEquivalent(entry.mnemonic)}
-                                      title={`Open ${entry.mnemonic} details`}
+                                      data-tooltip={`Open ${entry.mnemonic} details`}
                                     >
                                       <div className="flex items-center gap-1 text-[12px] font-mono text-emerald-200">
                                         {normalizeMnemonicKey(entry.mnemonic)}
@@ -2879,9 +2930,10 @@ const RISCVExplorer = () => {
               href="https://github.com/riscv/riscv-isa-manual"
               target="_blank"
               rel="noreferrer"
-              className="hover:opacity-80"
+              className="hover:opacity-80 tooltip-align-right"
               style={{ color: 'var(--riscv-text-2)' }}
-              title="View on GitHub"
+              data-tooltip="View on GitHub"
+              aria-label="View on GitHub"
             >
               <BookOpen size={14} />
             </a>
@@ -2923,7 +2975,8 @@ const RISCVExplorer = () => {
                   type="button"
                   className="riscv-btn p-1.5"
                   onClick={() => setEncoderValidatorOpen(false)}
-                  title="Close"
+                  data-tooltip="Close"
+                  aria-label="Close encoder validator"
                 >
                   <X size={15} />
                 </button>
@@ -3016,12 +3069,14 @@ const RISCVExplorer = () => {
                       disabled={!encoderValidatorResult?.proposed}
                       onClick={async () => {
                         if (!encoderValidatorResult?.proposed) return;
+                        setEncoderValidatorCopyStatus(null);
                         const report = formatEncoderValidatorReport(
                           encoderValidatorResult.proposed,
                           encoderValidatorResult
                         );
                         const ok = await copyTextToClipboard(report);
                         setEncoderValidatorCopyStatus(ok ? 'copied' : 'failed');
+                        if (ok) showToast('Copied validation report!');
                         if (encoderCopyTimerRef.current) window.clearTimeout(encoderCopyTimerRef.current);
                         encoderCopyTimerRef.current = window.setTimeout(() => {
                           encoderCopyTimerRef.current = null;
@@ -3029,7 +3084,7 @@ const RISCVExplorer = () => {
                         }, 1500);
                       }}
                       className="riscv-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] disabled:opacity-30"
-                      title="Copy validation report"
+                      data-tooltip="Copy validation report"
                     >
                       <Copy size={12} />
                       {encoderValidatorCopyStatus === 'copied'
@@ -3167,8 +3222,7 @@ const RISCVExplorer = () => {
               }
             }
             if (currentLocked.has(id)) {
-              setWorkspaceNotice(`Cannot remove ${id}: required by ${currentLocked.get(id).join(', ')}`);
-              setTimeout(() => setWorkspaceNotice(null), 4500);
+              showToast(`Cannot remove ${id}: required by ${currentLocked.get(id).join(', ')}`);
               return next;
             }
             next.delete(id);

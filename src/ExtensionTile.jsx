@@ -51,7 +51,22 @@ function ExtensionTile({
   return (
     <div
       id={`ext-${data.id}`}
+      role="button"
+      tabIndex={dimmed ? -1 : 0}
       onClick={() => onSelect(data)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          onSelect(data);
+        } else if (e.key === ' ') {
+          e.preventDefault();
+          if (builderMode && !isDiscontinued) {
+            onToggleWorkspace(data.id);
+          } else {
+            onSelect(data);
+          }
+        }
+      }}
       className={[
         'ext-tile group relative rounded-lg border cursor-pointer select-none',
         isSelected ? 'ext-tile-active' : '',
@@ -97,7 +112,7 @@ function ExtensionTile({
         return (
           <button
             type="button"
-            data-in-workspace={inWorkspace ? 'true' : 'false'}
+            tabIndex={-1}
             onClick={(e) => {
               e.stopPropagation();
               // The handler reports lock rejections itself.
