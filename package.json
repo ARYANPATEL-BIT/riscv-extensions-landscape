@@ -16,8 +16,7 @@
     "test": "node --test tests/*.test.mjs",
     "dev": "webpack serve --mode development",
     "lint": "eslint .",
-    "format": "prettier --write \"src/**/*.{js,jsx,css}\"",
-    "format:check": "prettier --check \"src/**/*.{js,jsx,css}\""
+    "format": "prettier --write \"src/**/*.{js,jsx,css}\""
   },
   "keywords": [],
   "author": "",
