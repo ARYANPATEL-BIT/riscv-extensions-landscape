@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "homepage": "https://rpsene.github.io/riscv-extensions-landscape/",
+  "homepage": "https://riscv.github.io/riscv-extensions-landscape/",
   "scripts": {
     "build": "webpack",
     "deploy": "gh-pages -d dist --branch gh-pages --dotfiles",
