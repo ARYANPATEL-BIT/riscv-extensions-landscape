@@ -21788,11 +21788,26 @@
     {
       "id": "Zicfilp",
       "name": "Zicfilp",
-      "tags": [],
+      "tags": [
+        "rv_zicfilp"
+      ],
       "desc": "CFI Landing Pads",
       "use": "Forward-edge CFI for calls",
       "url": "https://docs.riscv.org/reference/isa/unpriv/unpriv-cfi.html",
-      "instructions": {},
+      "instructions": {
+        "LPAD": {
+          "encoding": "--------------------000000010111",
+          "variable_fields": [
+            "imm20"
+          ],
+          "extension": [
+            "rv_zicfilp"
+          ],
+          "match": "0x00000017",
+          "mask": "0x00000fff",
+          "alias_of": "AUIPC"
+        }
+      },
       "csrs": {
         "mseccfg": {
           "address": "1863",
@@ -26622,11 +26637,87 @@
     {
       "id": "Zicntr",
       "name": "Zicntr",
-      "tags": [],
+      "tags": [
+        "rv_zicntr",
+        "rv32_zicntr"
+      ],
       "desc": "Base Counters/Timers",
       "use": "cycle/instret + timers",
       "url": "https://docs.riscv.org/reference/isa/unpriv/counters.html",
-      "instructions": {},
+      "instructions": {
+        "RDCYCLE": {
+          "encoding": "11000000000000000010-----1110011",
+          "variable_fields": [
+            "rd"
+          ],
+          "extension": [
+            "rv_zicntr"
+          ],
+          "match": "0xc0002073",
+          "mask": "0xfffff07f",
+          "alias_of": "CSRRS"
+        },
+        "RDTIME": {
+          "encoding": "11000000000100000010-----1110011",
+          "variable_fields": [
+            "rd"
+          ],
+          "extension": [
+            "rv_zicntr"
+          ],
+          "match": "0xc0102073",
+          "mask": "0xfffff07f",
+          "alias_of": "CSRRS"
+        },
+        "RDINSTRET": {
+          "encoding": "11000000001000000010-----1110011",
+          "variable_fields": [
+            "rd"
+          ],
+          "extension": [
+            "rv_zicntr"
+          ],
+          "match": "0xc0202073",
+          "mask": "0xfffff07f",
+          "alias_of": "CSRRS"
+        },
+        "RDCYCLEH": {
+          "encoding": "11001000000000000010-----1110011",
+          "variable_fields": [
+            "rd"
+          ],
+          "extension": [
+            "rv32_zicntr"
+          ],
+          "match": "0xc8002073",
+          "mask": "0xfffff07f",
+          "alias_of": "CSRRS"
+        },
+        "RDTIMEH": {
+          "encoding": "11001000000100000010-----1110011",
+          "variable_fields": [
+            "rd"
+          ],
+          "extension": [
+            "rv32_zicntr"
+          ],
+          "match": "0xc8102073",
+          "mask": "0xfffff07f",
+          "alias_of": "CSRRS"
+        },
+        "RDINSTRETH": {
+          "encoding": "11001000001000000010-----1110011",
+          "variable_fields": [
+            "rd"
+          ],
+          "extension": [
+            "rv32_zicntr"
+          ],
+          "match": "0xc8202073",
+          "mask": "0xfffff07f",
+          "alias_of": "CSRRS"
+        }
+      },
       "csrs": {
         "cycle": {
           "address": "3072",
@@ -26799,20 +26890,76 @@
     {
       "id": "Zihintntl",
       "name": "Zihintntl",
-      "tags": [],
+      "tags": [
+        "rv_zihintntl"
+      ],
       "desc": "Non-Temporal Locality Hints",
       "use": "NT load/store hints",
       "url": "https://docs.riscv.org/reference/isa/unpriv/zihintntl.html",
-      "instructions": {}
+      "instructions": {
+        "NTL.P1": {
+          "encoding": "00000000001000000000000000110011",
+          "variable_fields": [],
+          "extension": [
+            "rv_zihintntl"
+          ],
+          "match": "0x00200033",
+          "mask": "0xffffffff",
+          "alias_of": "ADD"
+        },
+        "NTL.PALL": {
+          "encoding": "00000000001100000000000000110011",
+          "variable_fields": [],
+          "extension": [
+            "rv_zihintntl"
+          ],
+          "match": "0x00300033",
+          "mask": "0xffffffff",
+          "alias_of": "ADD"
+        },
+        "NTL.S1": {
+          "encoding": "00000000010000000000000000110011",
+          "variable_fields": [],
+          "extension": [
+            "rv_zihintntl"
+          ],
+          "match": "0x00400033",
+          "mask": "0xffffffff",
+          "alias_of": "ADD"
+        },
+        "NTL.ALL": {
+          "encoding": "00000000010100000000000000110011",
+          "variable_fields": [],
+          "extension": [
+            "rv_zihintntl"
+          ],
+          "match": "0x00500033",
+          "mask": "0xffffffff",
+          "alias_of": "ADD"
+        }
+      }
     },
     {
       "id": "Zihintpause",
       "name": "Zihintpause",
-      "tags": [],
+      "tags": [
+        "rv_zihintpause"
+      ],
       "desc": "Pause Hint",
       "use": "Power-friendly spin-wait",
       "url": "https://docs.riscv.org/reference/isa/unpriv/zihintpause.html",
-      "instructions": {}
+      "instructions": {
+        "PAUSE": {
+          "encoding": "00000001000000000000000000001111",
+          "variable_fields": [],
+          "extension": [
+            "rv_zihintpause"
+          ],
+          "match": "0x0100000f",
+          "mask": "0xffffffff",
+          "alias_of": "FENCE"
+        }
+      }
     },
     {
       "id": "Zihpm",
@@ -27320,11 +27467,53 @@
     {
       "id": "Zicbop",
       "name": "Zicbop",
-      "tags": [],
+      "tags": [
+        "rv_zicbop"
+      ],
       "desc": "Cache Prefetch",
       "use": "Prefetch cache blocks",
       "url": "https://docs.riscv.org/reference/isa/unpriv/cmo.html",
-      "instructions": {}
+      "instructions": {
+        "PREFETCH.I": {
+          "encoding": "-------00000-----110000000010011",
+          "variable_fields": [
+            "rs1",
+            "imm12hi"
+          ],
+          "extension": [
+            "rv_zicbop"
+          ],
+          "match": "0x00006013",
+          "mask": "0x01f07fff",
+          "alias_of": "ORI"
+        },
+        "PREFETCH.R": {
+          "encoding": "-------00001-----110000000010011",
+          "variable_fields": [
+            "rs1",
+            "imm12hi"
+          ],
+          "extension": [
+            "rv_zicbop"
+          ],
+          "match": "0x00106013",
+          "mask": "0x01f07fff",
+          "alias_of": "ORI"
+        },
+        "PREFETCH.W": {
+          "encoding": "-------00011-----110000000010011",
+          "variable_fields": [
+            "rs1",
+            "imm12hi"
+          ],
+          "extension": [
+            "rv_zicbop"
+          ],
+          "match": "0x00306013",
+          "mask": "0x01f07fff",
+          "alias_of": "ORI"
+        }
+      }
     },
     {
       "id": "Zicboz",

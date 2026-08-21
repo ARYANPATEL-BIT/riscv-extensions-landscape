@@ -156,6 +156,72 @@ test('Zbb matches the ratified instruction set', () => {
   );
 });
 
+test('extensions that define no new opcodes carry their pseudo-instructions', () => {
+  // Zihintpause, Zihintntl, Zicntr, Zicfilp and Zicbop introduce no encodings of
+  // their own; they name specific encodings of existing instructions. They read
+  // as empty extensions unless those aliases are carried explicitly.
+  const byId = new Map(entries.map((e) => [e.id, e]));
+  const expected = {
+    Zihintpause: { count: 1, alias: 'FENCE' },
+    Zihintntl: { count: 4, alias: 'ADD' },
+    Zicntr: { count: 6, alias: 'CSRRS' },
+    Zicfilp: { count: 1, alias: 'AUIPC' },
+    Zicbop: { count: 3, alias: 'ORI' },
+  };
+
+  for (const [id, { count, alias }] of Object.entries(expected)) {
+    const entry = byId.get(id);
+    assert.ok(entry, `${id} is missing from the catalogue`);
+    const instructions = Object.entries(entry.instructions || {});
+    assert.equal(instructions.length, count, `${id} should carry ${count} instruction(s)`);
+
+    // Each must record what it aliases. Without that the encoding looks wrong,
+    // since PAUSE decodes as a FENCE, and the validator's overlap against the
+    // base instruction reads as a data error rather than as a fact.
+    for (const [mnemonic, details] of instructions) {
+      assert.equal(
+        details.alias_of, alias,
+        `${id}.${mnemonic} should record alias_of ${alias}, got ${details.alias_of ?? 'nothing'}`,
+      );
+    }
+  }
+});
+
+test('a mnemonic never carries two different encodings', () => {
+  // Guards the case deliberately left out: rv32_zclsd redefines c.ld and c.sd
+  // onto the C.FLW/C.FSW encodings for RV32, while Zca already defines those
+  // mnemonics for RV64. Importing that pair would leave one mnemonic meaning
+  // two different things depending on XLEN, so it stays out until represented
+  // properly. This fails if someone imports it without making that decision.
+  // One legitimate exception, and it is worth naming rather than loosening the
+  // rule around. The shift-immediate instructions genuinely differ by XLEN:
+  // RV32 takes a 5-bit shamt so bit 25 must be zero (mask 0xfe00707f), RV64
+  // takes 6 bits (0xfc00707f). Same mnemonic, same meaning, different width.
+  // See the RV32 shift-mask injection in scripts/sync_instructions.mjs and
+  // ISA Vol I section 2.6. That is different in kind from the Zclsd case, where
+  // the mnemonic would mean a different operation depending on XLEN.
+  const XLEN_VARIANTS = new Set(['SLLI', 'SRLI', 'SRAI']);
+
+  const byMnemonic = new Map();
+  for (const e of entries) {
+    for (const [m, d] of Object.entries(e.instructions || {})) {
+      if (!d.match || !d.mask) continue;
+      const prev = byMnemonic.get(m);
+      if (prev && (prev.match !== d.match || prev.mask !== d.mask)) {
+        // A width-only difference on a known shift instruction is expected.
+        const widthOnly = XLEN_VARIANTS.has(m.toUpperCase()) && prev.match === d.match;
+        assert.ok(
+          widthOnly,
+          `${m} has two different encodings: ${prev.ext} says ${prev.match}/${prev.mask}, `
+          + `${e.id} says ${d.match}/${d.mask}`,
+        );
+        continue;
+      }
+      if (!prev) byMnemonic.set(m, { match: d.match, mask: d.mask, ext: e.id });
+    }
+  }
+});
+
 test('extension ids are unique', () => {
   const seen = new Set();
   const dupes = [];

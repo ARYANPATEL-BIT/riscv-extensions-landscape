@@ -2663,6 +2663,24 @@ const RISCVExplorer = () => {
                           <div className="flex items-start justify-between gap-3 mb-2">
                             <h4 className="text-[11px] uppercase tracking-wider text-purple-300 font-bold flex items-center gap-1">
                               <ArrowRight size={10} /> Instruction Details
+                              {/* Some extensions define no new opcode: they name a
+                                  specific encoding of an existing instruction. PAUSE is
+                                  a FENCE, NTL.* are ADDs, RDCYCLE is a CSRRS. Saying so
+                                  explains why the encoding below looks like something
+                                  else, and why the validator reports an overlap. */}
+                              {selectedInstruction.alias_of && (
+                                <span
+                                  className="ml-1 px-1.5 py-0.5 rounded font-mono normal-case tracking-normal text-[10px]"
+                                  style={{
+                                    background: 'var(--riscv-tint-3)',
+                                    color: 'var(--riscv-text-2)',
+                                    border: '1px solid var(--riscv-tint-4)',
+                                  }}
+                                  title={`Defines no new opcode: this is a specific encoding of ${selectedInstruction.alias_of}`}
+                                >
+                                  alias of {selectedInstruction.alias_of}
+                                </span>
+                              )}
                             </h4>
                             <div className="flex items-center gap-2">
                               <button
