@@ -349,7 +349,11 @@ for (const id of gaps) {
     if (ver.state) entry.state = ver.state;
     // UDB writes `ratification_date: null` for unratified versions, which the
     // minimal parser captures as the string "null" — treat that as absent.
-    if (ver.ratification_date && ver.ratification_date !== 'null') {
+    // Only a real year-month is useful. UDB writes null for unratified versions,
+    // which the minimal parser captures as the string "null", and at least one
+    // entry carries the literal "unknown". Either would render as
+    // "Ratified unknown" in the badge, which says less than showing no date.
+    if (/^\d{4}-\d{2}$/.test(String(ver.ratification_date ?? ''))) {
       entry.ratification_date = ver.ratification_date;
     }
     if (ver.url && !entry.url) entry.url = ver.url;
@@ -463,7 +467,11 @@ for (const [id, loc] of entryIndex) {
   if (!ver || !ver.state) continue;
 
   entry.state = ver.state;
-  if (ver.ratification_date && ver.ratification_date !== 'null') {
+  // Only a real year-month is useful. UDB writes null for unratified versions,
+    // which the minimal parser captures as the string "null", and at least one
+    // entry carries the literal "unknown". Either would render as
+    // "Ratified unknown" in the badge, which says less than showing no date.
+    if (/^\d{4}-\d{2}$/.test(String(ver.ratification_date ?? ''))) {
     entry.ratification_date = String(ver.ratification_date);
   }
   stateAdded++;
