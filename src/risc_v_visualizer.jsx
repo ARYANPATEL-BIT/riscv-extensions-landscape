@@ -46,7 +46,12 @@ import ExtensionTile from './ExtensionTile.jsx';
 // INCOMPATIBLE_WITH is no longer imported here: conflicts now come back from
 // resolveSelection(), which checks them over the resolved closure rather than
 // only over what the user clicked.
-import { BASE_ISA_IDS, SMART_DEPENDENCIES, buildMarchString, buildCombinedCatalog } from './marchUtils.js';
+import {
+  BASE_ISA_IDS,
+  SMART_DEPENDENCIES,
+  buildMarchString,
+  buildCombinedCatalog,
+} from './marchUtils.js';
 import { resolveSelection } from './isaGraph.js';
 import { PROFILES } from './profiles.js';
 import { buildIsaConfigYaml } from './exportUtils.js';
@@ -55,7 +60,10 @@ import { buildIsaConfigYaml } from './exportUtils.js';
 // the catalog does not (UDB's S requires Sm, for which we have no entry), and
 // adding one of those to the workspace would show a row with nothing behind it.
 const CATALOG_IDS = new Set(
-  Object.values(extensions).flat().filter(Boolean).map((e) => e.id),
+  Object.values(extensions)
+    .flat()
+    .filter(Boolean)
+    .map((e) => e.id),
 );
 
 const BIT_WIDTH = 32n;
@@ -76,7 +84,9 @@ const PERMALINK_PARAM = 'ext';
 const allExtensionsFlat = Object.values(extensions).flat().filter(Boolean);
 
 const findExtensionById = (id) => {
-  const wanted = String(id ?? '').trim().toLowerCase();
+  const wanted = String(id ?? '')
+    .trim()
+    .toLowerCase();
   if (!wanted) return null;
   // Case-insensitive: people type ?ext=zba as readily as ?ext=Zba.
   return allExtensionsFlat.find((ext) => ext.id.toLowerCase() === wanted) ?? null;
@@ -95,7 +105,11 @@ const permalinkFor = (extId) => {
   return url.toString();
 };
 
-const normalizeMnemonicKey = (value) => String(value ?? '').trim().toUpperCase().split(/\s+/)[0];
+const normalizeMnemonicKey = (value) =>
+  String(value ?? '')
+    .trim()
+    .toUpperCase()
+    .split(/\s+/)[0];
 
 const COMPRESSED_INSTRUCTION_MAPPINGS = [
   {
@@ -194,42 +208,42 @@ const COMPRESSED_INSTRUCTION_MAPPINGS = [
     compressed: "C.AND rd', rs2'",
     standard: "and rd', rd', rs2'",
     description: 'AND Register',
-    notes: "Operands restricted to x8-x15.",
+    notes: 'Operands restricted to x8-x15.',
   },
   {
     mnemonic: 'C.OR',
     compressed: "C.OR rd', rs2'",
     standard: "or rd', rd', rs2'",
     description: 'OR Register',
-    notes: "Operands restricted to x8-x15.",
+    notes: 'Operands restricted to x8-x15.',
   },
   {
     mnemonic: 'C.XOR',
     compressed: "C.XOR rd', rs2'",
     standard: "xor rd', rd', rs2'",
     description: 'XOR Register',
-    notes: "Operands restricted to x8-x15.",
+    notes: 'Operands restricted to x8-x15.',
   },
   {
     mnemonic: 'C.SUB',
     compressed: "C.SUB rd', rs2'",
     standard: "sub rd', rd', rs2'",
     description: 'Subtract Register',
-    notes: "Operands restricted to x8-x15.",
+    notes: 'Operands restricted to x8-x15.',
   },
   {
     mnemonic: 'C.SUBW',
     compressed: "C.SUBW rd', rs2'",
     standard: "subw rd', rd', rs2'",
     description: 'Subtract Word',
-    notes: "RV64/128 Only. Operands restricted to x8-x15.",
+    notes: 'RV64/128 Only. Operands restricted to x8-x15.',
   },
   {
     mnemonic: 'C.ADDW',
     compressed: "C.ADDW rd', rs2'",
     standard: "addw rd', rd', rs2'",
     description: 'Add Word',
-    notes: "RV64/128 Only. Operands restricted to x8-x15.",
+    notes: 'RV64/128 Only. Operands restricted to x8-x15.',
   },
   {
     mnemonic: 'C.LW',
@@ -385,7 +399,11 @@ const encodingToMatchMask = (encoding) => {
   const normalized = normalizeEncodingString(encoding);
   if (!normalized) return { match: null, mask: null, error: 'Provide an encoding or match/mask.' };
   if (normalized.length !== 32) {
-    return { match: null, mask: null, error: `Encoding must be 32 characters (got ${normalized.length}).` };
+    return {
+      match: null,
+      mask: null,
+      error: `Encoding must be 32 characters (got ${normalized.length}).`,
+    };
   }
   if (!/^[01-]{32}$/.test(normalized)) {
     return { match: null, mask: null, error: 'Encoding may only contain 0, 1, and -.' };
@@ -416,8 +434,8 @@ const matchMaskToEncoding = (match, mask) => {
 };
 
 const patternsOverlap = (aMatch, aMask, bMatch, bMask) => {
-  const commonMask = (aMask & bMask) & BIT_MASK_32;
-  const diff = ((aMatch ^ bMatch) & commonMask) & BIT_MASK_32;
+  const commonMask = aMask & bMask & BIT_MASK_32;
+  const diff = (aMatch ^ bMatch) & commonMask & BIT_MASK_32;
   return diff === 0n;
 };
 
@@ -454,7 +472,10 @@ const EncodingDiagram = ({ encoding }) => {
   const normalized = String(encoding || '').replace(/\s+/g, '');
   if (normalized.length !== 32) {
     return (
-      <div className="font-mono text-[12px] bg-[var(--riscv-surface-2)] border border-[var(--riscv-border-2)] rounded px-2 py-1 break-all" style={{ color: 'var(--riscv-text-2)' }}>
+      <div
+        className="font-mono text-[12px] bg-[var(--riscv-surface-2)] border border-[var(--riscv-border-2)] rounded px-2 py-1 break-all"
+        style={{ color: 'var(--riscv-text-2)' }}
+      >
         {encoding}
       </div>
     );
@@ -553,11 +574,17 @@ const EncodingDiagram = ({ encoding }) => {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider font-semibold" style={{ color: 'var(--riscv-text-3)' }}>
+        <div
+          className="flex items-center gap-2 text-[11px] uppercase tracking-wider font-semibold"
+          style={{ color: 'var(--riscv-text-3)' }}
+        >
           <Binary size={11} />
           <span>Bit Fields</span>
           {canScroll && (
-            <span className="inline-flex items-center gap-1 normal-case tracking-normal" style={{ color: 'var(--riscv-gold)' }}>
+            <span
+              className="inline-flex items-center gap-1 normal-case tracking-normal"
+              style={{ color: 'var(--riscv-gold)' }}
+            >
               scroll <ArrowRight size={11} />
             </span>
           )}
@@ -614,7 +641,10 @@ const EncodingDiagram = ({ encoding }) => {
           </div>
 
           {/* Bit number labels */}
-          <div className="mt-1 flex justify-between text-[10px] font-mono px-0.5" style={{ color: 'var(--riscv-text-3)' }}>
+          <div
+            className="mt-1 flex justify-between text-[10px] font-mono px-0.5"
+            style={{ color: 'var(--riscv-text-3)' }}
+          >
             <span>31</span>
             <span>0</span>
           </div>
@@ -702,7 +732,6 @@ const extensionCsrLabels = {
 };
 
 const RISCVExplorer = () => {
-
   const [activeProfile, setActiveProfile] = useState(null);
   const [activeVolume, setActiveVolume] = useState(null);
   // Lazy initialiser, so ?ext=Zba is honoured on first paint rather than
@@ -742,13 +771,19 @@ const RISCVExplorer = () => {
     try {
       const saved = window.localStorage.getItem('riscv-landscape-theme');
       if (saved === 'light' || saved === 'dark') return saved;
-    } catch { /* storage unavailable — fall through to the system preference */ }
+    } catch {
+      /* storage unavailable — fall through to the system preference */
+    }
     return window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
   });
 
   React.useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    try { window.localStorage.setItem('riscv-landscape-theme', theme); } catch { /* ignore */ }
+    try {
+      window.localStorage.setItem('riscv-landscape-theme', theme);
+    } catch {
+      /* ignore */
+    }
   }, [theme]);
 
   const [builderMode, setBuilderMode] = useState(false);
@@ -775,7 +810,7 @@ const RISCVExplorer = () => {
 
   // Smart dependency and mutually-exclusive handler
   const addWorkspaceIdsSmart = React.useCallback((idsToAdd, isToggle = false) => {
-    setWorkspaceIds(prev => {
+    setWorkspaceIds((prev) => {
       const next = new Set(prev);
       const autoAdded = [];
       let baseChanged = false;
@@ -799,7 +834,9 @@ const RISCVExplorer = () => {
         if (isToggle && next.has(id)) {
           // If locked, we cannot toggle it off
           if (currentLocked.has(id)) {
-            setWorkspaceNotice(`Cannot remove ${id}: required by ${currentLocked.get(id).join(', ')}`);
+            setWorkspaceNotice(
+              `Cannot remove ${id}: required by ${currentLocked.get(id).join(', ')}`,
+            );
             setTimeout(() => setWorkspaceNotice(null), 4500);
             continue; // block removal
           }
@@ -811,7 +848,7 @@ const RISCVExplorer = () => {
         if (BASE_ISA_IDS.has(id)) {
           for (const baseId of BASE_ISA_IDS) {
             if (baseId !== id && next.has(baseId)) {
-              // Note: Base ISAs aren't typically locked by other extensions in our SMART_DEPENDENCIES, 
+              // Note: Base ISAs aren't typically locked by other extensions in our SMART_DEPENDENCIES,
               // but if they were, we might need a lock check here too. Safe for now.
               next.delete(baseId);
               baseChanged = true;
@@ -841,7 +878,9 @@ const RISCVExplorer = () => {
       if (resolution.conflicts.length > 0) {
         const c = resolution.conflicts[0];
         const via = c.path.length > 1 ? ` (pulled in by ${c.path.join(' -> ')})` : '';
-        setWorkspaceNotice(`Architecturally Invalid: ${c.with} is incompatible with ${c.ext}${via}`);
+        setWorkspaceNotice(
+          `Architecturally Invalid: ${c.with} is incompatible with ${c.ext}${via}`,
+        );
         setTimeout(() => setWorkspaceNotice(null), 4500);
         return prev; // revert the whole batch, as before
       }
@@ -867,10 +906,7 @@ const RISCVExplorer = () => {
   }, []);
 
   // Flat list of all extensions — stable reference for workspace utilities
-  const allExtsList = React.useMemo(
-    () => Object.values(extensions).flat().filter(Boolean),
-    []
-  );
+  const allExtsList = React.useMemo(() => Object.values(extensions).flat().filter(Boolean), []);
 
   const workspaceTotalInstr = React.useMemo(() => {
     if (workspaceIds.size === 0) return 0;
@@ -901,12 +937,15 @@ const RISCVExplorer = () => {
   const scrollTimerRef = React.useRef(null);
   const permalinkTimerRef = React.useRef(null);
 
-  React.useEffect(() => () => {
-    if (copyStatusTimerRef.current) window.clearTimeout(copyStatusTimerRef.current);
-    if (encoderCopyTimerRef.current) window.clearTimeout(encoderCopyTimerRef.current);
-    if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
-    if (permalinkTimerRef.current) window.clearTimeout(permalinkTimerRef.current);
-  }, []);
+  React.useEffect(
+    () => () => {
+      if (copyStatusTimerRef.current) window.clearTimeout(copyStatusTimerRef.current);
+      if (encoderCopyTimerRef.current) window.clearTimeout(encoderCopyTimerRef.current);
+      if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
+      if (permalinkTimerRef.current) window.clearTimeout(permalinkTimerRef.current);
+    },
+    [],
+  );
   const searchInputRef = React.useRef(null);
 
   // Encoder Validator dialog keyboard behaviour.
@@ -921,14 +960,17 @@ const RISCVExplorer = () => {
     // click does not focus a button in every browser, so activeElement can be
     // <body> here and focus would be dropped on the floor when the dialog closes.
     const opener = document.activeElement;
-    const fallbackOpener = opener instanceof HTMLElement && opener !== document.body ? opener : null;
+    const fallbackOpener =
+      opener instanceof HTMLElement && opener !== document.body ? opener : null;
 
-    const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
+    const FOCUSABLE =
+      'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
     const focusable = () => {
       const root = encoderDialogRef.current;
       if (!root) return [];
-      return [...root.querySelectorAll(FOCUSABLE)]
-        .filter((el) => el.offsetWidth > 0 || el.offsetHeight > 0);
+      return [...root.querySelectorAll(FOCUSABLE)].filter(
+        (el) => el.offsetWidth > 0 || el.offsetHeight > 0,
+      );
     };
 
     // Start inside the dialog, on the first field rather than the close button.
@@ -953,7 +995,10 @@ const RISCVExplorer = () => {
       if (e.shiftKey && (active === firstEl || !encoderDialogRef.current?.contains(active))) {
         e.preventDefault();
         lastEl.focus();
-      } else if (!e.shiftKey && (active === lastEl || !encoderDialogRef.current?.contains(active))) {
+      } else if (
+        !e.shiftKey &&
+        (active === lastEl || !encoderDialogRef.current?.contains(active))
+      ) {
         e.preventDefault();
         firstEl.focus();
       }
@@ -989,7 +1034,6 @@ const RISCVExplorer = () => {
   // them; see that file for why.
   const profiles = PROFILES;
 
-
   // ---------------------------------------------------------------------------
   // Derived helpers
   // ---------------------------------------------------------------------------
@@ -998,7 +1042,7 @@ const RISCVExplorer = () => {
       Object.values(extensions)
         .flat()
         .filter(Boolean)
-        .map((ext) => ext.id)
+        .map((ext) => ext.id),
     );
 
     const vol2Ids = new Set();
@@ -1018,7 +1062,9 @@ const RISCVExplorer = () => {
   }, []);
 
   const instructionMatchesQuery = (mnemonic, details, q) => {
-    const needle = String(q || '').trim().toLowerCase();
+    const needle = String(q || '')
+      .trim()
+      .toLowerCase();
     if (!needle) return false;
 
     if (mnemonic && String(mnemonic).toLowerCase().includes(needle)) return true;
@@ -1081,17 +1127,17 @@ const RISCVExplorer = () => {
       setSearchMatches(null);
       return true;
     },
-    [instructionIndex, selectedExt]
+    [instructionIndex, selectedExt],
   );
 
   const selectStandardEquivalent = React.useCallback(
     (mnemonic) => selectInstructionByMnemonicKey(mnemonic, STANDARD_EQUIVALENT_PRIORITY),
-    [selectInstructionByMnemonicKey]
+    [selectInstructionByMnemonicKey],
   );
 
   const selectCompressedEquivalent = React.useCallback(
     (mnemonic) => selectInstructionByMnemonicKey(mnemonic, ['C']),
-    [selectInstructionByMnemonicKey]
+    [selectInstructionByMnemonicKey],
   );
 
   const compressedMapping = selectedInstruction
@@ -1103,9 +1149,9 @@ const RISCVExplorer = () => {
   const hasStandardEquivalent =
     Boolean(standardEquivalentMnemonic) && instructionIndex.get(standardEquivalentMnemonic)?.length;
   const compressedEquivalents = selectedInstruction
-    ? (COMPRESSED_BY_STANDARD[normalizeMnemonicKey(selectedInstruction.mnemonic)] || []).filter((entry) =>
-      instructionIndex.has(normalizeMnemonicKey(entry.mnemonic))
-    )
+    ? (COMPRESSED_BY_STANDARD[normalizeMnemonicKey(selectedInstruction.mnemonic)] || []).filter(
+        (entry) => instructionIndex.has(normalizeMnemonicKey(entry.mnemonic)),
+      )
     : [];
 
   const formatInstructionForClipboard = React.useCallback((ext, instr) => {
@@ -1278,8 +1324,12 @@ const RISCVExplorer = () => {
         errors.push('Mask exceeds 32 bits.');
       }
 
-      if (matchParsed != null && maskParsed != null
-          && matchParsed <= BIT_MASK_32 && maskParsed <= BIT_MASK_32) {
+      if (
+        matchParsed != null &&
+        maskParsed != null &&
+        matchParsed <= BIT_MASK_32 &&
+        maskParsed <= BIT_MASK_32
+      ) {
         const matchNorm = matchParsed & BIT_MASK_32;
         const maskNorm = maskParsed & BIT_MASK_32;
         if ((matchNorm & ~maskNorm) !== 0n) {
@@ -1310,7 +1360,8 @@ const RISCVExplorer = () => {
 
     const proposed = {
       mnemonic: proposedMnemonic,
-      encoding: normalizeEncodingString(normalizedEncoding) || matchMaskToEncoding(matchNorm, maskNorm),
+      encoding:
+        normalizeEncodingString(normalizedEncoding) || matchMaskToEncoding(matchNorm, maskNorm),
       match: toHex32(matchNorm),
       mask: toHex32(maskNorm),
       matchValue: matchNorm,
@@ -1322,7 +1373,7 @@ const RISCVExplorer = () => {
       const overlaps = patternsOverlap(matchNorm, maskNorm, other.match, other.mask);
       if (!overlaps) continue;
 
-      const commonMask = (maskNorm & other.mask) & BIT_MASK_32;
+      const commonMask = maskNorm & other.mask & BIT_MASK_32;
       const type =
         matchNorm === other.match && maskNorm === other.mask
           ? 'identical'
@@ -1332,7 +1383,8 @@ const RISCVExplorer = () => {
               ? 'existing_subset_of_proposed'
               : 'partial_overlap';
 
-      let why = 'Overlapping decode space (there exist instruction words that satisfy both patterns).';
+      let why =
+        'Overlapping decode space (there exist instruction words that satisfy both patterns).';
       if (type === 'identical') {
         why = 'Exact same match/mask pattern.';
       } else if (type === 'proposed_subset_of_existing') {
@@ -1366,15 +1418,21 @@ const RISCVExplorer = () => {
     setEncoderValidatorResult({ errors, proposed, conflicts });
   }, [allInstructionPatterns, encoderValidatorInput]);
 
-  const isHighlightedByProfile = React.useCallback((id) => {
-    if (!activeProfile) return false;
-    return profiles[activeProfile].includes(id);
-  }, [activeProfile]);
+  const isHighlightedByProfile = React.useCallback(
+    (id) => {
+      if (!activeProfile) return false;
+      return profiles[activeProfile].includes(id);
+    },
+    [activeProfile],
+  );
 
-  const isHighlightedByVolume = React.useCallback((id) => {
-    if (!activeVolume) return false;
-    return volumeMembership[activeVolume]?.has(id) ?? false;
-  }, [activeVolume, volumeMembership]);
+  const isHighlightedByVolume = React.useCallback(
+    (id) => {
+      if (!activeVolume) return false;
+      return volumeMembership[activeVolume]?.has(id) ?? false;
+    },
+    [activeVolume, volumeMembership],
+  );
 
   const extensionSearchIndexById = React.useMemo(() => {
     const index = new Map();
@@ -1399,7 +1457,12 @@ const RISCVExplorer = () => {
         const names = Object.keys(ext.csrs);
         if (names.length) {
           parts.push(names.join(' '));
-          parts.push(names.map((n) => ext.csrs[n]?.desc).filter(Boolean).join(' '));
+          parts.push(
+            names
+              .map((n) => ext.csrs[n]?.desc)
+              .filter(Boolean)
+              .join(' '),
+          );
         }
       }
 
@@ -1444,11 +1507,14 @@ const RISCVExplorer = () => {
   // This used to return false as soon as a volume was set, which meant picking
   // a volume while a profile was active un-dimmed the entire grid while both
   // filters still highlighted, and nothing showed which one was responsible.
-  const isDimmed = React.useCallback((id) => {
-    if (activeVolume) return !(volumeMembership[activeVolume]?.has(id) ?? false);
-    if (activeProfile) return !profiles[activeProfile].includes(id);
-    return false;
-  }, [activeVolume, activeProfile, volumeMembership]);
+  const isDimmed = React.useCallback(
+    (id) => {
+      if (activeVolume) return !(volumeMembership[activeVolume]?.has(id) ?? false);
+      if (activeProfile) return !profiles[activeProfile].includes(id);
+      return false;
+    },
+    [activeVolume, activeProfile, volumeMembership],
+  );
 
   // The tile lives in ./ExtensionTile.jsx. It used to be defined here, inside
   // the render body, which meant a new component type on every render and a
@@ -1476,7 +1542,9 @@ const RISCVExplorer = () => {
   }, [selectedExt]);
 
   // A fresh selection invalidates the "Copied" confirmation.
-  React.useEffect(() => { setPermalinkCopied(false); }, [selectedExt]);
+  React.useEffect(() => {
+    setPermalinkCopied(false);
+  }, [selectedExt]);
 
   const copyPermalink = React.useCallback(async () => {
     if (!selectedExt) return;
@@ -1502,11 +1570,14 @@ const RISCVExplorer = () => {
     });
   }, []);
 
-  const handleToggleWorkspace = React.useCallback((id) => {
-    addWorkspaceIdsSmart(id, true);
-  }, [addWorkspaceIdsSmart]);
+  const handleToggleWorkspace = React.useCallback(
+    (id) => {
+      addWorkspaceIdsSmart(id, true);
+    },
+    [addWorkspaceIdsSmart],
+  );
 
-// Setting a VLEN floor is not the same as adding an extension. The Zvl*b
+  // Setting a VLEN floor is not the same as adding an extension. The Zvl*b
   // chain is nested — Zvl1024b already implies Zvl128b — so clicking a lower
   // value while a higher one is selected has to REMOVE the higher ones, or
   // nothing visible happens. That was the original bug: the button only added,
@@ -1533,24 +1604,36 @@ const RISCVExplorer = () => {
     });
   }, []);
 
-  const tileProps = React.useMemo(() => ({
-    searchQuery,
-    selectedExtId: selectedExt?.id ?? null,
-    workspaceIds,
-    lockedExtensions,
-    builderMode,
-    isHighlighted,
-    isDimmed,
-    onSelect: handleSelectExt,
-    onToggleWorkspace: handleToggleWorkspace,
-  }), [searchQuery, selectedExt, workspaceIds, lockedExtensions, builderMode,
-       isHighlighted, isDimmed, handleSelectExt, handleToggleWorkspace]);
+  const tileProps = React.useMemo(
+    () => ({
+      searchQuery,
+      selectedExtId: selectedExt?.id ?? null,
+      workspaceIds,
+      lockedExtensions,
+      builderMode,
+      isHighlighted,
+      isDimmed,
+      onSelect: handleSelectExt,
+      onToggleWorkspace: handleToggleWorkspace,
+    }),
+    [
+      searchQuery,
+      selectedExt,
+      workspaceIds,
+      lockedExtensions,
+      builderMode,
+      isHighlighted,
+      isDimmed,
+      handleSelectExt,
+      handleToggleWorkspace,
+    ],
+  );
 
   // Calculate if search has any matching extensions
   const hasSearchMatches = React.useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return true;
-    return allExtsList.some(ext => {
+    return allExtsList.some((ext) => {
       const indexStr = extensionSearchIndexById.get(ext.id) || '';
       return indexStr.includes(q);
     });
@@ -1593,8 +1676,7 @@ const RISCVExplorer = () => {
     // If still no match, try a deep search against indexed extension+instruction details
     if (!targetExt) {
       targetExt =
-        allExts.find((ext) => (extensionSearchIndexById.get(ext.id) || '').includes(q)) ||
-        null;
+        allExts.find((ext) => (extensionSearchIndexById.get(ext.id) || '').includes(q)) || null;
     }
 
     if (targetExt) {
@@ -1614,8 +1696,12 @@ const RISCVExplorer = () => {
       // Always open/update the Selected Details panel for the matched extension
       searchDrivenSelectionRef.current = true;
       setSelectedExt(targetExt);
-      setSearchMatches(hits.length ? { extId: targetExt.id, query: q, mnemonics: hits, index: 0 } : null);
-      setSelectedInstruction(matchedMnemonic && matchedDetails ? { mnemonic: matchedMnemonic, ...matchedDetails } : null);
+      setSearchMatches(
+        hits.length ? { extId: targetExt.id, query: q, mnemonics: hits, index: 0 } : null,
+      );
+      setSelectedInstruction(
+        matchedMnemonic && matchedDetails ? { mnemonic: matchedMnemonic, ...matchedDetails } : null,
+      );
 
       const key = targetExt.id;
 
@@ -1635,7 +1721,8 @@ const RISCVExplorer = () => {
         if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
         scrollTimerRef.current = window.setTimeout(() => {
           scrollTimerRef.current = null;
-          document.getElementById(`ext-${targetExt.id}`)
+          document
+            .getElementById(`ext-${targetExt.id}`)
             ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           lastScrolledKeyRef.current = key;
         }, 180);
@@ -1654,7 +1741,10 @@ const RISCVExplorer = () => {
   }, [searchQuery, extensionSearchIndexById]);
 
   // Compute stat bar numbers from loaded JSON
-  const totalExtensions = React.useMemo(() => Object.values(extensions).flat().filter(Boolean).length, []);
+  const totalExtensions = React.useMemo(
+    () => Object.values(extensions).flat().filter(Boolean).length,
+    [],
+  );
   const totalInstructions = React.useMemo(() => {
     let c = 0;
     for (const ext of Object.values(extensions).flat().filter(Boolean)) {
@@ -1664,15 +1754,19 @@ const RISCVExplorer = () => {
   }, []);
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden" style={{ background: 'var(--riscv-bg)', color: 'var(--riscv-text)' }}>
-
-
+    <div
+      className="min-h-screen relative overflow-x-hidden"
+      style={{ background: 'var(--riscv-bg)', color: 'var(--riscv-text)' }}
+    >
       {/* Gradient top border */}
       <div className="riscv-top-border" />
       <div className="px-3 md:px-6 py-4 md:py-6 max-w-[1700px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* ─── Header ───────────────────────────────────────────────────── */}
-          <div className="lg:col-span-12 pb-5 mb-2" style={{ borderBottom: '1px solid var(--riscv-border)' }}>
+          <div
+            className="lg:col-span-12 pb-5 mb-2"
+            style={{ borderBottom: '1px solid var(--riscv-border)' }}
+          >
             {/* Title row */}
             <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4">
               <div>
@@ -1681,7 +1775,8 @@ const RISCVExplorer = () => {
                   <h1
                     className="text-2xl md:text-3xl font-black tracking-tight"
                     style={{
-                      background: 'linear-gradient(90deg, var(--riscv-title-a) 0%, var(--riscv-title-b) 50%, var(--riscv-title-a) 100%)',
+                      background:
+                        'linear-gradient(90deg, var(--riscv-title-a) 0%, var(--riscv-title-b) 50%, var(--riscv-title-a) 100%)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                     }}
@@ -1691,7 +1786,10 @@ const RISCVExplorer = () => {
                 </div>
                 {/* nowrap only once there is room for it: on a phone it pushed the
                     line past the viewport, and the root clips overflow. */}
-                <p className="text-xs ml-9 sm:whitespace-nowrap" style={{ color: 'var(--riscv-text-2)' }}>
+                <p
+                  className="text-xs ml-9 sm:whitespace-nowrap"
+                  style={{ color: 'var(--riscv-text-2)' }}
+                >
                   Reference for extensions, profiles &amp; per-instruction encoding.
                 </p>
                 {/* Stat bar */}
@@ -1703,8 +1801,15 @@ const RISCVExplorer = () => {
                     { label: 'Volumes', value: 2 },
                   ].map(({ label, value }) => (
                     <div key={label} className="flex items-baseline gap-1.5">
-                      <span className="text-base font-black" style={{ color: 'var(--riscv-gold)' }}>{value}</span>
-                      <span className="text-[11px] uppercase tracking-wider" style={{ color: 'var(--riscv-text-3)' }}>{label}</span>
+                      <span className="text-base font-black" style={{ color: 'var(--riscv-gold)' }}>
+                        {value}
+                      </span>
+                      <span
+                        className="text-[11px] uppercase tracking-wider"
+                        style={{ color: 'var(--riscv-text-3)' }}
+                      >
+                        {label}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -1724,398 +1829,559 @@ const RISCVExplorer = () => {
                 <div className="flex flex-wrap items-center justify-start xl:justify-end gap-x-3 gap-y-3">
                   {/* Grouped Filters Container. Wraps on narrow screens; without
                       it this row stays one 557px line that cannot shrink. */}
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3.5 py-2 rounded-xl border shadow-lg backdrop-blur-md" style={{ background: 'var(--riscv-plate)', borderColor: 'rgba(255,255,255,0.08)' }}>
-                  
-                  {/* Profiles. Wraps at 320px, where the label plus four buttons
+                  <div
+                    className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3.5 py-2 rounded-xl border shadow-lg backdrop-blur-md"
+                    style={{
+                      background: 'var(--riscv-plate)',
+                      borderColor: 'rgba(255,255,255,0.08)',
+                    }}
+                  >
+                    {/* Profiles. Wraps at 320px, where the label plus four buttons
                       measured 338px and ran past the edge. */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[11px] uppercase tracking-widest font-semibold" style={{ color: 'var(--riscv-text-3)' }}>Profile</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {Object.keys(profiles).map((profile) => (
-                        <button
-                          key={profile}
-                          onClick={() =>
-                            setActiveProfile((current) => {
-                              // Profile and volume are mutually exclusive. With
-                              // both live, highlight matched either one while
-                              // dimming followed only the volume, so the grid
-                              // gave no clue which filter was acting.
-                              setActiveVolume(null);
-                              setSelectedInstruction(null);
-                              setSearchMatches(null);
-                              return current === profile ? null : profile;
-                            })
-                          }
-                          className={[
-                            'px-3 py-1.5 text-[12px] rounded-lg transition-all duration-200 font-medium',
-                            activeProfile === profile 
-                              ? 'bg-slate-700/80 text-white shadow-inner border border-slate-500/50' 
-                              : 'text-slate-300 hover:text-white hover:bg-slate-700/40 border border-transparent hover:border-slate-600/30',
-                          ].join(' ')}
-                        >
-                          {profile}
-                        </button>
-                      ))}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className="text-[11px] uppercase tracking-widest font-semibold"
+                        style={{ color: 'var(--riscv-text-3)' }}
+                      >
+                        Profile
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {Object.keys(profiles).map((profile) => (
+                          <button
+                            key={profile}
+                            onClick={() =>
+                              setActiveProfile((current) => {
+                                // Profile and volume are mutually exclusive. With
+                                // both live, highlight matched either one while
+                                // dimming followed only the volume, so the grid
+                                // gave no clue which filter was acting.
+                                setActiveVolume(null);
+                                setSelectedInstruction(null);
+                                setSearchMatches(null);
+                                return current === profile ? null : profile;
+                              })
+                            }
+                            className={[
+                              'px-3 py-1.5 text-[12px] rounded-lg transition-all duration-200 font-medium',
+                              activeProfile === profile
+                                ? 'bg-slate-700/80 text-white shadow-inner border border-slate-500/50'
+                                : 'text-slate-300 hover:text-white hover:bg-slate-700/40 border border-transparent hover:border-slate-600/30',
+                            ].join(' ')}
+                          >
+                            {profile}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Vertical Divider */}
+                    <div className="h-5 w-px bg-slate-700/60 mx-1" />
+
+                    {/* Volumes */}
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="text-[11px] uppercase tracking-widest font-semibold"
+                        style={{ color: 'var(--riscv-text-3)' }}
+                      >
+                        Volume
+                      </span>
+                      <div className="flex gap-1.5">
+                        {['I', 'II'].map((vol) => (
+                          <button
+                            key={vol}
+                            onClick={() =>
+                              setActiveVolume((current) => {
+                                setActiveProfile(null);
+                                setSelectedInstruction(null);
+                                setSearchMatches(null);
+                                return current === vol ? null : vol;
+                              })
+                            }
+                            className={[
+                              'px-3 py-1.5 text-[12px] rounded-lg transition-all duration-200 font-medium',
+                              activeVolume === vol
+                                ? 'bg-slate-700/80 text-white shadow-inner border border-slate-500/50'
+                                : 'text-slate-300 hover:text-white hover:bg-slate-700/40 border border-transparent hover:border-slate-600/30',
+                            ].join(' ')}
+                          >
+                            Vol {vol}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Vertical Divider */}
-                  <div className="h-5 w-px bg-slate-700/60 mx-1" />
+                  {/* Encoder Validator - Sleek Outline Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEncoderValidatorOpen(true);
+                      setEncoderValidatorResult(null);
+                      setEncoderValidatorCopyStatus(null);
+                    }}
+                    ref={encoderTriggerRef}
+                    aria-haspopup="dialog"
+                    aria-expanded={encoderValidatorOpen}
+                    className="group inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-300 whitespace-nowrap border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/15 hover:border-indigo-400 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+                    data-tooltip="Validate a proposed instruction encoding against the existing instruction set"
+                  >
+                    <ScanSearch
+                      size={14}
+                      className="text-indigo-400/80 group-hover:text-indigo-300 transition-colors"
+                    />
+                    <span className="whitespace-nowrap">Encoder Validator</span>
+                  </button>
 
-                  {/* Volumes */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-[11px] uppercase tracking-widest font-semibold" style={{ color: 'var(--riscv-text-3)' }}>Volume</span>
-                    <div className="flex gap-1.5">
-                      {['I', 'II'].map((vol) => (
-                        <button
-                          key={vol}
-                          onClick={() =>
-                            setActiveVolume((current) => {
-                              setActiveProfile(null);
-                              setSelectedInstruction(null);
-                              setSearchMatches(null);
-                              return current === vol ? null : vol;
-                            })
-                          }
-                          className={[
-                            'px-3 py-1.5 text-[12px] rounded-lg transition-all duration-200 font-medium',
-                            activeVolume === vol 
-                              ? 'bg-slate-700/80 text-white shadow-inner border border-slate-500/50' 
-                              : 'text-slate-300 hover:text-white hover:bg-slate-700/40 border border-transparent hover:border-slate-600/30',
-                          ].join(' ')}
-                        >
-                          Vol {vol}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                  {/* Theme toggle relocated to header */}
 
-                {/* Encoder Validator - Sleek Outline Button */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEncoderValidatorOpen(true);
-                    setEncoderValidatorResult(null);
-                    setEncoderValidatorCopyStatus(null);
-                  }}
-                  ref={encoderTriggerRef}
-                  aria-haspopup="dialog"
-                  aria-expanded={encoderValidatorOpen}
-                  className="group inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-300 whitespace-nowrap border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/15 hover:border-indigo-400 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]"
-                  data-tooltip="Validate a proposed instruction encoding against the existing instruction set"
-                >
-                  <ScanSearch size={14} className="text-indigo-400/80 group-hover:text-indigo-300 transition-colors" />
-                  <span className="whitespace-nowrap">Encoder Validator</span>
-                </button>
+                  {/* ISA Configuration Builder — fused action group */}
+                  <div className="relative inline-flex items-stretch rounded-xl">
+                    {/* Active glow ring */}
+                    {builderMode && (
+                      <span className="absolute -inset-px rounded-xl animate-pulse bg-amber-400/20 pointer-events-none z-0" />
+                    )}
 
-                {/* Theme toggle relocated to header */}
-
-                {/* ISA Configuration Builder — fused action group */}
-                <div className="relative inline-flex items-stretch rounded-xl">
-
-                  {/* Active glow ring */}
-                  {builderMode && (
-                    <span className="absolute -inset-px rounded-xl animate-pulse bg-amber-400/20 pointer-events-none z-0" />
-                  )}
-
-                  {/* Main body — switches builder mode on and off.
+                    {/* Main body — switches builder mode on and off.
                       It deliberately does NOT open the panel: the panel is a
                       full-screen overlay, so opening it on activation would
                       immediately cover the tiles the user is meant to click. */}
-                  <div className="relative flex flex-col">
-                    <button
-                    type="button"
-                    aria-pressed={builderMode}
-                    onClick={() => setBuilderMode(v => !v)}
-                    className={[
-                      'relative z-10 inline-flex items-center gap-2 px-3 py-2 text-xs font-bold transition-all duration-300 whitespace-nowrap',
-                      builderMode
-                        ? 'bg-gradient-to-b from-amber-400 to-amber-500 text-slate-900 hover:from-amber-300 hover:to-amber-400 rounded-xl'
-                        : 'builder-btn-off bg-slate-800/80 text-amber-300/90 border border-amber-400/30 hover:bg-slate-700/80 hover:text-amber-200 rounded-xl',
-                    ].join(' ')}
-                    style={{ boxShadow: builderMode ? '0 4px 18px rgba(251,191,36,0.4)' : '0 2px 10px rgba(0,0,0,0.2)' }}
-                    data-tooltip={
-                      builderMode
-                        ? 'ISA Configuration Builder is ON — click any extension’s + to add it. Click here to turn off.'
-                        : 'Turn on the ISA Configuration Builder to start picking extensions'
-                    }
-                  >
-                    <Cpu size={14} className="opacity-80 flex-shrink-0" />
-                    <span className="whitespace-nowrap hidden sm:inline">ISA Configuration Builder</span>
-                    <span className="whitespace-nowrap sm:hidden">ISA Builder</span>
-                    <span
-                      className={[
-                        'inline-flex items-center justify-center px-1.5 h-[16px] rounded-full text-[10px] font-black tracking-wide',
-                        builderMode ? 'builder-badge-on bg-slate-900/75 text-amber-400' : 'builder-badge-off bg-slate-900/60 text-slate-400',
-                      ].join(' ')}
-                    >
-                      {builderMode ? 'ON' : 'OFF'}
-                    </span>
-                    {workspaceIds.size > 0 && (
-                      <span className="builder-badge-on inline-flex items-center justify-center min-w-[18px] px-1 h-[18px] rounded-full text-[10px] font-black bg-slate-900/75 text-amber-400">
-                        {workspaceIds.size}
-                      </span>
-                    )}
-                    </button>
+                    <div className="relative flex flex-col">
+                      <button
+                        type="button"
+                        aria-pressed={builderMode}
+                        onClick={() => setBuilderMode((v) => !v)}
+                        className={[
+                          'relative z-10 inline-flex items-center gap-2 px-3 py-2 text-xs font-bold transition-all duration-300 whitespace-nowrap',
+                          builderMode
+                            ? 'bg-gradient-to-b from-amber-400 to-amber-500 text-slate-900 hover:from-amber-300 hover:to-amber-400 rounded-xl'
+                            : 'builder-btn-off bg-slate-800/80 text-amber-300/90 border border-amber-400/30 hover:bg-slate-700/80 hover:text-amber-200 rounded-xl',
+                        ].join(' ')}
+                        style={{
+                          boxShadow: builderMode
+                            ? '0 4px 18px rgba(251,191,36,0.4)'
+                            : '0 2px 10px rgba(0,0,0,0.2)',
+                        }}
+                        data-tooltip={
+                          builderMode
+                            ? 'ISA Configuration Builder is ON — click any extension’s + to add it. Click here to turn off.'
+                            : 'Turn on the ISA Configuration Builder to start picking extensions'
+                        }
+                      >
+                        <Cpu size={14} className="opacity-80 flex-shrink-0" />
+                        <span className="whitespace-nowrap hidden sm:inline">
+                          ISA Configuration Builder
+                        </span>
+                        <span className="whitespace-nowrap sm:hidden">ISA Builder</span>
+                        <span
+                          className={[
+                            'inline-flex items-center justify-center px-1.5 h-[16px] rounded-full text-[10px] font-black tracking-wide',
+                            builderMode
+                              ? 'builder-badge-on bg-slate-900/75 text-amber-400'
+                              : 'builder-badge-off bg-slate-900/60 text-slate-400',
+                          ].join(' ')}
+                        >
+                          {builderMode ? 'ON' : 'OFF'}
+                        </span>
+                        {workspaceIds.size > 0 && (
+                          <span className="builder-badge-on inline-flex items-center justify-center min-w-[18px] px-1 h-[18px] rounded-full text-[10px] font-black bg-slate-900/75 text-amber-400">
+                            {workspaceIds.size}
+                          </span>
+                        )}
+                      </button>
 
-                    {/* Builder Contextual Actions Toolbar.
+                      {/* Builder Contextual Actions Toolbar.
                         Hidden while the full panel is open: this toolbar belongs to the
                         header, but it sits at z-50 against the panel's z-40, so leaving it
                         mounted floats it on top of the modal. Its actions are redundant
                         there too, one of them being "open the panel". */}
-                    {builderMode && !workspacePanelOpen && (
-                      <div className="builder-toolbar absolute top-[calc(100%+6px)] left-0 right-0 flex items-center justify-between p-1 bg-slate-800/90 border border-amber-500/40 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl z-50 animate-fade-in-up gap-1">
-                        
-                        {/* Open the full panel */}
-                        <button
-                          type="button"
-                          data-tooltip="Open the builder panel (-march string, export, conflicts)"
-                          aria-label="Open the builder panel"
-                          onClick={() => setWorkspacePanelOpen(true)}
-                          className={`builder-action-amber ${workspaceIds.size === 0 ? "flex-none px-4" : "flex-1"} flex items-center justify-center py-1.5 text-amber-300 hover:bg-amber-500/30 hover:text-amber-100 transition-all duration-300 rounded-lg hover:shadow-[0_0_12px_rgba(251,191,36,0.3)]`}
-                        >
-                          <Maximize2 size={14} className="transition-transform hover:scale-110" />
-                        </button>
-
-                        {/* Profile Menu */}
-                        <div className="relative flex-1 flex">
+                      {builderMode && !workspacePanelOpen && (
+                        <div className="builder-toolbar absolute top-[calc(100%+6px)] left-0 right-0 flex items-center justify-between p-1 bg-slate-800/90 border border-amber-500/40 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl z-50 animate-fade-in-up gap-1">
+                          {/* Open the full panel */}
                           <button
                             type="button"
-                            onClick={() => setProfileMenuOpen(v => !v)}
-                            data-tooltip="Start the configuration from a ratified profile"
-                            className={`builder-action-indigo w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-semibold transition-all duration-300 rounded-lg ${
-                              profileMenuOpen
-                                ? 'bg-indigo-500 text-white shadow-inner'
-                                : 'text-indigo-300 hover:bg-indigo-500/30 hover:text-indigo-100 hover:shadow-[0_0_12px_rgba(99,102,241,0.3)]'
-                            }`}
+                            data-tooltip="Open the builder panel (-march string, export, conflicts)"
+                            aria-label="Open the builder panel"
+                            onClick={() => setWorkspacePanelOpen(true)}
+                            className={`builder-action-amber ${workspaceIds.size === 0 ? 'flex-none px-4' : 'flex-1'} flex items-center justify-center py-1.5 text-amber-300 hover:bg-amber-500/30 hover:text-amber-100 transition-all duration-300 rounded-lg hover:shadow-[0_0_12px_rgba(251,191,36,0.3)]`}
                           >
-                            <Layers size={14} className="transition-transform hover:scale-110" />
-                            {workspaceIds.size === 0 && <span className="whitespace-nowrap">Start from profile</span>}
+                            <Maximize2 size={14} className="transition-transform hover:scale-110" />
                           </button>
 
-                      {profileMenuOpen && (
-                        <div className="builder-menu" style={{
-                          position: 'absolute', top: 'calc(100% + 8px)', right: 0,
-                          zIndex: 50, display: 'flex', flexDirection: 'column',
-                          borderRadius: 10,
-                          minWidth: 300, overflow: 'hidden',
-                        }}>
-                          <div style={{
-                            padding: '10px 14px',
-                            borderBottom: '1px solid var(--riscv-tint-3)',
-                            background: 'rgba(245,197,66,0.04)',
-                            fontSize: 12, color: 'var(--riscv-text)', fontWeight: 700,
-                          }}>
-                            Start from a ratified profile
-                          </div>
-
-                          {Object.entries(profiles).map(([name, list]) => (
+                          {/* Profile Menu */}
+                          <div className="relative flex-1 flex">
                             <button
-                              key={name}
                               type="button"
-                              onClick={() => {
-                                // Replace rather than merge: "start from" means
-                                // this profile is the starting point, and mixing
-                                // it into an existing pick would silently produce
-                                // a configuration matching neither.
-                                setWorkspaceIds(new Set());
-                                addWorkspaceIdsSmart(list);
-                                setProfileMenuOpen(false);
-                              }}
-                              style={{
-                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                gap: 12, padding: '10px 14px', textAlign: 'left',
-                                borderBottom: '1px solid var(--riscv-tint-2)',
-                                background: 'transparent', cursor: 'pointer',
-                              }}
-                              className="hover:bg-amber-400/10 transition-colors"
+                              onClick={() => setProfileMenuOpen((v) => !v)}
+                              data-tooltip="Start the configuration from a ratified profile"
+                              className={`builder-action-indigo w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-semibold transition-all duration-300 rounded-lg ${
+                                profileMenuOpen
+                                  ? 'bg-indigo-500 text-white shadow-inner'
+                                  : 'text-indigo-300 hover:bg-indigo-500/30 hover:text-indigo-100 hover:shadow-[0_0_12px_rgba(99,102,241,0.3)]'
+                              }`}
                             >
-                              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--riscv-gold)' }}>{name}</span>
-                              <span style={{ fontSize: 11, color: 'var(--riscv-text-2)' }}>
-                                {list.length} extensions
-                              </span>
+                              <Layers size={14} className="transition-transform hover:scale-110" />
+                              {workspaceIds.size === 0 && (
+                                <span className="whitespace-nowrap">Start from profile</span>
+                              )}
                             </button>
-                          ))}
 
-                          <div style={{ padding: '8px 14px', fontSize: 11, color: 'var(--riscv-text-3)', lineHeight: 1.5 }}>
-                            Replaces the current selection. Dependencies are resolved
-                            automatically, so the result may include more than the
-                            profile lists.
+                            {profileMenuOpen && (
+                              <div
+                                className="builder-menu"
+                                style={{
+                                  position: 'absolute',
+                                  top: 'calc(100% + 8px)',
+                                  right: 0,
+                                  zIndex: 50,
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  borderRadius: 10,
+                                  minWidth: 300,
+                                  overflow: 'hidden',
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    padding: '10px 14px',
+                                    borderBottom: '1px solid var(--riscv-tint-3)',
+                                    background: 'rgba(245,197,66,0.04)',
+                                    fontSize: 12,
+                                    color: 'var(--riscv-text)',
+                                    fontWeight: 700,
+                                  }}
+                                >
+                                  Start from a ratified profile
+                                </div>
+
+                                {Object.entries(profiles).map(([name, list]) => (
+                                  <button
+                                    key={name}
+                                    type="button"
+                                    onClick={() => {
+                                      // Replace rather than merge: "start from" means
+                                      // this profile is the starting point, and mixing
+                                      // it into an existing pick would silently produce
+                                      // a configuration matching neither.
+                                      setWorkspaceIds(new Set());
+                                      addWorkspaceIdsSmart(list);
+                                      setProfileMenuOpen(false);
+                                    }}
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      gap: 12,
+                                      padding: '10px 14px',
+                                      textAlign: 'left',
+                                      borderBottom: '1px solid var(--riscv-tint-2)',
+                                      background: 'transparent',
+                                      cursor: 'pointer',
+                                    }}
+                                    className="hover:bg-amber-400/10 transition-colors"
+                                  >
+                                    <span
+                                      style={{
+                                        fontSize: 13,
+                                        fontWeight: 700,
+                                        color: 'var(--riscv-gold)',
+                                      }}
+                                    >
+                                      {name}
+                                    </span>
+                                    <span style={{ fontSize: 11, color: 'var(--riscv-text-2)' }}>
+                                      {list.length} extensions
+                                    </span>
+                                  </button>
+                                ))}
+
+                                <div
+                                  style={{
+                                    padding: '8px 14px',
+                                    fontSize: 11,
+                                    color: 'var(--riscv-text-3)',
+                                    lineHeight: 1.5,
+                                  }}
+                                >
+                                  Replaces the current selection. Dependencies are resolved
+                                  automatically, so the result may include more than the profile
+                                  lists.
+                                </div>
+                              </div>
+                            )}
                           </div>
+
+                          {workspaceIds.size > 0 && (
+                            <>
+                              <button
+                                type="button"
+                                data-tooltip="Clear all extensions"
+                                aria-label="Clear all extensions"
+                                onClick={() => setWorkspaceIds(new Set())}
+                                className="builder-action-rose flex-1 flex items-center justify-center py-1.5 text-rose-300 hover:bg-rose-500/30 hover:text-rose-100 hover:shadow-[0_0_12px_rgba(244,63,94,0.3)] transition-all duration-300 rounded-lg"
+                              >
+                                <Trash2
+                                  size={14}
+                                  className="transition-transform hover:scale-110"
+                                />
+                              </button>
+
+                              <div className="relative flex-1 flex">
+                                <button
+                                  type="button"
+                                  data-tooltip="Export configuration YAML"
+                                  aria-label="Export configuration YAML"
+                                  onClick={() => setQuickExportOpen((v) => !v)}
+                                  className={`builder-action-emerald w-full flex items-center justify-center py-1.5 transition-all duration-300 rounded-lg ${
+                                    quickExportOpen
+                                      ? 'bg-emerald-500 text-white shadow-inner'
+                                      : 'text-emerald-300 hover:bg-emerald-500/30 hover:text-emerald-100 hover:shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+                                  }`}
+                                >
+                                  <Download
+                                    size={14}
+                                    className="transition-transform hover:scale-110"
+                                  />
+                                </button>
+
+                                {quickExportOpen && (
+                                  <div
+                                    className="builder-menu"
+                                    style={{
+                                      position: 'absolute',
+                                      top: 'calc(100% + 8px)',
+                                      right: 0,
+                                      zIndex: 50,
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: 0,
+                                      borderRadius: 10,
+                                      minWidth: 280,
+                                      overflow: 'hidden',
+                                    }}
+                                  >
+                                    {/* Header strip */}
+                                    <div
+                                      style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        padding: '10px 14px',
+                                        borderBottom: '1px solid var(--riscv-tint-3)',
+                                        background: 'rgba(245,197,66,0.04)',
+                                      }}
+                                    >
+                                      <div
+                                        style={{ display: 'flex', alignItems: 'center', gap: 7 }}
+                                      >
+                                        <Package
+                                          size={12}
+                                          style={{ color: 'var(--riscv-gold)', opacity: 0.85 }}
+                                        />
+                                        <span
+                                          style={{
+                                            fontSize: 12,
+                                            color: 'var(--riscv-text)',
+                                            fontWeight: 700,
+                                            letterSpacing: '0.01em',
+                                          }}
+                                        >
+                                          Export Configuration YAML
+                                        </span>
+                                      </div>
+                                      <button
+                                        onClick={() => setQuickExportOpen(false)}
+                                        style={{
+                                          background: 'none',
+                                          border: 'none',
+                                          color: '#6f7f95',
+                                          cursor: 'pointer',
+                                          padding: 2,
+                                          lineHeight: 0,
+                                          borderRadius: 4,
+                                        }}
+                                        onMouseEnter={(e) =>
+                                          (e.currentTarget.style.color = '#94a3b8')
+                                        }
+                                        onMouseLeave={(e) =>
+                                          (e.currentTarget.style.color = '#6f7f95')
+                                        }
+                                      >
+                                        <X size={13} />
+                                      </button>
+                                    </div>
+
+                                    {/* Toggle card */}
+                                    <div style={{ padding: '12px 14px' }}>
+                                      <div
+                                        onClick={() => setQuickExportIncludeInstr((v) => !v)}
+                                        style={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'space-between',
+                                          gap: 12,
+                                          padding: '10px 12px',
+                                          borderRadius: 8,
+                                          cursor: 'pointer',
+                                          background: quickExportIncludeInstr
+                                            ? 'rgba(245,197,66,0.07)'
+                                            : 'var(--riscv-tint-2)',
+                                          border: `1px solid ${quickExportIncludeInstr ? 'rgba(245,197,66,0.2)' : 'var(--riscv-tint-3)'}`,
+                                          transition: 'all 0.2s',
+                                          userSelect: 'none',
+                                        }}
+                                      >
+                                        <div style={{ flex: 1 }}>
+                                          <span
+                                            style={{
+                                              fontSize: 12.5,
+                                              fontWeight: 600,
+                                              color: quickExportIncludeInstr
+                                                ? 'var(--riscv-text)'
+                                                : '#94a3b8',
+                                              display: 'block',
+                                              lineHeight: 1.35,
+                                              transition: 'color 0.2s',
+                                            }}
+                                          >
+                                            Include instruction catalog
+                                          </span>
+                                          <span
+                                            style={{
+                                              fontSize: 11,
+                                              marginTop: 2,
+                                              display: 'block',
+                                              color:
+                                                workspaceTotalInstr > 100 ? '#f59e0b' : '#64748b',
+                                              fontVariantNumeric: 'tabular-nums',
+                                            }}
+                                          >
+                                            {workspaceTotalInstr.toLocaleString()} instructions
+                                            {workspaceTotalInstr > 100 ? ' · large export' : ''}
+                                          </span>
+                                        </div>
+
+                                        {/* Premium toggle track */}
+                                        <div
+                                          style={{
+                                            width: 38,
+                                            height: 21,
+                                            borderRadius: 11,
+                                            flexShrink: 0,
+                                            background: quickExportIncludeInstr
+                                              ? 'linear-gradient(135deg, #f5c542 0%, #fde68a 100%)'
+                                              : 'rgba(255,255,255,0.08)',
+                                            boxShadow: quickExportIncludeInstr
+                                              ? '0 0 8px rgba(245,197,66,0.4)'
+                                              : 'none',
+                                            position: 'relative',
+                                            transition: 'all 0.25s',
+                                            border: `1px solid ${quickExportIncludeInstr ? 'rgba(245,197,66,0.7)' : 'var(--riscv-tint-4)'}`,
+                                          }}
+                                        >
+                                          <div
+                                            style={{
+                                              width: 15,
+                                              height: 15,
+                                              borderRadius: '50%',
+                                              background: quickExportIncludeInstr
+                                                ? '#1a1206'
+                                                : '#6f7f95',
+                                              position: 'absolute',
+                                              top: 2,
+                                              left: quickExportIncludeInstr ? 19 : 2,
+                                              transition: 'all 0.25s',
+                                              boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
+                                            }}
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Download button */}
+                                    <div style={{ padding: '0 14px 13px' }}>
+                                      <button
+                                        onClick={() => {
+                                          const { yaml } = buildIsaConfigYaml(
+                                            Array.from(workspaceIds),
+                                            allExtsList,
+                                            quickExportIncludeInstr,
+                                          );
+                                          const blob = new Blob([yaml], { type: 'text/yaml' });
+                                          const url = URL.createObjectURL(blob);
+                                          const a = document.createElement('a');
+                                          a.href = url;
+                                          const marchRes = buildMarchString(
+                                            Array.from(workspaceIds),
+                                            allExtsList,
+                                          );
+                                          const base = marchRes.march
+                                            ? marchRes.march.split('_')[0]
+                                            : 'core';
+                                          a.download = `riscv_${base}_config.yaml`;
+                                          document.body.appendChild(a);
+                                          a.click();
+                                          document.body.removeChild(a);
+                                          setTimeout(() => URL.revokeObjectURL(url), 1000);
+                                          setQuickExportOpen(false);
+                                          showToast('Exported YAML configuration!');
+                                        }}
+                                        style={{
+                                          width: '100%',
+                                          padding: '9px 14px',
+                                          borderRadius: 7,
+                                          background:
+                                            'linear-gradient(135deg, rgba(245,197,66,0.22) 0%, rgba(245,197,66,0.12) 100%)',
+                                          color: 'var(--riscv-gold)',
+                                          border: '1px solid rgba(245,197,66,0.4)',
+                                          fontSize: 12.5,
+                                          fontWeight: 700,
+                                          cursor: 'pointer',
+                                          transition: 'all 0.18s',
+                                          letterSpacing: '0.02em',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          gap: 6,
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.currentTarget.style.background =
+                                            'linear-gradient(135deg, rgba(245,197,66,0.35) 0%, rgba(245,197,66,0.22) 100%)';
+                                          e.currentTarget.style.boxShadow =
+                                            '0 0 12px rgba(245,197,66,0.2)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.background =
+                                            'linear-gradient(135deg, rgba(245,197,66,0.22) 0%, rgba(245,197,66,0.12) 100%)';
+                                          e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                      >
+                                        <Package size={11} />
+                                        Download .yaml
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>
-
-                        {workspaceIds.size > 0 && (
-                          <>
-                            <button
-                              type="button"
-                              data-tooltip="Clear all extensions"
-                              aria-label="Clear all extensions"
-                              onClick={() => setWorkspaceIds(new Set())}
-                              className="builder-action-rose flex-1 flex items-center justify-center py-1.5 text-rose-300 hover:bg-rose-500/30 hover:text-rose-100 hover:shadow-[0_0_12px_rgba(244,63,94,0.3)] transition-all duration-300 rounded-lg"
-                            >
-                              <Trash2 size={14} className="transition-transform hover:scale-110" />
-                            </button>
-
-                            <div className="relative flex-1 flex">
-                              <button
-                                type="button"
-                                data-tooltip="Export configuration YAML"
-                                aria-label="Export configuration YAML"
-                                onClick={() => setQuickExportOpen(v => !v)}
-                                className={`builder-action-emerald w-full flex items-center justify-center py-1.5 transition-all duration-300 rounded-lg ${
-                                  quickExportOpen 
-                                    ? 'bg-emerald-500 text-white shadow-inner' 
-                                    : 'text-emerald-300 hover:bg-emerald-500/30 hover:text-emerald-100 hover:shadow-[0_0_12px_rgba(16,185,129,0.3)]'
-                                }`}
-                              >
-                                <Download size={14} className="transition-transform hover:scale-110" />
-                              </button>
-
-                      {quickExportOpen && (
-                        <div className="builder-menu" style={{
-                          position: 'absolute', top: 'calc(100% + 8px)', right: 0,
-                          zIndex: 50,
-                          display: 'flex', flexDirection: 'column', gap: 0,
-                          borderRadius: 10,
-                          minWidth: 280, overflow: 'hidden',
-                        }}>
-                          {/* Header strip */}
-                          <div style={{
-                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                            padding: '10px 14px',
-                            borderBottom: '1px solid var(--riscv-tint-3)',
-                            background: 'rgba(245,197,66,0.04)',
-                          }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                              <Package size={12} style={{ color: 'var(--riscv-gold)', opacity: 0.85 }} />
-                              <span style={{ fontSize: 12, color: 'var(--riscv-text)', fontWeight: 700, letterSpacing: '0.01em' }}>
-                                Export Configuration YAML
-                              </span>
-                            </div>
-                            <button
-                              onClick={() => setQuickExportOpen(false)}
-                              style={{ background: 'none', border: 'none', color: '#6f7f95', cursor: 'pointer', padding: 2, lineHeight: 0, borderRadius: 4 }}
-                              onMouseEnter={e => e.currentTarget.style.color = '#94a3b8'}
-                              onMouseLeave={e => e.currentTarget.style.color = '#6f7f95'}
-                            ><X size={13} /></button>
-                          </div>
-
-                          {/* Toggle card */}
-                          <div style={{ padding: '12px 14px' }}>
-                            <div
-                              onClick={() => setQuickExportIncludeInstr(v => !v)}
-                              style={{
-                                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-                                padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
-                                background: quickExportIncludeInstr ? 'rgba(245,197,66,0.07)' : 'var(--riscv-tint-2)',
-                                border: `1px solid ${quickExportIncludeInstr ? 'rgba(245,197,66,0.2)' : 'var(--riscv-tint-3)'}`,
-                                transition: 'all 0.2s',
-                                userSelect: 'none',
-                              }}
-                            >
-                              <div style={{ flex: 1 }}>
-                                <span style={{
-                                  fontSize: 12.5, fontWeight: 600,
-                                  color: quickExportIncludeInstr ? 'var(--riscv-text)' : '#94a3b8',
-                                  display: 'block', lineHeight: 1.35, transition: 'color 0.2s',
-                                }}>
-                                  Include instruction catalog
-                                </span>
-                                <span style={{
-                                  fontSize: 11, marginTop: 2, display: 'block',
-                                  color: workspaceTotalInstr > 100 ? '#f59e0b' : '#64748b',
-                                  fontVariantNumeric: 'tabular-nums',
-                                }}>
-                                  {workspaceTotalInstr.toLocaleString()} instructions{workspaceTotalInstr > 100 ? ' · large export' : ''}
-                                </span>
-                              </div>
-
-                              {/* Premium toggle track */}
-                              <div style={{
-                                width: 38, height: 21, borderRadius: 11, flexShrink: 0,
-                                background: quickExportIncludeInstr
-                                  ? 'linear-gradient(135deg, #f5c542 0%, #fde68a 100%)'
-                                  : 'rgba(255,255,255,0.08)',
-                                boxShadow: quickExportIncludeInstr ? '0 0 8px rgba(245,197,66,0.4)' : 'none',
-                                position: 'relative', transition: 'all 0.25s',
-                                border: `1px solid ${quickExportIncludeInstr ? 'rgba(245,197,66,0.7)' : 'var(--riscv-tint-4)'}`,
-                              }}>
-                                <div style={{
-                                  width: 15, height: 15, borderRadius: '50%',
-                                  background: quickExportIncludeInstr ? '#1a1206' : '#6f7f95',
-                              position: 'absolute', top: 2,
-                                  left: quickExportIncludeInstr ? 19 : 2,
-                                  transition: 'all 0.25s',
-                                  boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
-                                }} />
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Download button */}
-                          <div style={{ padding: '0 14px 13px' }}>
-                            <button
-                              onClick={() => {
-                                const { yaml } = buildIsaConfigYaml(Array.from(workspaceIds), allExtsList, quickExportIncludeInstr);
-                                const blob = new Blob([yaml], { type: 'text/yaml' });
-                                const url = URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                const marchRes = buildMarchString(Array.from(workspaceIds), allExtsList);
-                                const base = marchRes.march ? marchRes.march.split('_')[0] : 'core';
-                                a.download = `riscv_${base}_config.yaml`;
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                                setTimeout(() => URL.revokeObjectURL(url), 1000);
-                                setQuickExportOpen(false);
-                                showToast('Exported YAML configuration!');
-                              }}
-                              style={{
-                                width: '100%', padding: '9px 14px', borderRadius: 7,
-                                background: 'linear-gradient(135deg, rgba(245,197,66,0.22) 0%, rgba(245,197,66,0.12) 100%)',
-                                color: 'var(--riscv-gold)',
-                                border: '1px solid rgba(245,197,66,0.4)',
-                                fontSize: 12.5, fontWeight: 700,
-                                cursor: 'pointer', transition: 'all 0.18s',
-                                letterSpacing: '0.02em',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                              }}
-                              onMouseEnter={e => {
-                                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(245,197,66,0.35) 0%, rgba(245,197,66,0.22) 100%)';
-                                e.currentTarget.style.boxShadow = '0 0 12px rgba(245,197,66,0.2)';
-                              }}
-                              onMouseLeave={e => {
-                                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(245,197,66,0.22) 0%, rgba(245,197,66,0.12) 100%)';
-                                e.currentTarget.style.boxShadow = 'none';
-                              }}
-                            >
-                              <Package size={11} />
-                              Download .yaml
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        {/* ─── Main Grid ───────────────────────────────────────────────── */}
+          {/* ─── Main Grid ───────────────────────────────────────────────── */}
           <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-min">
             {/* Search Bar */}
             <div className="col-span-full mb-2 flex items-center gap-3">
               <div className="relative flex-1">
-                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--riscv-text-3)' }} />
+                <Search
+                  size={15}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                  style={{ color: 'var(--riscv-text-3)' }}
+                />
                 <input
                   ref={searchInputRef}
                   type="text"
@@ -2137,7 +2403,14 @@ const RISCVExplorer = () => {
                       <X size={13} />
                     </button>
                   )}
-                  <kbd className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ background: 'var(--riscv-surface)', color: 'var(--riscv-text-3)', border: '1px solid var(--riscv-border-2)' }}>
+                  <kbd
+                    className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium"
+                    style={{
+                      background: 'var(--riscv-surface)',
+                      color: 'var(--riscv-text-3)',
+                      border: '1px solid var(--riscv-border-2)',
+                    }}
+                  >
                     <span className="text-[10px]">⌘</span> K
                   </kbd>
                 </div>
@@ -2151,388 +2424,544 @@ const RISCVExplorer = () => {
                 aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
                 className="group flex items-center justify-center rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 border flex-shrink-0"
                 style={{
-                  width: 42, height: 42,
+                  width: 42,
+                  height: 42,
                   background: 'var(--riscv-plate)',
                   borderColor: 'rgba(128,128,128,0.2)',
                   color: 'var(--riscv-text-2)',
                 }}
               >
-                {theme === 'dark' ? <Sun size={18} className="group-hover:text-amber-400 transition-colors" /> : <Moon size={18} className="group-hover:text-indigo-500 transition-colors" />}
+                {theme === 'dark' ? (
+                  <Sun size={18} className="group-hover:text-amber-400 transition-colors" />
+                ) : (
+                  <Moon size={18} className="group-hover:text-indigo-500 transition-colors" />
+                )}
               </button>
             </div>
 
             {hasSearchMatches ? (
               <>
                 {/* 1. Base ISA */}
-            <div className="space-y-2.5 col-span-full">
-              <div className="flex items-center gap-2">
-                <CircuitBoard size={13} style={{ color: '#60a5fa' }} />
-                <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#60a5fa' }}>Base ISA</h3>
-                <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.base.length} isa</span>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                {extensions.base.map((item) => (
-                  <ExtensionTile
-                    key={item.id}
-                    data={item}
-                    searchIndex={extensionSearchIndexById.get(item.id)}
-                    {...tileProps}
-                    colorClass="border-blue-900/60 bg-blue-950/40 text-blue-100"
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* 2. Single-Letter Extensions */}
-            <div className="space-y-2.5 col-span-full">
-              <div className="flex items-center gap-2">
-                <Braces size={13} style={{ color: '#34d399' }} />
-                <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#34d399' }}>Single-Letter Extensions</h3>
-                <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.standard.length} ext</span>
-              </div>
-              <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
-                {extensions.standard.map((item) => (
-                  <ExtensionTile
-                    key={item.id}
-                    data={item}
-                    searchIndex={extensionSearchIndexById.get(item.id)}
-                    {...tileProps}
-                    colorClass="border-emerald-900/60 bg-emerald-950/40 text-emerald-100"
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* 3. Z-Extensions */}
-            <div
-              className="col-span-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pt-5"
-              style={{ borderTop: '1px solid var(--riscv-border)' }}
-            >
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <Binary size={12} style={{ color: '#a78bfa' }} />
-                  <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#a78bfa' }}>Bit Manipulation (Zb*)</h3>
-                  <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_bit.length}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.z_bit.map((item) => (
-                    <ExtensionTile
-                      key={item.id}
-                      data={item}
-                      searchIndex={extensionSearchIndexById.get(item.id)}
-                      {...tileProps}
-                      colorClass="border-purple-900/60 bg-purple-950/30 text-purple-100"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <Shuffle size={12} style={{ color: '#fbbf24' }} />
-                  <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#fbbf24' }}>Atomics (Za/Zic*)</h3>
-                  <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_atomics.length}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.z_atomics.map((item) => (
-                    <ExtensionTile
-                      key={item.id}
-                      data={item}
-                      searchIndex={extensionSearchIndexById.get(item.id)}
-                      {...tileProps}
-                      colorClass="border-amber-900/60 bg-amber-950/30 text-amber-100"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <Layers size={12} style={{ color: '#818cf8' }} />
-                  <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#818cf8' }}>Compressed (Zc*)</h3>
-                  <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_compress.length}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.z_compress.map((item) => (
-                    <ExtensionTile
-                      key={item.id}
-                      data={item}
-                      searchIndex={extensionSearchIndexById.get(item.id)}
-                      {...tileProps}
-                      colorClass="border-indigo-900/60 bg-indigo-950/30 text-indigo-100"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <FlaskConical size={12} style={{ color: '#f472b6' }} />
-                  <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#f472b6' }}>Float & Numerics (Zf*)</h3>
-                  <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_float.length}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.z_float.map((item) => (
-                    <ExtensionTile
-                      key={item.id}
-                      data={item}
-                      searchIndex={extensionSearchIndexById.get(item.id)}
-                      {...tileProps}
-                      colorClass="border-pink-900/60 bg-pink-950/30 text-pink-100"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <Database size={12} style={{ color: '#38bdf8' }} />
-                  <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#38bdf8' }}>Load / Store</h3>
-                  <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_load_store.length}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.z_load_store.map((item) => (
-                    <ExtensionTile
-                      key={item.id}
-                      data={item}
-                      searchIndex={extensionSearchIndexById.get(item.id)}
-                      {...tileProps}
-                      colorClass="border-sky-900/60 bg-sky-950/30 text-sky-100"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <Activity size={12} style={{ color: '#e879f9' }} />
-                  <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#e879f9' }}>Integer</h3>
-                  <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_integer.length}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.z_integer.map((item) => (
-                    <ExtensionTile
-                      key={item.id}
-                      data={item}
-                      searchIndex={extensionSearchIndexById.get(item.id)}
-                      {...tileProps}
-                      colorClass="border-fuchsia-900/60 bg-fuchsia-950/30 text-fuchsia-100"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <Zap size={12} style={{ color: '#2dd4bf' }} />
-                  <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#2dd4bf' }}>Vector Subsets (Zv/Zve)</h3>
-                  <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_vector.length}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.z_vector.map((item) => (
-                    <ExtensionTile
-                      key={item.id}
-                      data={item}
-                      searchIndex={extensionSearchIndexById.get(item.id)}
-                      {...tileProps}
-                      colorClass="border-teal-900/60 bg-teal-950/30 text-teal-100"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <Shield size={12} style={{ color: '#f87171' }} />
-                  <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#f87171' }}>Security & CFI (Zi*)</h3>
-                  <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_security.length}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.z_security.map((item) => (
-                    <ExtensionTile
-                      key={item.id}
-                      data={item}
-                      searchIndex={extensionSearchIndexById.get(item.id)}
-                      {...tileProps}
-                      colorClass="border-red-900/60 bg-red-950/30 text-red-100"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <KeyRound size={12} style={{ color: '#94a3b8' }} />
-                  <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#94a3b8' }}>Cryptography (Zk*)</h3>
-                  <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_crypto.length}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.z_crypto.map((item) => (
-                    <ExtensionTile
-                      key={item.id}
-                      data={item}
-                      searchIndex={extensionSearchIndexById.get(item.id)}
-                      {...tileProps}
-                      colorClass="border-[var(--riscv-border-2)] bg-[var(--riscv-surface-2)] text-slate-300"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <Lock size={12} style={{ color: '#c4b5fd' }} />
-                  <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#c4b5fd' }}>Vector Cryptography (Zvk*)</h3>
-                  <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_vector_crypto.length}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.z_vector_crypto.map((item) => (
-                    <ExtensionTile
-                      key={item.id}
-                      data={item}
-                      searchIndex={extensionSearchIndexById.get(item.id)}
-                      {...tileProps}
-                      colorClass="border-violet-900/60 bg-violet-950/30 text-violet-100"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <Settings2 size={12} style={{ color: '#fb923c' }} />
-                  <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#fb923c' }}>System</h3>
-                  <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_system.length}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.z_system.map((item) => (
-                    <ExtensionTile
-                      key={item.id}
-                      data={item}
-                      searchIndex={extensionSearchIndexById.get(item.id)}
-                      {...tileProps}
-                      colorClass="border-orange-900/60 bg-orange-950/30 text-orange-100"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <MemoryStick size={12} style={{ color: '#fdba74' }} />
-                  <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#fdba74' }}>Caches</h3>
-                  <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.z_caches.length}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {extensions.z_caches.map((item) => (
-                    <ExtensionTile
-                      key={item.id}
-                      data={item}
-                      searchIndex={extensionSearchIndexById.get(item.id)}
-                      {...tileProps}
-                      colorClass="border-orange-900/40 bg-orange-950/20 text-orange-100"
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* 4. S-Extensions (Privileged) */}
-            <div
-              className="col-span-full pt-5"
-              style={{ borderTop: '1px solid var(--riscv-border)' }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <Network size={13} style={{ color: '#22d3ee' }} />
-                <h3 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: '#22d3ee' }}>S &amp; Sv Extensions — Privileged ISA</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div className="space-y-2.5">
-                  <div className="flex items-center gap-1.5">
-                    <Layers size={11} style={{ color: 'var(--riscv-text-3)' }} />
-                    <h4 className="text-[11px] uppercase tracking-widest font-semibold" style={{ color: 'var(--riscv-text-3)' }}>Memory (Sv)</h4>
-                    <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.s_mem.length}</span>
+                <div className="space-y-2.5 col-span-full">
+                  <div className="flex items-center gap-2">
+                    <CircuitBoard size={13} style={{ color: '#60a5fa' }} />
+                    <h3
+                      className="text-[12px] font-semibold uppercase tracking-widest"
+                      style={{ color: '#60a5fa' }}
+                    >
+                      Base ISA
+                    </h3>
+                    <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                      {extensions.base.length} isa
+                    </span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {extensions.s_mem.map((item) => (
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                    {extensions.base.map((item) => (
                       <ExtensionTile
                         key={item.id}
                         data={item}
                         searchIndex={extensionSearchIndexById.get(item.id)}
                         {...tileProps}
-                        colorClass="border-cyan-900/50 bg-cyan-950/20 text-cyan-100"
+                        colorClass="border-blue-900/60 bg-blue-950/40 text-blue-100"
                       />
                     ))}
                   </div>
                 </div>
-                <div className="space-y-2.5">
-                  <div className="flex items-center gap-1.5">
-                    <Timer size={11} style={{ color: 'var(--riscv-text-3)' }} />
-                    <h4 className="text-[11px] uppercase tracking-widest font-semibold" style={{ color: 'var(--riscv-text-3)' }}>Interrupts (Sm/Ss)</h4>
-                    <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.s_interrupt.length}</span>
+
+                {/* 2. Single-Letter Extensions */}
+                <div className="space-y-2.5 col-span-full">
+                  <div className="flex items-center gap-2">
+                    <Braces size={13} style={{ color: '#34d399' }} />
+                    <h3
+                      className="text-[12px] font-semibold uppercase tracking-widest"
+                      style={{ color: '#34d399' }}
+                    >
+                      Single-Letter Extensions
+                    </h3>
+                    <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                      {extensions.standard.length} ext
+                    </span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {extensions.s_interrupt.map((item) => (
+                  <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+                    {extensions.standard.map((item) => (
                       <ExtensionTile
                         key={item.id}
                         data={item}
                         searchIndex={extensionSearchIndexById.get(item.id)}
                         {...tileProps}
-                        colorClass="border-cyan-900/50 bg-cyan-950/20 text-cyan-100"
+                        colorClass="border-emerald-900/60 bg-emerald-950/40 text-emerald-100"
                       />
                     ))}
                   </div>
                 </div>
-                <div className="space-y-2.5">
-                  <div className="flex items-center gap-1.5">
-                    <ServerCrash size={11} style={{ color: 'var(--riscv-text-3)' }} />
-                    <h4 className="text-[11px] uppercase tracking-widest font-semibold" style={{ color: 'var(--riscv-text-3)' }}>Trap, Debug &amp; Hypervisor</h4>
-                    <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>{extensions.s_trap.length}</span>
+
+                {/* 3. Z-Extensions */}
+                <div
+                  className="col-span-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pt-5"
+                  style={{ borderTop: '1px solid var(--riscv-border)' }}
+                >
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <Binary size={12} style={{ color: '#a78bfa' }} />
+                      <h3
+                        className="text-[12px] font-semibold uppercase tracking-widest"
+                        style={{ color: '#a78bfa' }}
+                      >
+                        Bit Manipulation (Zb*)
+                      </h3>
+                      <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                        {extensions.z_bit.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {extensions.z_bit.map((item) => (
+                        <ExtensionTile
+                          key={item.id}
+                          data={item}
+                          searchIndex={extensionSearchIndexById.get(item.id)}
+                          {...tileProps}
+                          colorClass="border-purple-900/60 bg-purple-950/30 text-purple-100"
+                        />
+                      ))}
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {extensions.s_trap.map((item) => (
-                      <ExtensionTile
-                        key={item.id}
-                        data={item}
-                        searchIndex={extensionSearchIndexById.get(item.id)}
-                        {...tileProps}
-                        colorClass="border-cyan-900/50 bg-cyan-950/20 text-cyan-100"
-                      />
-                    ))}
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <Shuffle size={12} style={{ color: '#fbbf24' }} />
+                      <h3
+                        className="text-[12px] font-semibold uppercase tracking-widest"
+                        style={{ color: '#fbbf24' }}
+                      >
+                        Atomics (Za/Zic*)
+                      </h3>
+                      <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                        {extensions.z_atomics.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {extensions.z_atomics.map((item) => (
+                        <ExtensionTile
+                          key={item.id}
+                          data={item}
+                          searchIndex={extensionSearchIndexById.get(item.id)}
+                          {...tileProps}
+                          colorClass="border-amber-900/60 bg-amber-950/30 text-amber-100"
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <Layers size={12} style={{ color: '#818cf8' }} />
+                      <h3
+                        className="text-[12px] font-semibold uppercase tracking-widest"
+                        style={{ color: '#818cf8' }}
+                      >
+                        Compressed (Zc*)
+                      </h3>
+                      <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                        {extensions.z_compress.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {extensions.z_compress.map((item) => (
+                        <ExtensionTile
+                          key={item.id}
+                          data={item}
+                          searchIndex={extensionSearchIndexById.get(item.id)}
+                          {...tileProps}
+                          colorClass="border-indigo-900/60 bg-indigo-950/30 text-indigo-100"
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <FlaskConical size={12} style={{ color: '#f472b6' }} />
+                      <h3
+                        className="text-[12px] font-semibold uppercase tracking-widest"
+                        style={{ color: '#f472b6' }}
+                      >
+                        Float & Numerics (Zf*)
+                      </h3>
+                      <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                        {extensions.z_float.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {extensions.z_float.map((item) => (
+                        <ExtensionTile
+                          key={item.id}
+                          data={item}
+                          searchIndex={extensionSearchIndexById.get(item.id)}
+                          {...tileProps}
+                          colorClass="border-pink-900/60 bg-pink-950/30 text-pink-100"
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <Database size={12} style={{ color: '#38bdf8' }} />
+                      <h3
+                        className="text-[12px] font-semibold uppercase tracking-widest"
+                        style={{ color: '#38bdf8' }}
+                      >
+                        Load / Store
+                      </h3>
+                      <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                        {extensions.z_load_store.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {extensions.z_load_store.map((item) => (
+                        <ExtensionTile
+                          key={item.id}
+                          data={item}
+                          searchIndex={extensionSearchIndexById.get(item.id)}
+                          {...tileProps}
+                          colorClass="border-sky-900/60 bg-sky-950/30 text-sky-100"
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <Activity size={12} style={{ color: '#e879f9' }} />
+                      <h3
+                        className="text-[12px] font-semibold uppercase tracking-widest"
+                        style={{ color: '#e879f9' }}
+                      >
+                        Integer
+                      </h3>
+                      <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                        {extensions.z_integer.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {extensions.z_integer.map((item) => (
+                        <ExtensionTile
+                          key={item.id}
+                          data={item}
+                          searchIndex={extensionSearchIndexById.get(item.id)}
+                          {...tileProps}
+                          colorClass="border-fuchsia-900/60 bg-fuchsia-950/30 text-fuchsia-100"
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <Zap size={12} style={{ color: '#2dd4bf' }} />
+                      <h3
+                        className="text-[12px] font-semibold uppercase tracking-widest"
+                        style={{ color: '#2dd4bf' }}
+                      >
+                        Vector Subsets (Zv/Zve)
+                      </h3>
+                      <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                        {extensions.z_vector.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {extensions.z_vector.map((item) => (
+                        <ExtensionTile
+                          key={item.id}
+                          data={item}
+                          searchIndex={extensionSearchIndexById.get(item.id)}
+                          {...tileProps}
+                          colorClass="border-teal-900/60 bg-teal-950/30 text-teal-100"
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <Shield size={12} style={{ color: '#f87171' }} />
+                      <h3
+                        className="text-[12px] font-semibold uppercase tracking-widest"
+                        style={{ color: '#f87171' }}
+                      >
+                        Security & CFI (Zi*)
+                      </h3>
+                      <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                        {extensions.z_security.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {extensions.z_security.map((item) => (
+                        <ExtensionTile
+                          key={item.id}
+                          data={item}
+                          searchIndex={extensionSearchIndexById.get(item.id)}
+                          {...tileProps}
+                          colorClass="border-red-900/60 bg-red-950/30 text-red-100"
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <KeyRound size={12} style={{ color: '#94a3b8' }} />
+                      <h3
+                        className="text-[12px] font-semibold uppercase tracking-widest"
+                        style={{ color: '#94a3b8' }}
+                      >
+                        Cryptography (Zk*)
+                      </h3>
+                      <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                        {extensions.z_crypto.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {extensions.z_crypto.map((item) => (
+                        <ExtensionTile
+                          key={item.id}
+                          data={item}
+                          searchIndex={extensionSearchIndexById.get(item.id)}
+                          {...tileProps}
+                          colorClass="border-[var(--riscv-border-2)] bg-[var(--riscv-surface-2)] text-slate-300"
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <Lock size={12} style={{ color: '#c4b5fd' }} />
+                      <h3
+                        className="text-[12px] font-semibold uppercase tracking-widest"
+                        style={{ color: '#c4b5fd' }}
+                      >
+                        Vector Cryptography (Zvk*)
+                      </h3>
+                      <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                        {extensions.z_vector_crypto.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {extensions.z_vector_crypto.map((item) => (
+                        <ExtensionTile
+                          key={item.id}
+                          data={item}
+                          searchIndex={extensionSearchIndexById.get(item.id)}
+                          {...tileProps}
+                          colorClass="border-violet-900/60 bg-violet-950/30 text-violet-100"
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <Settings2 size={12} style={{ color: '#fb923c' }} />
+                      <h3
+                        className="text-[12px] font-semibold uppercase tracking-widest"
+                        style={{ color: '#fb923c' }}
+                      >
+                        System
+                      </h3>
+                      <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                        {extensions.z_system.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {extensions.z_system.map((item) => (
+                        <ExtensionTile
+                          key={item.id}
+                          data={item}
+                          searchIndex={extensionSearchIndexById.get(item.id)}
+                          {...tileProps}
+                          colorClass="border-orange-900/60 bg-orange-950/30 text-orange-100"
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <MemoryStick size={12} style={{ color: '#fdba74' }} />
+                      <h3
+                        className="text-[12px] font-semibold uppercase tracking-widest"
+                        style={{ color: '#fdba74' }}
+                      >
+                        Caches
+                      </h3>
+                      <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                        {extensions.z_caches.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {extensions.z_caches.map((item) => (
+                        <ExtensionTile
+                          key={item.id}
+                          data={item}
+                          searchIndex={extensionSearchIndexById.get(item.id)}
+                          {...tileProps}
+                          colorClass="border-orange-900/40 bg-orange-950/20 text-orange-100"
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-            </>
-          ) : (
-            <div className="col-span-full flex flex-col items-center justify-center py-20 text-center animate-fade-in-up" style={{ minHeight: '50vh' }}>
-              <div style={{ padding: '20px', background: 'var(--riscv-surface-2)', borderRadius: '50%', marginBottom: '24px' }}>
-                <Search size={40} strokeWidth={1.5} style={{ color: 'var(--riscv-text-3)' }} />
-              </div>
-              <h3 className="text-[16px] font-semibold mb-2" style={{ color: 'var(--riscv-text)' }}>No results found</h3>
-              <p className="text-[13px] max-w-sm" style={{ color: 'var(--riscv-text-2)', lineHeight: 1.5 }}>
-                We couldn't find any extensions, instructions, or encodings matching <strong style={{ color: 'var(--riscv-text)' }}>"{searchQuery}"</strong>.
-              </p>
-              <button 
-                onClick={() => setSearchQuery('')}
-                className="mt-6 riscv-btn px-4 py-2"
+
+                {/* 4. S-Extensions (Privileged) */}
+                <div
+                  className="col-span-full pt-5"
+                  style={{ borderTop: '1px solid var(--riscv-border)' }}
+                >
+                  <div className="flex items-center gap-2 mb-4">
+                    <Network size={13} style={{ color: '#22d3ee' }} />
+                    <h3
+                      className="text-[12px] font-semibold uppercase tracking-widest"
+                      style={{ color: '#22d3ee' }}
+                    >
+                      S &amp; Sv Extensions — Privileged ISA
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div className="space-y-2.5">
+                      <div className="flex items-center gap-1.5">
+                        <Layers size={11} style={{ color: 'var(--riscv-text-3)' }} />
+                        <h4
+                          className="text-[11px] uppercase tracking-widest font-semibold"
+                          style={{ color: 'var(--riscv-text-3)' }}
+                        >
+                          Memory (Sv)
+                        </h4>
+                        <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                          {extensions.s_mem.length}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {extensions.s_mem.map((item) => (
+                          <ExtensionTile
+                            key={item.id}
+                            data={item}
+                            searchIndex={extensionSearchIndexById.get(item.id)}
+                            {...tileProps}
+                            colorClass="border-cyan-900/50 bg-cyan-950/20 text-cyan-100"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-2.5">
+                      <div className="flex items-center gap-1.5">
+                        <Timer size={11} style={{ color: 'var(--riscv-text-3)' }} />
+                        <h4
+                          className="text-[11px] uppercase tracking-widest font-semibold"
+                          style={{ color: 'var(--riscv-text-3)' }}
+                        >
+                          Interrupts (Sm/Ss)
+                        </h4>
+                        <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                          {extensions.s_interrupt.length}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {extensions.s_interrupt.map((item) => (
+                          <ExtensionTile
+                            key={item.id}
+                            data={item}
+                            searchIndex={extensionSearchIndexById.get(item.id)}
+                            {...tileProps}
+                            colorClass="border-cyan-900/50 bg-cyan-950/20 text-cyan-100"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-2.5">
+                      <div className="flex items-center gap-1.5">
+                        <ServerCrash size={11} style={{ color: 'var(--riscv-text-3)' }} />
+                        <h4
+                          className="text-[11px] uppercase tracking-widest font-semibold"
+                          style={{ color: 'var(--riscv-text-3)' }}
+                        >
+                          Trap, Debug &amp; Hypervisor
+                        </h4>
+                        <span className="text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>
+                          {extensions.s_trap.length}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {extensions.s_trap.map((item) => (
+                          <ExtensionTile
+                            key={item.id}
+                            data={item}
+                            searchIndex={extensionSearchIndexById.get(item.id)}
+                            {...tileProps}
+                            colorClass="border-cyan-900/50 bg-cyan-950/20 text-cyan-100"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div
+                className="col-span-full flex flex-col items-center justify-center py-20 text-center animate-fade-in-up"
+                style={{ minHeight: '50vh' }}
               >
-                Clear Search
-              </button>
-            </div>
-          )}
+                <div
+                  style={{
+                    padding: '20px',
+                    background: 'var(--riscv-surface-2)',
+                    borderRadius: '50%',
+                    marginBottom: '24px',
+                  }}
+                >
+                  <Search size={40} strokeWidth={1.5} style={{ color: 'var(--riscv-text-3)' }} />
+                </div>
+                <h3
+                  className="text-[16px] font-semibold mb-2"
+                  style={{ color: 'var(--riscv-text)' }}
+                >
+                  No results found
+                </h3>
+                <p
+                  className="text-[13px] max-w-sm"
+                  style={{ color: 'var(--riscv-text-2)', lineHeight: 1.5 }}
+                >
+                  We couldn't find any extensions, instructions, or encodings matching{' '}
+                  <strong style={{ color: 'var(--riscv-text)' }}>"{searchQuery}"</strong>.
+                </p>
+                <button onClick={() => setSearchQuery('')} className="mt-6 riscv-btn px-4 py-2">
+                  Clear Search
+                </button>
+              </div>
+            )}
           </div>
 
           {/* ─── Sidebar ─────────────────────────────────────────────────── */}
-          <div id="detail-panel" className={`lg:col-span-3 mt-6 lg:mt-0 ${selectedExt ? 'panel-open' : ''}`}>
+          <div
+            id="detail-panel"
+            className={`lg:col-span-3 mt-6 lg:mt-0 ${selectedExt ? 'panel-open' : ''}`}
+          >
             <div
               className="sticky top-6 riscv-card backdrop-blur-sm min-h-[400px] max-h-[calc(100vh-3rem)] flex flex-col overflow-hidden"
               style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.6)' }}
             >
-              <div className="p-4 pb-3 flex items-center justify-between" style={{ borderBottom: '1px solid var(--riscv-border)' }}>
+              <div
+                className="p-4 pb-3 flex items-center justify-between"
+                style={{ borderBottom: '1px solid var(--riscv-border)' }}
+              >
                 <div className="flex items-center gap-2">
                   <Info size={14} style={{ color: 'var(--riscv-text-3)' }} />
-                  <h2 className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: 'var(--riscv-text-3)' }}>Selected Details</h2>
+                  <h2
+                    className="text-[12px] font-semibold uppercase tracking-widest"
+                    style={{ color: 'var(--riscv-text-3)' }}
+                  >
+                    Selected Details
+                  </h2>
                 </div>
                 {/* Mobile Close Button */}
                 <button
@@ -2555,7 +2984,11 @@ const RISCVExplorer = () => {
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-start gap-1 font-black tracking-tight break-words hover:opacity-80"
-                          style={{ fontSize: '1.5rem', lineHeight: 1.2, color: 'var(--riscv-gold)' }}
+                          style={{
+                            fontSize: '1.5rem',
+                            lineHeight: 1.2,
+                            color: 'var(--riscv-gold)',
+                          }}
                           data-tooltip="Open reference link"
                         >
                           <span>{selectedExt.name}</span>
@@ -2564,6 +2997,57 @@ const RISCVExplorer = () => {
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
+                        {/* Ratification status. Without this, a proposal such as
+                            Zvabd reads exactly as settled as Zbb, which is the
+                            same hazard as publishing a withdrawn encoding: the
+                            reader cannot tell what is real.
+
+                            "Unconfirmed" rather than "unratified" is deliberate.
+                            It means our sources are silent, not that we know the
+                            extension was rejected. Zvabd, Zibi and Zvfofp8min are
+                            absent from both riscv-unified-db and riscv-opcodes;
+                            RV32E and RV64E are simply not modelled in UDB. Those
+                            are different situations and neither warrants a claim
+                            we cannot source. */}
+                        {(() => {
+                          const state = selectedExt.state;
+                          const hasInstructions =
+                            Object.keys(selectedExt.instructions || {}).length > 0;
+                          if (!state && !hasInstructions) return null;
+
+                          const ratified = state === 'ratified';
+                          const label = ratified
+                            ? `Ratified${selectedExt.ratification_date ? ` ${selectedExt.ratification_date}` : ''}`
+                            : state
+                              ? state.charAt(0).toUpperCase() + state.slice(1)
+                              : 'Status unconfirmed';
+                          const tip = ratified
+                            ? 'Ratified per riscv-unified-db'
+                            : state
+                              ? `riscv-unified-db reports this extension as ${state}`
+                              : 'Neither riscv-unified-db nor riscv-opcodes describes this extension, so its status could not be confirmed';
+                          return (
+                            <span
+                              title={tip}
+                              className="px-2 py-1 rounded-md text-[11px] font-mono uppercase tracking-wide border whitespace-nowrap"
+                              style={
+                                ratified
+                                  ? {
+                                      background: 'var(--riscv-check-fill)',
+                                      color: 'var(--riscv-check)',
+                                      borderColor: 'var(--riscv-check-edge)',
+                                    }
+                                  : {
+                                      background: 'var(--riscv-gold-dim)',
+                                      color: 'var(--riscv-gold)',
+                                      borderColor: 'rgba(245,197,66,0.35)',
+                                    }
+                              }
+                            >
+                              {label}
+                            </span>
+                          );
+                        })()}
                         {selectedExt.discontinued === 1 && (
                           <span className="px-2 py-1 rounded-md text-[11px] font-mono uppercase tracking-wide border bg-red-950/40 text-red-200 border-red-600/60">
                             Discontinued
@@ -2587,15 +3071,30 @@ const RISCVExplorer = () => {
 
                     <div className="space-y-6">
                       <div>
-                        <h4 className="text-[11px] uppercase tracking-widest font-semibold mb-1.5" style={{ color: 'var(--riscv-text-3)' }}>Description</h4>
-                        <p className="text-sm leading-relaxed" style={{ color: 'var(--riscv-text)' }}>{selectedExt.desc}</p>
+                        <h4
+                          className="text-[11px] uppercase tracking-widest font-semibold mb-1.5"
+                          style={{ color: 'var(--riscv-text-3)' }}
+                        >
+                          Description
+                        </h4>
+                        <p
+                          className="text-sm leading-relaxed"
+                          style={{ color: 'var(--riscv-text)' }}
+                        >
+                          {selectedExt.desc}
+                        </p>
                       </div>
 
                       <div className="riscv-card-2 p-3 rounded-lg">
-                        <h4 className="text-[11px] uppercase tracking-widest font-semibold mb-2 flex items-center gap-1" style={{ color: 'var(--riscv-violet)' }}>
+                        <h4
+                          className="text-[11px] uppercase tracking-widest font-semibold mb-2 flex items-center gap-1"
+                          style={{ color: 'var(--riscv-violet)' }}
+                        >
                           <ArrowRight size={10} /> Use Case
                         </h4>
-                        <p className="text-sm italic" style={{ color: 'var(--riscv-text-2)' }}>{selectedExt.use}</p>
+                        <p className="text-sm italic" style={{ color: 'var(--riscv-text-2)' }}>
+                          {selectedExt.use}
+                        </p>
                       </div>
 
                       {/* Instruction list, when available */}
@@ -2623,9 +3122,11 @@ const RISCVExplorer = () => {
                                   className="px-2 py-1 rounded border border-slate-600 bg-slate-800 text-[11px] font-mono text-slate-100 disabled:opacity-40"
                                   onClick={() => {
                                     setSearchMatches((current) => {
-                                      if (!current || current.extId !== selectedExt.id) return current;
+                                      if (!current || current.extId !== selectedExt.id)
+                                        return current;
                                       const nextIndex =
-                                        (current.index - 1 + current.mnemonics.length) % current.mnemonics.length;
+                                        (current.index - 1 + current.mnemonics.length) %
+                                        current.mnemonics.length;
                                       const mnemonic = current.mnemonics[nextIndex];
                                       selectInstructionByMnemonic(selectedExt, mnemonic);
                                       return { ...current, index: nextIndex };
@@ -2640,8 +3141,10 @@ const RISCVExplorer = () => {
                                   className="px-2 py-1 rounded border border-slate-600 bg-slate-800 text-[11px] font-mono text-slate-100 disabled:opacity-40"
                                   onClick={() => {
                                     setSearchMatches((current) => {
-                                      if (!current || current.extId !== selectedExt.id) return current;
-                                      const nextIndex = (current.index + 1) % current.mnemonics.length;
+                                      if (!current || current.extId !== selectedExt.id)
+                                        return current;
+                                      const nextIndex =
+                                        (current.index + 1) % current.mnemonics.length;
                                       const mnemonic = current.mnemonics[nextIndex];
                                       selectInstructionByMnemonic(selectedExt, mnemonic);
                                       return { ...current, index: nextIndex };
@@ -2659,7 +3162,8 @@ const RISCVExplorer = () => {
                       {Object.keys(selectedExt.instructions || {}).length > 0 && (
                         <div className="bg-slate-900 p-3 rounded border border-slate-700">
                           <h4 className="text-[11px] uppercase tracking-wider text-emerald-400 font-bold mb-2">
-                            Instruction Set Snapshot ({Object.keys(selectedExt.instructions || {}).length})
+                            Instruction Set Snapshot (
+                            {Object.keys(selectedExt.instructions || {}).length})
                           </h4>
                           <div className="flex flex-wrap gap-1">
                             {Object.keys(selectedExt.instructions || {}).map((mnemonic) => {
@@ -2679,7 +3183,7 @@ const RISCVExplorer = () => {
                                   onClick={() => {
                                     if (!isClickable) return;
                                     setSelectedInstruction(
-                                      isActive ? null : { mnemonic, ...instructionDetails }
+                                      isActive ? null : { mnemonic, ...instructionDetails },
                                     );
                                     setSearchMatches((current) => {
                                       if (
@@ -2694,16 +3198,17 @@ const RISCVExplorer = () => {
                                       return { ...current, index: idx };
                                     });
                                   }}
-                                  className={`px-1.5 py-0.5 rounded border text-[11px] font-mono tracking-tight ${isActive
-                                    ? isDeprecated
-                                      ? 'border-red-400 bg-red-500/10 text-red-200'
-                                      : 'border-emerald-400 bg-emerald-500/10 text-emerald-200'
-                                    : isHit
-                                      ? 'border-yellow-400 bg-yellow-500/10 text-yellow-200'
-                                      : isDeprecated
-                                        ? 'border-red-500/60 bg-red-500/5 text-red-200'
-                                        : 'border-slate-700 bg-slate-800/70'
-                                    }`}
+                                  className={`px-1.5 py-0.5 rounded border text-[11px] font-mono tracking-tight ${
+                                    isActive
+                                      ? isDeprecated
+                                        ? 'border-red-400 bg-red-500/10 text-red-200'
+                                        : 'border-emerald-400 bg-emerald-500/10 text-emerald-200'
+                                      : isHit
+                                        ? 'border-yellow-400 bg-yellow-500/10 text-yellow-200'
+                                        : isDeprecated
+                                          ? 'border-red-500/60 bg-red-500/5 text-red-200'
+                                          : 'border-slate-700 bg-slate-800/70'
+                                  }`}
                                   title={
                                     isClickable
                                       ? `View details for ${mnemonic}`
@@ -2722,26 +3227,33 @@ const RISCVExplorer = () => {
                       {selectedExt.csrs && Object.keys(selectedExt.csrs).length > 0 && (
                         <div className="bg-slate-900 p-3 rounded border border-slate-700">
                           <h4 className="text-[11px] uppercase tracking-wider text-sky-300 font-bold mb-2">
-                            {(extensionCsrLabels[selectedExt.id] || 'CSRs')}{' '}
-                            ({Object.keys(selectedExt.csrs).length})
+                            {extensionCsrLabels[selectedExt.id] || 'CSRs'} (
+                            {Object.keys(selectedExt.csrs).length})
                           </h4>
                           <div className="flex flex-wrap gap-1">
-                            {Object.keys(selectedExt.csrs).sort().map((name) => {
-                              const csr = selectedExt.csrs[name] || {};
-                              // Address and description are what identify a CSR;
-                              // both ride along in the catalogue entry.
-                              const tip = [csr.desc, csr.address, csr.priv_mode && `${csr.priv_mode}-mode`]
-                                .filter(Boolean).join(' · ');
-                              return (
-                                <span
-                                  key={name}
-                                  title={tip || undefined}
-                                  className="px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800/70 text-[11px] font-mono text-slate-200"
-                                >
-                                  {name.toUpperCase()}
-                                </span>
-                              );
-                            })}
+                            {Object.keys(selectedExt.csrs)
+                              .sort()
+                              .map((name) => {
+                                const csr = selectedExt.csrs[name] || {};
+                                // Address and description are what identify a CSR;
+                                // both ride along in the catalogue entry.
+                                const tip = [
+                                  csr.desc,
+                                  csr.address,
+                                  csr.priv_mode && `${csr.priv_mode}-mode`,
+                                ]
+                                  .filter(Boolean)
+                                  .join(' · ');
+                                return (
+                                  <span
+                                    key={name}
+                                    title={tip || undefined}
+                                    className="px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800/70 text-[11px] font-mono text-slate-200"
+                                  >
+                                    {name.toUpperCase()}
+                                  </span>
+                                );
+                              })}
                           </div>
                         </div>
                       )}
@@ -2775,11 +3287,15 @@ const RISCVExplorer = () => {
                                 type="button"
                                 className="inline-flex items-center gap-1 px-2 py-1 rounded border border-slate-600 bg-slate-800 text-[11px] font-mono text-slate-100 hover:border-slate-500"
                                 onClick={async () => {
-                                  const text = formatInstructionForClipboard(selectedExt, selectedInstruction);
+                                  const text = formatInstructionForClipboard(
+                                    selectedExt,
+                                    selectedInstruction,
+                                  );
                                   const ok = await copyTextToClipboard(text);
                                   setCopyStatus(ok ? 'copied' : 'failed');
                                   if (ok) showToast('Copied instruction details!');
-                                  if (copyStatusTimerRef.current) window.clearTimeout(copyStatusTimerRef.current);
+                                  if (copyStatusTimerRef.current)
+                                    window.clearTimeout(copyStatusTimerRef.current);
                                   copyStatusTimerRef.current = window.setTimeout(() => {
                                     copyStatusTimerRef.current = null;
                                     setCopyStatus(null);
@@ -2822,8 +3338,8 @@ const RISCVExplorer = () => {
                               </div>
                               <EncodingDiagram encoding={selectedInstruction.encoding} />
                               <div className="mt-1 text-[11px] text-slate-500">
-                                Fixed bits are <span className="font-mono">0/1</span>, variable bits are{' '}
-                                <span className="font-mono">x</span>.
+                                Fixed bits are <span className="font-mono">0/1</span>, variable bits
+                                are <span className="font-mono">x</span>.
                               </div>
                             </div>
 
@@ -2849,13 +3365,14 @@ const RISCVExplorer = () => {
                                   Match
                                 </div>
                                 <div
-                                  className={`font-mono text-[12px] text-slate-100 bg-slate-800/70 border rounded px-2 py-1 ${searchQuery.trim().length &&
+                                  className={`font-mono text-[12px] text-slate-100 bg-slate-800/70 border rounded px-2 py-1 ${
+                                    searchQuery.trim().length &&
                                     String(selectedInstruction.match || '')
                                       .toLowerCase()
                                       .includes(searchQuery.trim().toLowerCase())
-                                    ? 'border-yellow-400 bg-yellow-500/10'
-                                    : 'border-slate-700'
-                                    }`}
+                                      ? 'border-yellow-400 bg-yellow-500/10'
+                                      : 'border-slate-700'
+                                  }`}
                                 >
                                   {selectedInstruction.match}
                                 </div>
@@ -2865,13 +3382,14 @@ const RISCVExplorer = () => {
                                   Mask
                                 </div>
                                 <div
-                                  className={`font-mono text-[12px] text-slate-100 bg-slate-800/70 border rounded px-2 py-1 ${searchQuery.trim().length &&
+                                  className={`font-mono text-[12px] text-slate-100 bg-slate-800/70 border rounded px-2 py-1 ${
+                                    searchQuery.trim().length &&
                                     String(selectedInstruction.mask || '')
                                       .toLowerCase()
                                       .includes(searchQuery.trim().toLowerCase())
-                                    ? 'border-yellow-400 bg-yellow-500/10'
-                                    : 'border-slate-700'
-                                    }`}
+                                      ? 'border-yellow-400 bg-yellow-500/10'
+                                      : 'border-slate-700'
+                                  }`}
                                 >
                                   {selectedInstruction.mask}
                                 </div>
@@ -2900,7 +3418,9 @@ const RISCVExplorer = () => {
                                       <button
                                         type="button"
                                         className="w-full text-left font-mono text-[12px] text-slate-100 bg-slate-800/70 border border-slate-700 rounded px-2 py-1 hover:border-cyan-400/60"
-                                        onClick={() => selectStandardEquivalent(standardEquivalentMnemonic)}
+                                        onClick={() =>
+                                          selectStandardEquivalent(standardEquivalentMnemonic)
+                                        }
                                         data-tooltip="Open standard instruction details"
                                       >
                                         <span className="inline-flex items-center gap-1">
@@ -2923,7 +3443,9 @@ const RISCVExplorer = () => {
                                         <button
                                           type="button"
                                           className="inline-flex items-center gap-1 text-[12px] font-mono text-cyan-200 hover:text-cyan-100 underline"
-                                          onClick={() => selectStandardEquivalent(standardEquivalentMnemonic)}
+                                          onClick={() =>
+                                            selectStandardEquivalent(standardEquivalentMnemonic)
+                                          }
                                           data-tooltip="Open standard instruction details"
                                         >
                                           {standardEquivalentMnemonic}
@@ -2942,7 +3464,9 @@ const RISCVExplorer = () => {
                                     <div className="text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-1">
                                       Description
                                     </div>
-                                    <div className="text-[12px] text-slate-200">{compressedMapping.description}</div>
+                                    <div className="text-[12px] text-slate-200">
+                                      {compressedMapping.description}
+                                    </div>
                                   </div>
                                 </div>
                               </div>
@@ -2966,13 +3490,14 @@ const RISCVExplorer = () => {
                                         {normalizeMnemonicKey(entry.mnemonic)}
                                         <ArrowUpRight size={12} className="opacity-70" />
                                       </div>
-                                      <div className="text-[11px] font-mono text-slate-400">{entry.compressed}</div>
+                                      <div className="text-[11px] font-mono text-slate-400">
+                                        {entry.compressed}
+                                      </div>
                                     </button>
                                   ))}
                                 </div>
                               </div>
                             )}
-
                           </div>
                         </div>
                       )}
@@ -2981,10 +3506,11 @@ const RISCVExplorer = () => {
                         <div
                           className={`
                       mt-4 p-3 rounded text-xs flex items-center gap-2 border
-                      ${isHighlighted(selectedExt.id)
-                              ? 'bg-yellow-900/20 border-yellow-700/30 text-yellow-200'
-                              : 'bg-slate-800 border-slate-700 text-slate-500'
-                            }
+                      ${
+                        isHighlighted(selectedExt.id)
+                          ? 'bg-yellow-900/20 border-yellow-700/30 text-yellow-200'
+                          : 'bg-slate-800 border-slate-700 text-slate-500'
+                      }
                     `}
                         >
                           {isHighlighted(selectedExt.id) ? (
@@ -3003,13 +3529,30 @@ const RISCVExplorer = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="h-[300px] flex flex-col items-center justify-center text-center space-y-3" style={{ color: 'var(--riscv-text-3)' }}>
-                    <div className="p-4 rounded-full" style={{ background: 'var(--riscv-surface-2)', border: '1px solid var(--riscv-border-2)' }}>
+                  <div
+                    className="h-[300px] flex flex-col items-center justify-center text-center space-y-3"
+                    style={{ color: 'var(--riscv-text-3)' }}
+                  >
+                    <div
+                      className="p-4 rounded-full"
+                      style={{
+                        background: 'var(--riscv-surface-2)',
+                        border: '1px solid var(--riscv-border-2)',
+                      }}
+                    >
                       <CircuitBoard size={28} style={{ color: 'var(--riscv-muted)' }} />
                     </div>
                     <div>
-                      <p className="text-xs font-medium mb-1" style={{ color: 'var(--riscv-text-2)' }}>No Extension Selected</p>
-                      <p className="text-[12px] max-w-[160px] mx-auto" style={{ color: 'var(--riscv-text-3)' }}>
+                      <p
+                        className="text-xs font-medium mb-1"
+                        style={{ color: 'var(--riscv-text-2)' }}
+                      >
+                        No Extension Selected
+                      </p>
+                      <p
+                        className="text-[12px] max-w-[160px] mx-auto"
+                        style={{ color: 'var(--riscv-text-3)' }}
+                      >
                         Click any tile to explore specifications, encodings &amp; profiles.
                       </p>
                     </div>
@@ -3023,13 +3566,30 @@ const RISCVExplorer = () => {
         {/* ─── Footer ─────────────────────────────────────────────────── */}
         <footer
           className="mt-10 pb-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px]"
-          style={{ borderTop: '1px solid var(--riscv-border)', paddingTop: '1.5rem', color: 'var(--riscv-text-3)' }}
+          style={{
+            borderTop: '1px solid var(--riscv-border)',
+            paddingTop: '1.5rem',
+            color: 'var(--riscv-text-3)',
+          }}
         >
           <div className="flex items-center gap-2">
             <CircuitBoard size={14} style={{ color: 'var(--riscv-gold)' }} />
-            <span className="font-semibold" style={{ color: 'var(--riscv-text-2)' }}>RISC-V Extension Landscape</span>
+            <span className="font-semibold" style={{ color: 'var(--riscv-text-2)' }}>
+              RISC-V Extension Landscape
+            </span>
             <span style={{ color: 'var(--riscv-border-2)' }}>·</span>
-            <span>Data sourced from <a href="https://github.com/riscv/riscv-isa-manual" target="_blank" rel="noreferrer" className="hover:underline" style={{ color: 'var(--riscv-violet)' }}>riscv/riscv-isa-manual</a></span>
+            <span>
+              Data sourced from{' '}
+              <a
+                href="https://github.com/riscv/riscv-isa-manual"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:underline"
+                style={{ color: 'var(--riscv-violet)' }}
+              >
+                riscv/riscv-isa-manual
+              </a>
+            </span>
           </div>
           <div className="flex items-center gap-3">
             <a
@@ -3066,14 +3626,26 @@ const RISCVExplorer = () => {
               className="animate-scale-in w-full max-w-3xl riscv-card overflow-hidden"
               style={{ boxShadow: '0 0 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(139,124,248,0.15)' }}
             >
-              <div className="p-4 flex items-start justify-between gap-3" style={{ borderBottom: '1px solid var(--riscv-border)' }}>
+              <div
+                className="p-4 flex items-start justify-between gap-3"
+                style={{ borderBottom: '1px solid var(--riscv-border)' }}
+              >
                 <div className="min-w-0">
-                  <h3 id="encoder-validator-title" className="font-bold flex items-center gap-2" style={{ color: 'var(--riscv-text)', fontSize: '14px' }}>
+                  <h3
+                    id="encoder-validator-title"
+                    className="font-bold flex items-center gap-2"
+                    style={{ color: 'var(--riscv-text)', fontSize: '14px' }}
+                  >
                     <ScanSearch size={15} style={{ color: 'var(--riscv-violet)' }} />
                     <span>Encoder Validator</span>
                   </h3>
-                  <p id="encoder-validator-desc" className="text-[12px] mt-1" style={{ color: 'var(--riscv-text-3)' }}>
-                    Enter a 32-bit encoding (0/1/-) or Match+Mask (hex). Detects overlaps against the full ISA database.
+                  <p
+                    id="encoder-validator-desc"
+                    className="text-[12px] mt-1"
+                    style={{ color: 'var(--riscv-text-3)' }}
+                  >
+                    Enter a 32-bit encoding (0/1/-) or Match+Mask (hex). Detects overlaps against
+                    the full ISA database.
                   </p>
                 </div>
 
@@ -3091,7 +3663,12 @@ const RISCVExplorer = () => {
               <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <div>
-                    <div className="text-[11px] uppercase tracking-widest font-semibold mb-1.5" style={{ color: 'var(--riscv-text-3)' }}>Proposed Mnemonic <span style={{ fontWeight: 400 }}>(optional)</span></div>
+                    <div
+                      className="text-[11px] uppercase tracking-widest font-semibold mb-1.5"
+                      style={{ color: 'var(--riscv-text-3)' }}
+                    >
+                      Proposed Mnemonic <span style={{ fontWeight: 400 }}>(optional)</span>
+                    </div>
                     <input
                       type="text"
                       value={encoderValidatorInput.mnemonic}
@@ -3104,7 +3681,12 @@ const RISCVExplorer = () => {
                   </div>
 
                   <div>
-                    <div className="text-[11px] uppercase tracking-widest font-semibold mb-1.5" style={{ color: 'var(--riscv-text-3)' }}>Encoding <span style={{ fontWeight: 400 }}>(required if no match/mask)</span></div>
+                    <div
+                      className="text-[11px] uppercase tracking-widest font-semibold mb-1.5"
+                      style={{ color: 'var(--riscv-text-3)' }}
+                    >
+                      Encoding <span style={{ fontWeight: 400 }}>(required if no match/mask)</span>
+                    </div>
                     <input
                       type="text"
                       value={encoderValidatorInput.encoding}
@@ -3118,7 +3700,12 @@ const RISCVExplorer = () => {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <div className="text-[11px] uppercase tracking-widest font-semibold mb-1.5" style={{ color: 'var(--riscv-text-3)' }}>Match (hex)</div>
+                      <div
+                        className="text-[11px] uppercase tracking-widest font-semibold mb-1.5"
+                        style={{ color: 'var(--riscv-text-3)' }}
+                      >
+                        Match (hex)
+                      </div>
                       <input
                         type="text"
                         value={encoderValidatorInput.match}
@@ -3130,7 +3717,12 @@ const RISCVExplorer = () => {
                       />
                     </div>
                     <div>
-                      <div className="text-[11px] uppercase tracking-widest font-semibold mb-1.5" style={{ color: 'var(--riscv-text-3)' }}>Mask (hex)</div>
+                      <div
+                        className="text-[11px] uppercase tracking-widest font-semibold mb-1.5"
+                        style={{ color: 'var(--riscv-text-3)' }}
+                      >
+                        Mask (hex)
+                      </div>
                       <input
                         type="text"
                         value={encoderValidatorInput.mask}
@@ -3156,7 +3748,12 @@ const RISCVExplorer = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        setEncoderValidatorInput({ mnemonic: '', encoding: '', match: '', mask: '' });
+                        setEncoderValidatorInput({
+                          mnemonic: '',
+                          encoding: '',
+                          match: '',
+                          mask: '',
+                        });
                         setEncoderValidatorResult(null);
                         setEncoderValidatorCopyStatus(null);
                       }}
@@ -3169,7 +3766,12 @@ const RISCVExplorer = () => {
 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="text-[11px] uppercase tracking-widest font-semibold" style={{ color: 'var(--riscv-text-3)' }}>Results</div>
+                    <div
+                      className="text-[11px] uppercase tracking-widest font-semibold"
+                      style={{ color: 'var(--riscv-text-3)' }}
+                    >
+                      Results
+                    </div>
                     <button
                       type="button"
                       disabled={!encoderValidatorResult?.proposed}
@@ -3178,12 +3780,13 @@ const RISCVExplorer = () => {
                         setEncoderValidatorCopyStatus(null);
                         const report = formatEncoderValidatorReport(
                           encoderValidatorResult.proposed,
-                          encoderValidatorResult
+                          encoderValidatorResult,
                         );
                         const ok = await copyTextToClipboard(report);
                         setEncoderValidatorCopyStatus(ok ? 'copied' : 'failed');
                         if (ok) showToast('Copied validation report!');
-                        if (encoderCopyTimerRef.current) window.clearTimeout(encoderCopyTimerRef.current);
+                        if (encoderCopyTimerRef.current)
+                          window.clearTimeout(encoderCopyTimerRef.current);
                         encoderCopyTimerRef.current = window.setTimeout(() => {
                           encoderCopyTimerRef.current = null;
                           setEncoderValidatorCopyStatus(null);
@@ -3204,7 +3807,11 @@ const RISCVExplorer = () => {
                   {!encoderValidatorResult ? (
                     <div
                       className="text-[12px] rounded-lg p-3"
-                      style={{ background: 'var(--riscv-surface-2)', border: '1px solid var(--riscv-border-2)', color: 'var(--riscv-text-3)' }}
+                      style={{
+                        background: 'var(--riscv-surface-2)',
+                        border: '1px solid var(--riscv-border-2)',
+                        color: 'var(--riscv-text-3)',
+                      }}
                     >
                       Enter a proposed encoding and click Validate.
                     </div>
@@ -3233,32 +3840,61 @@ const RISCVExplorer = () => {
                               Encoding: {encoderValidatorResult.proposed.encoding}
                             </div>
                             <div className="grid grid-cols-2 gap-2">
-                              <div className="font-mono text-[12px] text-slate-200">Match: {encoderValidatorResult.proposed.match}</div>
-                              <div className="font-mono text-[12px] text-slate-200">Mask: {encoderValidatorResult.proposed.mask}</div>
+                              <div className="font-mono text-[12px] text-slate-200">
+                                Match: {encoderValidatorResult.proposed.match}
+                              </div>
+                              <div className="font-mono text-[12px] text-slate-200">
+                                Mask: {encoderValidatorResult.proposed.mask}
+                              </div>
                             </div>
                           </div>
                         </div>
                       )}
 
                       {encoderValidatorResult.proposed && (
-                        <div className="rounded-lg p-3" style={{ border: '1px solid var(--riscv-border-2)', background: 'var(--riscv-surface-2)' }}>
-                          <div className="text-[11px] uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--riscv-text-3)' }}>Conflicts ({encoderValidatorResult.conflicts.length})</div>
+                        <div
+                          className="rounded-lg p-3"
+                          style={{
+                            border: '1px solid var(--riscv-border-2)',
+                            background: 'var(--riscv-surface-2)',
+                          }}
+                        >
+                          <div
+                            className="text-[11px] uppercase tracking-widest font-semibold mb-2"
+                            style={{ color: 'var(--riscv-text-3)' }}
+                          >
+                            Conflicts ({encoderValidatorResult.conflicts.length})
+                          </div>
                           {encoderValidatorResult.conflicts.length === 0 ? (
                             <div className="conflict-none rounded-lg p-3 flex items-center gap-2 border">
-                              <CheckCircle2 size={15} style={{ color: 'var(--riscv-success)', flexShrink: 0 }} />
-                              <span className="text-[13px] font-medium" style={{ color: 'var(--riscv-success)' }}>No overlaps found in ISA database — safe to use.</span>
+                              <CheckCircle2
+                                size={15}
+                                style={{ color: 'var(--riscv-success)', flexShrink: 0 }}
+                              />
+                              <span
+                                className="text-[13px] font-medium"
+                                style={{ color: 'var(--riscv-success)' }}
+                              >
+                                No overlaps found in ISA database — safe to use.
+                              </span>
                             </div>
                           ) : (
                             <div className="space-y-2 max-h-[340px] overflow-y-auto overscroll-contain pr-1">
                               {encoderValidatorResult.conflicts.map((conflict) => {
                                 const severityCls =
-                                  conflict.type === 'identical' ? 'conflict-identical' :
-                                    conflict.type === 'proposed_subset_of_existing' ? 'conflict-subset-in' :
-                                      conflict.type === 'existing_subset_of_proposed' ? 'conflict-subset-out' :
-                                        'conflict-partial';
+                                  conflict.type === 'identical'
+                                    ? 'conflict-identical'
+                                    : conflict.type === 'proposed_subset_of_existing'
+                                      ? 'conflict-subset-in'
+                                      : conflict.type === 'existing_subset_of_proposed'
+                                        ? 'conflict-subset-out'
+                                        : 'conflict-partial';
                                 const SeverityIcon =
-                                  conflict.type === 'identical' ? XCircle :
-                                    conflict.type === 'partial_overlap' ? AlertCircle : AlertTriangle;
+                                  conflict.type === 'identical'
+                                    ? XCircle
+                                    : conflict.type === 'partial_overlap'
+                                      ? AlertCircle
+                                      : AlertTriangle;
                                 return (
                                   <div
                                     key={`${conflict.other.extId}:${conflict.other.mnemonic}:${conflict.type}`}
@@ -3266,13 +3902,26 @@ const RISCVExplorer = () => {
                                   >
                                     <div className="flex items-start justify-between gap-2">
                                       <div className="min-w-0 flex items-start gap-1.5">
-                                        <SeverityIcon size={13} className="mt-0.5 shrink-0 opacity-80" />
+                                        <SeverityIcon
+                                          size={13}
+                                          className="mt-0.5 shrink-0 opacity-80"
+                                        />
                                         <div>
-                                          <div className="font-mono text-[12px] font-medium break-words" style={{ color: 'var(--riscv-text)' }}>
+                                          <div
+                                            className="font-mono text-[12px] font-medium break-words"
+                                            style={{ color: 'var(--riscv-text)' }}
+                                          >
                                             {conflict.other.mnemonic}{' '}
-                                            <span style={{ color: 'var(--riscv-text-3)' }}>({conflict.other.extId})</span>
+                                            <span style={{ color: 'var(--riscv-text-3)' }}>
+                                              ({conflict.other.extId})
+                                            </span>
                                           </div>
-                                          <div className="text-[11px] mt-0.5" style={{ color: 'var(--riscv-text-3)' }}>{conflict.other.extName}</div>
+                                          <div
+                                            className="text-[11px] mt-0.5"
+                                            style={{ color: 'var(--riscv-text-3)' }}
+                                          >
+                                            {conflict.other.extName}
+                                          </div>
                                         </div>
                                       </div>
                                       <span
@@ -3283,10 +3932,25 @@ const RISCVExplorer = () => {
                                       </span>
                                     </div>
 
-                                    <div className="mt-1.5 text-[12px]" style={{ color: 'var(--riscv-text-2)' }}>{conflict.why}</div>
+                                    <div
+                                      className="mt-1.5 text-[12px]"
+                                      style={{ color: 'var(--riscv-text-2)' }}
+                                    >
+                                      {conflict.why}
+                                    </div>
                                     <div className="mt-1.5 grid grid-cols-2 gap-2">
-                                      <div className="font-mono text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>mask: {conflict.commonMask}</div>
-                                      <div className="font-mono text-[11px]" style={{ color: 'var(--riscv-text-3)' }}>example: {conflict.exampleWord}</div>
+                                      <div
+                                        className="font-mono text-[11px]"
+                                        style={{ color: 'var(--riscv-text-3)' }}
+                                      >
+                                        mask: {conflict.commonMask}
+                                      </div>
+                                      <div
+                                        className="font-mono text-[11px]"
+                                        style={{ color: 'var(--riscv-text-3)' }}
+                                      >
+                                        example: {conflict.exampleWord}
+                                      </div>
                                     </div>
                                   </div>
                                 );
@@ -3338,7 +4002,7 @@ const RISCVExplorer = () => {
         onClear={() => setWorkspaceIds(new Set())}
         onLoadIds={(ids) => {
           setWorkspaceIds(new Set()); // clear
-          addWorkspaceIdsSmart(ids);  // smartly add all
+          addWorkspaceIdsSmart(ids); // smartly add all
         }}
         onSelectInstruction={({ extId, mnemonic, encoding, variable_fields, match, mask }) => {
           // Navigate the main view to the specified extension + instruction

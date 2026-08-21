@@ -349,7 +349,11 @@ for (const id of gaps) {
     if (ver.state) entry.state = ver.state;
     // UDB writes `ratification_date: null` for unratified versions, which the
     // minimal parser captures as the string "null" — treat that as absent.
-    if (ver.ratification_date && ver.ratification_date !== 'null') {
+    // Only a real year-month is useful. UDB writes null for unratified versions,
+    // which the minimal parser captures as the string "null", and at least one
+    // entry carries the literal "unknown". Either would render as
+    // "Ratified unknown" in the badge, which says less than showing no date.
+    if (/^\d{4}-\d{2}$/.test(String(ver.ratification_date ?? ''))) {
       entry.ratification_date = ver.ratification_date;
     }
     if (ver.url && !entry.url) entry.url = ver.url;
@@ -414,6 +418,69 @@ if (parseFailures > 0) {
 // means UDB restructured its layout and our minimal parser is quietly missing
 // data, which would otherwise be reported as "No new extensions found".
 //
+// ---- Pass 1c: ratification status across the whole catalog ----
+//
+// Same widening as the CSR pass below, for the same reason: the gap loop above
+// only visits supervisor-prefixed extensions with no structured data, so 176 of
+// 227 entries carried no ratification marker at all.
+//
+// That matters more than it looks. The catalog lists genuinely unratified
+// proposals such as Zvabd, Zibi and the vector dot-product extensions alongside
+// ratified ones, and with no state field their instructions read as equally
+// settled. It is the same hazard as publishing a withdrawn encoding: a reader
+// cannot tell what is real. Labelling is the alternative to deleting them, and
+// deleting would throw away work people track deliberately.
+//
+// Uses a real YAML parse rather than the minimal one, because versions[] is a
+// list of maps and picking the wrong entry silently mislabels an extension.
+const YAML_EXT = require('yaml');
+
+// UDB models the base integer ISA as one extension, I, parameterised by XLEN.
+// We list the concrete bases a reader looks for. Without this mapping all five
+// come back unlabelled and read as though their ratification were in doubt,
+// which would be wrong: I was ratified in 2019.
+//
+// E is deliberately absent here. UDB carries no E.yaml, so there is nothing to
+// inherit, and asserting a date we cannot source would be worse than saying
+// nothing.
+const UDB_ID_ALIASES = { RV32I: 'I', RV64I: 'I', RV128I: 'I' };
+
+let stateAdded = 0;
+for (const [id, loc] of entryIndex) {
+  const entry = loc.entries[loc.index];
+  if (entry.state) continue;                      // already labelled, leave it
+
+  const udbId = UDB_ID_ALIASES[id] || id;
+  const yamlPath = path.join(UDB_EXT_DIR, udbId + '.yaml');
+  if (!fs.existsSync(yamlPath)) continue;         // absent from UDB, nothing to say
+
+  let doc;
+  try {
+    doc = YAML_EXT.parse(fs.readFileSync(yamlPath, 'utf8'));
+  } catch (err) {
+    parseFailures++;
+    console.warn('  warning: could not parse ' + yamlPath + ': ' + err.message);
+    continue;
+  }
+
+  const ver = pickVersion(doc && doc.versions);
+  if (!ver || !ver.state) continue;
+
+  entry.state = ver.state;
+  // Only a real year-month is useful. UDB writes null for unratified versions,
+    // which the minimal parser captures as the string "null", and at least one
+    // entry carries the literal "unknown". Either would render as
+    // "Ratified unknown" in the badge, which says less than showing no date.
+    if (/^\d{4}-\d{2}$/.test(String(ver.ratification_date ?? ''))) {
+    entry.ratification_date = String(ver.ratification_date);
+  }
+  stateAdded++;
+  updated++;
+}
+
+console.log('');
+console.log('Ratification pass: ' + stateAdded + ' extension(s) gained a state');
+
 // ---- Pass 2: CSR coverage across the whole catalog ----
 //
 // The pass above is deliberately narrow: supervisor-prefixed extensions with no
