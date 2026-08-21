@@ -530,7 +530,9 @@
           "mask": "0xfe00707f"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/rv32.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/rv32.html",
+      "state": "ratified",
+      "ratification_date": "2019-06"
     },
     {
       "id": "RV64I",
@@ -1220,7 +1222,9 @@
           "mask": "0x707f"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/rv64.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/rv64.html",
+      "state": "ratified",
+      "ratification_date": "2019-06"
     },
     {
       "id": "RV32E",
@@ -3132,7 +3136,9 @@
           "mask": "0x707f"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/colophon.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/colophon.html",
+      "state": "ratified",
+      "ratification_date": "2019-06"
     }
   ],
   "standard": [
@@ -3476,7 +3482,9 @@
           "mask": "0xf800707f"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/a-st-ext.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/a-st-ext.html",
+      "state": "ratified",
+      "ratification_date": "2019-12"
     },
     {
       "id": "B",
@@ -4037,7 +4045,9 @@
         "Zba",
         "Zbb",
         "Zbs"
-      ]
+      ],
+      "state": "ratified",
+      "ratification_date": "2024-04"
     },
     {
       "id": "C",
@@ -4473,7 +4483,9 @@
           "mask": "0xfc63"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/c-st-ext.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/c-st-ext.html",
+      "state": "ratified",
+      "ratification_date": "2019-12"
     },
     {
       "id": "D",
@@ -4913,7 +4925,9 @@
           "mask": "0xfe00007f"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/d-st-ext.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/d-st-ext.html",
+      "state": "ratified",
+      "ratification_date": "2019-12"
     },
     {
       "id": "F",
@@ -5347,7 +5361,9 @@
           "length": 32,
           "desc": "Floating-Point Dynamic Rounding Mode"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2019-12"
     },
     {
       "id": "H",
@@ -5746,7 +5762,9 @@
           "length": 64,
           "desc": "Supervisor Trap Vector"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2019-12"
     },
     {
       "id": "K",
@@ -5939,7 +5957,9 @@
           "mask": "0xfe00707f"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/m-st-ext.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/m-st-ext.html",
+      "state": "ratified",
+      "ratification_date": "2019-12"
     },
     {
       "id": "N",
@@ -6425,7 +6445,9 @@
           "mask": "0xfe00007f"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/q-st-ext.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/q-st-ext.html",
+      "state": "ratified",
+      "ratification_date": "2019-04"
     },
     {
       "id": "S",
@@ -6557,7 +6579,9 @@
           "length": 64,
           "desc": "Supervisor Trap Vector"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2024-10"
     },
     {
       "id": "U",
@@ -6605,7 +6629,9 @@
           "length": 64,
           "desc": "Supervisor Environment Configuration"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2019-12"
     },
     {
       "id": "V",
@@ -15206,7 +15232,9 @@
           "length": "MXLEN",
           "desc": "Vector Fixed-Point Saturate Flag"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2021-11"
     }
   ],
   "z_bit": [
@@ -15325,7 +15353,9 @@
           "mask": "0xfe00707f"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/b-st-ext.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/b-st-ext.html",
+      "state": "ratified",
+      "ratification_date": "2021-06"
     },
     {
       "id": "Zbb",
@@ -15675,7 +15705,9 @@
           "mask": "0xfff0707f"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/b-st-ext.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/b-st-ext.html",
+      "state": "ratified",
+      "ratification_date": "2021-06"
     },
     {
       "id": "Zbc",
@@ -15734,7 +15766,9 @@
           "mask": "0xfe00707f"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/b-st-ext.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/b-st-ext.html",
+      "state": "ratified",
+      "ratification_date": "2021-06"
     },
     {
       "id": "Zbs",
@@ -15851,7 +15885,9 @@
           "mask": "0xfe00707f"
         }
       },
-      "url": "https://docs.riscv.org/reference/isa/unpriv/b-st-ext.html"
+      "url": "https://docs.riscv.org/reference/isa/unpriv/b-st-ext.html",
+      "state": "ratified",
+      "ratification_date": "2021-06"
     }
   ],
   "z_atomics": [
@@ -16133,7 +16169,9 @@
           "match": "0xe000302f",
           "mask": "0xf800707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2024-04"
     },
     {
       "id": "Zacas",
@@ -16222,7 +16260,9 @@
           "match": "0x2800202f",
           "mask": "0xf800707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-11"
     },
     {
       "id": "Zalasr",
@@ -16338,7 +16378,9 @@
           "match": "0x3a00202f",
           "mask": "0xfa007fff"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2025-10"
     },
     {
       "id": "Zalrsc",
@@ -16406,7 +16448,9 @@
           "match": "0x1800302f",
           "mask": "0xf800707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2024-04"
     },
     {
       "id": "Ziccrse",
@@ -16415,7 +16459,9 @@
       "desc": "LR/SC Forward Progress",
       "use": "Guarantees LR/SC forward progress",
       "url": "https://github.com/riscv/riscv-isa-manual",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-03"
     }
   ],
   "z_compress": [
@@ -16848,7 +16894,9 @@
           "match": "0x8401",
           "mask": "0xec03"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-04"
     },
     {
       "id": "Zcb",
@@ -17004,7 +17052,9 @@
           "match": "0x9c69",
           "mask": "0xfc7f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-04"
     },
     {
       "id": "Zcd",
@@ -17069,7 +17119,9 @@
           "match": "0xa002",
           "mask": "0xe003"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-04"
     },
     {
       "id": "Zce",
@@ -17078,7 +17130,9 @@
       "desc": "Embedded Compressed",
       "use": "RV32E/RV64E-focused compressed subset",
       "url": "https://docs.riscv.org/reference/isa/unpriv/zc.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-04"
     },
     {
       "id": "Zcf",
@@ -17143,7 +17197,9 @@
           "match": "0xe002",
           "mask": "0xe003"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-04"
     },
     {
       "id": "Zcmp",
@@ -17227,7 +17283,9 @@
           "match": "0xb802",
           "mask": "0xff03"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-04"
     },
     {
       "id": "Zcmt",
@@ -17258,7 +17316,9 @@
           "length": "MXLEN",
           "desc": "Table Jump Base Vector and Control Register"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-04"
     },
     {
       "id": "Zcmop",
@@ -17342,7 +17402,9 @@
           "match": "0x6781",
           "mask": "0xffff"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2024-03"
     },
     {
       "id": "Zclsd",
@@ -17351,7 +17413,9 @@
       "desc": "Compressed LS-Pair",
       "use": "Compressed load/store pairs",
       "url": "https://docs.riscv.org/reference/isa/unpriv/zilsd.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2025-02"
     },
     {
       "id": "Zcmlsd",
@@ -17747,7 +17811,9 @@
           "match": "0xd2300053",
           "mask": "0xfff0007f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zfa",
@@ -18186,7 +18252,9 @@
           "match": "0x44500053",
           "mask": "0xfff0007f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zfbfmin",
@@ -18224,7 +18292,9 @@
           "match": "0x40600053",
           "mask": "0xfff0007f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2024-06"
     },
     {
       "id": "Zfh",
@@ -18586,7 +18656,9 @@
           "match": "0xc000053",
           "mask": "0xfe00007f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zfhmin",
@@ -18729,7 +18801,9 @@
           "match": "0x1027",
           "mask": "0x707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zfinx",
@@ -19088,7 +19162,9 @@
           "match": "0xd0300053",
           "mask": "0xfff0007f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zhinx",
@@ -19473,7 +19549,9 @@
           "match": "0xd4300053",
           "mask": "0xfff0007f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zhinxmin",
@@ -19509,7 +19587,9 @@
           "match": "0x44000053",
           "mask": "0xfff0007f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zmmul",
@@ -19584,7 +19664,9 @@
           "match": "0x200003b",
           "mask": "0xfe00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-06"
     }
   ],
   "z_load_store": [
@@ -19595,7 +19677,9 @@
       "desc": "Misaligned L/S Support",
       "use": "Misaligned loads/stores in cacheable+coherent regions",
       "url": "https://github.com/riscv/riscv-isa-manual",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-03"
     },
     {
       "id": "Zilsd",
@@ -19604,7 +19688,9 @@
       "desc": "Load/Store Pair for RV32",
       "use": "Streaming loads/stores (data)",
       "url": "https://docs.riscv.org/reference/isa/unpriv/zilsd.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2025-02"
     }
   ],
   "z_integer": [
@@ -19644,7 +19730,9 @@
           "match": "0xe007033",
           "mask": "0xfe00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-11"
     }
   ],
   "z_vector": [
@@ -19664,7 +19752,9 @@
       "desc": "Vec Int (32-bit, embedded)",
       "use": "Int-only embedded vectors",
       "url": "https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zve32f",
@@ -19673,7 +19763,9 @@
       "desc": "Vec FP32 (embedded)",
       "use": "Embedded FP32 vector compute",
       "url": "https://docs.riscv.org/reference/isa/unpriv/bfloat16.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zve64x",
@@ -19682,7 +19774,9 @@
       "desc": "Vec Int (64-bit, embedded)",
       "use": "64-bit int embedded vectors",
       "url": "https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zve64f",
@@ -19691,7 +19785,9 @@
       "desc": "Vec FP32+Int (64-bit, embedded)",
       "use": "FP32 + 64-bit int vectors",
       "url": "https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zve64d",
@@ -19700,7 +19796,9 @@
       "desc": "Vec FP64+FP32+Int",
       "use": "Full FP64 embedded vectors",
       "url": "https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zv",
@@ -19718,7 +19816,9 @@
       "desc": "Min VLEN ≥ 32b",
       "use": "Vector length capability",
       "url": "https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zvl64b",
@@ -19727,7 +19827,9 @@
       "desc": "Min VLEN ≥ 64b",
       "use": "Vector length capability",
       "url": "https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zvl128b",
@@ -19736,7 +19838,9 @@
       "desc": "Min VLEN ≥ 128b",
       "use": "Vector length capability",
       "url": "https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zvl256b",
@@ -19745,7 +19849,9 @@
       "desc": "Min VLEN ≥ 256b",
       "use": "Vector length capability",
       "url": "https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zvl512b",
@@ -19754,7 +19860,9 @@
       "desc": "Min VLEN ≥ 512b",
       "use": "Vector length capability",
       "url": "https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zvl1024b",
@@ -19763,7 +19871,9 @@
       "desc": "Min VLEN ≥ 1024b",
       "use": "Vector length capability",
       "url": "https://docs.riscv.org/reference/isa/unpriv/v-st-ext.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Zvf",
@@ -21164,7 +21274,9 @@
           "match": "0xfc005057",
           "mask": "0xfc00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-06"
     },
     {
       "id": "Zvfhmin",
@@ -21200,7 +21312,9 @@
           "match": "0x480a1057",
           "mask": "0xfc0ff07f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-06"
     },
     {
       "id": "Zvfbfmin",
@@ -21238,7 +21352,9 @@
           "match": "0x48069057",
           "mask": "0xfc0ff07f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2024-06"
     },
     {
       "id": "Zvfbfa",
@@ -21287,7 +21403,9 @@
           "match": "0xec001057",
           "mask": "0xfc00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2024-06"
     },
     {
       "id": "Zvfofp8min",
@@ -21668,7 +21786,9 @@
           "match": "0xd4004057",
           "mask": "0xfc00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvbc",
@@ -21736,7 +21856,9 @@
           "match": "0x34006057",
           "mask": "0xfc00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvbc32e",
@@ -21821,7 +21943,9 @@
           "length": 32,
           "desc": "Most significant 32 bits of Machine Security Configuration"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2024-07"
     },
     {
       "id": "Zicfiss",
@@ -21871,7 +21995,9 @@
           "length": "MXLEN",
           "desc": "Shadow Stack Pointer"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2024-07"
     },
     {
       "id": "Zimop",
@@ -22371,7 +22497,9 @@
           "match": "0xce004073",
           "mask": "0xfe00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2024-03"
     }
   ],
   "z_crypto": [
@@ -22636,7 +22764,9 @@
           "match": "0x69805013",
           "mask": "0xfff0707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-02"
     },
     {
       "id": "Zbkc",
@@ -22682,7 +22812,9 @@
           "match": "0xa003033",
           "mask": "0xfe00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-02"
     },
     {
       "id": "Zbkx",
@@ -22726,7 +22858,9 @@
           "match": "0x28004033",
           "mask": "0xfe00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-02"
     },
     {
       "id": "Zk",
@@ -23511,7 +23645,9 @@
         "Zkr",
         "Zks",
         "Zkt"
-      ]
+      ],
+      "state": "ratified",
+      "ratification_date": "2022-02"
     },
     {
       "id": "Zkn",
@@ -24220,7 +24356,9 @@
         "Zkne",
         "Zknd",
         "Zknh"
-      ]
+      ],
+      "state": "ratified",
+      "ratification_date": "2022-02"
     },
     {
       "id": "Zknd",
@@ -24341,7 +24479,9 @@
           "match": "0x7e000033",
           "mask": "0xfe00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-02"
     },
     {
       "id": "Zkne",
@@ -24448,7 +24588,9 @@
           "match": "0x7e000033",
           "mask": "0xfe00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-02"
     },
     {
       "id": "Zknh",
@@ -24664,7 +24806,9 @@
           "match": "0x10101013",
           "mask": "0xfff0707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-02"
     },
     {
       "id": "Zkr",
@@ -24713,7 +24857,9 @@
           "length": 32,
           "desc": "Most significant 32 bits of Machine Security Configuration"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-02"
     },
     {
       "id": "Zks",
@@ -25104,7 +25250,9 @@
         "Zbkx",
         "Zksed",
         "Zksh"
-      ]
+      ],
+      "state": "ratified",
+      "ratification_date": "2022-02"
     },
     {
       "id": "Zksed",
@@ -25146,7 +25294,9 @@
           "match": "0x34000033",
           "mask": "0x3e00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-02"
     },
     {
       "id": "Zksh",
@@ -25184,7 +25334,9 @@
           "match": "0x10901013",
           "mask": "0xfff0707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-02"
     },
     {
       "id": "Zkt",
@@ -25193,7 +25345,9 @@
       "desc": "Timing-Safe Crypto",
       "use": "Data-independent latency constraints",
       "url": "https://docs.riscv.org/reference/isa/unpriv/scalar-crypto.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2022-02"
     }
   ],
   "z_vector_crypto": [
@@ -25213,7 +25367,9 @@
       "desc": "Vector Crypto Bitmanip",
       "use": "Vector crypto bit ops",
       "url": "https://docs.riscv.org/reference/isa/unpriv/vector-crypto.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvkg",
@@ -25250,7 +25406,9 @@
           "match": "0xa208a077",
           "mask": "0xfe0ff07f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvkgs",
@@ -25604,7 +25762,9 @@
           "match": "0xb6002077",
           "mask": "0xfe00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvknc",
@@ -25613,7 +25773,9 @@
       "desc": "Vector NIST + CLMUL",
       "use": "NIST crypto with carryless multiply",
       "url": "https://docs.riscv.org/reference/isa/unpriv/vector-crypto.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvkned",
@@ -25770,7 +25932,9 @@
           "match": "0xa603a077",
           "mask": "0xfe0ff07f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvknf",
@@ -25788,7 +25952,9 @@
       "desc": "Vector NIST + GCM",
       "use": "NIST suite + GCM vector bundle",
       "url": "https://docs.riscv.org/reference/isa/unpriv/vector-crypto.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvknha",
@@ -25845,7 +26011,9 @@
           "match": "0xb6002077",
           "mask": "0xfe00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvknhb",
@@ -25902,7 +26070,9 @@
           "match": "0xb6002077",
           "mask": "0xfe00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvks",
@@ -26125,7 +26295,9 @@
           "match": "0xa2082077",
           "mask": "0xfe0ff07f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvksc",
@@ -26134,7 +26306,9 @@
       "desc": "Vector ShangMi + CLMUL",
       "use": "SMx with carryless multiply",
       "url": "https://docs.riscv.org/reference/isa/unpriv/vector-crypto.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvksed",
@@ -26186,7 +26360,9 @@
           "match": "0xa2082077",
           "mask": "0xfe0ff07f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvksg",
@@ -26195,7 +26371,9 @@
       "desc": "Vector ShangMi + GCM",
       "use": "ShangMi + GCM vectors",
       "url": "https://docs.riscv.org/reference/isa/unpriv/vector-crypto.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvksh",
@@ -26235,7 +26413,9 @@
           "match": "0x82002077",
           "mask": "0xfe00707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-09"
     },
     {
       "id": "Zvkt",
@@ -26244,7 +26424,9 @@
       "desc": "Vector Timing-Safe Crypto",
       "use": "Vector data-independent latency",
       "url": "https://docs.riscv.org/reference/isa/unpriv/vector-crypto.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-09"
     }
   ],
   "z_system": [
@@ -26255,7 +26437,9 @@
       "desc": "128B Reservation Set",
       "use": "Reservation set granularity (128-byte)",
       "url": "https://github.com/riscv/riscv-isa-manual",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-03"
     },
     {
       "id": "Za64rs",
@@ -26264,7 +26448,9 @@
       "desc": "64B Reservation Set",
       "use": "Reservation set granularity (64-byte)",
       "url": "https://github.com/riscv/riscv-isa-manual",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-03"
     },
     {
       "id": "Zabha",
@@ -26546,7 +26732,9 @@
           "match": "0x2000102f",
           "mask": "0xf800707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2024-04"
     },
     {
       "id": "Zama16b",
@@ -26555,7 +26743,9 @@
       "desc": "16B Misaligned Atomicity",
       "use": "Misaligned atomicity granule (16 bytes)",
       "url": "https://github.com/riscv/riscv-isa-manual",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2024-10"
     },
     {
       "id": "Zawrs",
@@ -26585,7 +26775,9 @@
           "match": "0x1d00073",
           "mask": "0xffffffff"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-11"
     },
     {
       "id": "Zccid",
@@ -26761,7 +26953,9 @@
           "length": 32,
           "desc": "High-half timer for RDTIME Instruction"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2019-12"
     },
     {
       "id": "Zicntrpmf",
@@ -26860,7 +27054,9 @@
           "match": "0x5073",
           "mask": "0x707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2019-04"
     },
     {
       "id": "Zifencei",
@@ -26885,7 +27081,9 @@
           "match": "0x100f",
           "mask": "0x707f"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2019-04"
     },
     {
       "id": "Zihintntl",
@@ -26937,7 +27135,9 @@
           "mask": "0xffffffff",
           "alias_of": "ADD"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-05"
     },
     {
       "id": "Zihintpause",
@@ -26959,7 +27159,9 @@
           "mask": "0xffffffff",
           "alias_of": "FENCE"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2021-02"
     },
     {
       "id": "Zihpm",
@@ -27318,7 +27520,9 @@
           "length": 32,
           "desc": "Unprivileged Hardware Performance Counter 9, high half"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2023-03"
     },
     {
       "id": "Zilsm*",
@@ -27408,7 +27612,9 @@
       "desc": "Total Store Ordering",
       "use": "x86-style TSO memory model",
       "url": "https://docs.riscv.org/reference/isa/unpriv/ztso-st-ext.html",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-01"
     }
   ],
   "z_caches": [
@@ -27419,7 +27625,9 @@
       "desc": "64B Cache Blocks",
       "use": "Requires 64B naturally aligned cache lines",
       "url": "https://github.com/riscv/riscv-isa-manual",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-03"
     },
     {
       "id": "Zicbom",
@@ -27462,7 +27670,9 @@
           "match": "0x200f",
           "mask": "0xfff07fff"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-05"
     },
     {
       "id": "Zicbop",
@@ -27513,7 +27723,9 @@
           "mask": "0x01f07fff",
           "alias_of": "ORI"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-05"
     },
     {
       "id": "Zicboz",
@@ -27534,7 +27746,9 @@
           "match": "0x40200f",
           "mask": "0xfff07fff"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2022-05"
     },
     {
       "id": "Ziccamoa",
@@ -27543,7 +27757,9 @@
       "desc": "Atomics PMA",
       "use": "PMA guarantees for A-extension atomics",
       "url": "https://github.com/riscv/riscv-isa-manual",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-03"
     },
     {
       "id": "Ziccamoc",
@@ -27552,7 +27768,9 @@
       "desc": "CAS PMA",
       "use": "PMA guarantees for CAS-style atomics",
       "url": "https://github.com/riscv/riscv-isa-manual",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2024-10"
     },
     {
       "id": "Ziccif",
@@ -27561,7 +27779,9 @@
       "desc": "Inst-Fetch Atomicity",
       "use": "Atomic I-fetch in cacheable+coherent regions",
       "url": "https://github.com/riscv/riscv-isa-manual",
-      "instructions": {}
+      "instructions": {},
+      "state": "ratified",
+      "ratification_date": "2023-03"
     }
   ],
   "s_mem": [
@@ -27716,7 +27936,9 @@
           "match": "0x16000073",
           "mask": "0xfe007fff"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2021-11"
     },
     {
       "id": "Svade",
@@ -28190,7 +28412,9 @@
           "length": "MXLEN",
           "desc": "Machine NMI Status"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2024-06"
     }
   ],
   "s_trap": [
@@ -28239,7 +28463,9 @@
           "length": "MXLEN",
           "desc": "Debug scratch register"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2025-02"
     },
     {
       "id": "Sdtrig",
@@ -28578,7 +28804,9 @@
           "match": "0x10400073",
           "mask": "0xffffffff"
         }
-      }
+      },
+      "state": "ratified",
+      "ratification_date": "2024-11"
     },
     {
       "id": "Sddbltrp",

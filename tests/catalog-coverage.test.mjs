@@ -222,6 +222,39 @@ test('a mnemonic never carries two different encodings', () => {
   }
 });
 
+test('ratification labelling does not regress', () => {
+  // A reader has to be able to tell a ratified extension from a proposal. With
+  // no state field, Zvabd's instructions read exactly as settled as Zbb's,
+  // which is the same hazard as publishing a withdrawn encoding.
+  const labelled = entries.filter((e) => e.state);
+  assert.ok(
+    labelled.length >= 165,
+    `expected at least 165 extensions to carry a ratification state, found ${labelled.length}`,
+  );
+
+  // Dates are year-month, as UDB records them.
+  for (const e of labelled) {
+    if (!e.ratification_date) continue;
+    assert.match(
+      String(e.ratification_date), /^\d{4}-\d{2}$/,
+      `${e.id} has ratification_date ${e.ratification_date}, expected YYYY-MM`,
+    );
+  }
+});
+
+test('the base ISAs are labelled ratified', () => {
+  // UDB models the base integer ISA as one extension, I, parameterised by XLEN,
+  // so the concrete bases a reader looks for come back unlabelled without an
+  // explicit alias. Left that way they read as though their status were in
+  // doubt, which is wrong: I was ratified in 2019.
+  const byId = new Map(entries.map((e) => [e.id, e]));
+  for (const id of ['RV32I', 'RV64I', 'RV128I']) {
+    const entry = byId.get(id);
+    assert.ok(entry, `${id} is missing from the catalogue`);
+    assert.equal(entry.state, 'ratified', `${id} should be labelled ratified`);
+  }
+});
+
 test('extension ids are unique', () => {
   const seen = new Set();
   const dupes = [];
