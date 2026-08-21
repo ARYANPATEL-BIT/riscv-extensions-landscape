@@ -389,7 +389,7 @@ npm run deploy
 
 This runs `npm run build` (producing `dist/`), then publishes to the `gh-pages`
 branch. The site is available at:
-`https://rpsene.github.io/riscv-extensions-landscape/`
+`https://riscv.github.io/riscv-extensions-landscape/`
 
 ### Docker (alternative)
 
