@@ -6,6 +6,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   Copy,
+  Link2,
   ChevronLeft,
   ChevronRight,
   Search,
@@ -59,6 +60,40 @@ const CATALOG_IDS = new Set(
 
 const BIT_WIDTH = 32n;
 const BIT_MASK_32 = (1n << BIT_WIDTH) - 1n;
+
+/* ─── Permalinks ────────────────────────────────────────────────────────────
+ * A link to a specific extension, so the tool can be cited in a discussion or
+ * a spec review rather than described. Originally proposed in #94 by
+ * @Veekshitha11; that branch could not be rebased, so this reimplements it.
+ *
+ * A query parameter rather than a path, deliberately. The site is served as
+ * static files from GitHub Pages with no router, so /extensions/Zba would 404
+ * on a hard refresh unless the host were configured to fall back to
+ * index.html. ?ext=Zba needs no server cooperation at all.
+ */
+const PERMALINK_PARAM = 'ext';
+
+const allExtensionsFlat = Object.values(extensions).flat().filter(Boolean);
+
+const findExtensionById = (id) => {
+  const wanted = String(id ?? '').trim().toLowerCase();
+  if (!wanted) return null;
+  // Case-insensitive: people type ?ext=zba as readily as ?ext=Zba.
+  return allExtensionsFlat.find((ext) => ext.id.toLowerCase() === wanted) ?? null;
+};
+
+const extensionFromUrl = () => {
+  if (typeof window === 'undefined') return null;
+  return findExtensionById(new URLSearchParams(window.location.search).get(PERMALINK_PARAM));
+};
+
+const permalinkFor = (extId) => {
+  if (typeof window === 'undefined') return '';
+  const url = new URL(window.location.href);
+  url.searchParams.set(PERMALINK_PARAM, extId);
+  url.hash = '';
+  return url.toString();
+};
 
 const normalizeMnemonicKey = (value) => String(value ?? '').trim().toUpperCase().split(/\s+/)[0];
 
@@ -670,7 +705,10 @@ const RISCVExplorer = () => {
 
   const [activeProfile, setActiveProfile] = useState(null);
   const [activeVolume, setActiveVolume] = useState(null);
-  const [selectedExt, setSelectedExt] = useState(null);
+  // Lazy initialiser, so ?ext=Zba is honoured on first paint rather than
+  // selecting nothing and then correcting itself.
+  const [selectedExt, setSelectedExt] = useState(extensionFromUrl);
+  const [permalinkCopied, setPermalinkCopied] = useState(false);
   const [selectedInstruction, setSelectedInstruction] = useState(null);
   const [copyStatus, setCopyStatus] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -861,11 +899,13 @@ const RISCVExplorer = () => {
   // Pending auto-scroll from the search effect, so a later keystroke can cancel
   // one that has not fired yet.
   const scrollTimerRef = React.useRef(null);
+  const permalinkTimerRef = React.useRef(null);
 
   React.useEffect(() => () => {
     if (copyStatusTimerRef.current) window.clearTimeout(copyStatusTimerRef.current);
     if (encoderCopyTimerRef.current) window.clearTimeout(encoderCopyTimerRef.current);
     if (scrollTimerRef.current) window.clearTimeout(scrollTimerRef.current);
+    if (permalinkTimerRef.current) window.clearTimeout(permalinkTimerRef.current);
   }, []);
   const searchInputRef = React.useRef(null);
 
@@ -1417,6 +1457,39 @@ const RISCVExplorer = () => {
   // These props are memoised so the tile's comparator can do its job: stable
   // identities for everything shared, and the tile itself asks only whether ITS
   // own id changed membership.
+  // Keep the address bar in step with the selection, so copying the URL from
+  // the browser works without touching the Share button, and a reload or a
+  // bookmark returns to the same extension.
+  //
+  // replaceState rather than pushState on purpose: clicking through twenty
+  // tiles should not bury the previous page under twenty history entries that
+  // Back has to walk through one at a time.
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    const current = url.searchParams.get(PERMALINK_PARAM);
+    const next = selectedExt?.id ?? null;
+    if (current === next) return;
+    if (next) url.searchParams.set(PERMALINK_PARAM, next);
+    else url.searchParams.delete(PERMALINK_PARAM);
+    window.history.replaceState(null, '', url.toString());
+  }, [selectedExt]);
+
+  // A fresh selection invalidates the "Copied" confirmation.
+  React.useEffect(() => { setPermalinkCopied(false); }, [selectedExt]);
+
+  const copyPermalink = React.useCallback(async () => {
+    if (!selectedExt) return;
+    const ok = await copyTextToClipboard(permalinkFor(selectedExt.id));
+    setPermalinkCopied(ok);
+    if (ok) showToast(`Link to ${selectedExt.id} copied`);
+    if (permalinkTimerRef.current) window.clearTimeout(permalinkTimerRef.current);
+    permalinkTimerRef.current = window.setTimeout(() => {
+      permalinkTimerRef.current = null;
+      setPermalinkCopied(false);
+    }, 1500);
+  }, [selectedExt, copyTextToClipboard, showToast]);
+
   const handleSelectExt = React.useCallback((data) => {
     // A deliberate click owns the panel from here on, so a later non-matching
     // query must not clear it out from under the user.
@@ -2490,11 +2563,26 @@ const RISCVExplorer = () => {
                         </a>
                       </div>
 
-                      {selectedExt.discontinued === 1 && (
-                        <span className="shrink-0 px-2 py-1 rounded-md text-[11px] font-mono uppercase tracking-wide border bg-red-950/40 text-red-200 border-red-600/60">
-                          Discontinued
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {selectedExt.discontinued === 1 && (
+                          <span className="px-2 py-1 rounded-md text-[11px] font-mono uppercase tracking-wide border bg-red-950/40 text-red-200 border-red-600/60">
+                            Discontinued
+                          </span>
+                        )}
+                        {/* The address bar already carries ?ext=<id>, but a
+                            button is the discoverable route and works on mobile,
+                            where copying the URL is fiddly. */}
+                        <button
+                          type="button"
+                          onClick={copyPermalink}
+                          aria-label={`Copy a link to ${selectedExt.id}`}
+                          title={`Copy a link to ${selectedExt.id}`}
+                          className="riscv-btn inline-flex items-center gap-1 px-2 py-1 text-[11px]"
+                        >
+                          <Link2 size={12} />
+                          {permalinkCopied ? 'Copied' : 'Link'}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="space-y-6">
