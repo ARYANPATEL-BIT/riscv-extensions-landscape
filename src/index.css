@@ -371,10 +371,23 @@ pre,
 
 /* Extension tile hover lift */
 .ext-tile {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 70px;
   transition:
     transform 0.15s ease,
     box-shadow 0.15s ease,
     border-color 0.15s ease;
+}
+
+.ext-tile-primary {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ext-tile:has(.ext-tile-primary:focus-visible) {
+  box-shadow: 0 0 0 2px var(--riscv-text-3) !important;
 }
 
 .ext-tile:hover {
@@ -1021,37 +1034,95 @@ pre,
   border-color: #a5b4fc !important;
 }
 
-/* ISA Configuration Builder button */
-:root[data-theme='light'] .builder-btn-off {
-  background: #1e293b !important; /* slate-800 */
-  color: #fbbf24 !important; /* bright amber-400 */
-  border-color: rgba(245, 158, 11, 0.5) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-}
-/* The Compare toggle's OFF state used bg-slate-800/80, a Tailwind alpha with
-   no light-theme remap, so in light it rendered a washed grey chip beside the
-   builder's solid one and its label measured 3.79:1. Same treatment as the
-   builder, in violet rather than amber, because Compare is a different mode
-   and should not look like the builder in either theme. */
-:root[data-theme='light'] .compare-mode-toggle[aria-pressed='false'] {
-  background: #1e293b !important;
-  color: #a78bfa !important;
-  border-color: rgba(139, 124, 248, 0.5) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+/* Compare and Builder use the same explicit two-state switch. The track color
+   is the status signal: red while off, green while on. */
+.mode-toggle-button {
+  background: var(--riscv-surface);
+  color: var(--riscv-text-2);
+  border: 1px solid var(--riscv-border-2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
 }
 
-:root[data-theme='light'] .builder-btn-off:hover {
-  background: #334155 !important; /* slate-700 */
-  color: #fcd34d !important; /* bright amber-300 */
+.mode-toggle-button:hover {
+  border-color: var(--riscv-border);
 }
 
-:root[data-theme='light'] .builder-badge-off {
-  background: rgba(255, 255, 255, 0.15) !important;
-  color: #fbbf24 !important; /* match text */
+.mode-toggle-button[aria-pressed='true'] {
+  background: rgba(22, 163, 74, 0.1);
+  color: var(--riscv-text);
+  border-color: rgba(22, 163, 74, 0.55);
 }
-:root[data-theme='light'] .builder-badge-on {
-  background: rgba(0, 0, 0, 0.3) !important;
-  color: #fef3c7 !important;
+
+.mode-toggle-button:focus-visible {
+  outline: 2px solid var(--riscv-violet);
+  outline-offset: 2px;
+}
+
+.mode-toggle-status {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #f87171;
+}
+
+.mode-toggle-status[data-checked='true'] {
+  color: #4ade80;
+}
+
+.mode-toggle-count {
+  display: inline-flex;
+  min-width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--riscv-tint-3);
+  color: var(--riscv-text-2);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.mode-switch {
+  display: inline-flex;
+  width: 36px;
+  height: 20px;
+  align-items: center;
+  border: 1px solid #b91c1c;
+  border-radius: 999px;
+  background: #dc2626;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.mode-switch[data-checked='true'] {
+  border-color: #15803d;
+  background: #16a34a;
+}
+
+.mode-switch-thumb {
+  width: 14px;
+  height: 14px;
+  margin-left: 2px;
+  border-radius: 999px;
+  background: #ffffff;
+  transform: translateX(0);
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.mode-switch[data-checked='true'] .mode-switch-thumb {
+  transform: translateX(16px);
+}
+
+:root[data-theme='light'] .mode-toggle-status {
+  color: #b91c1c;
+}
+
+:root[data-theme='light'] .mode-toggle-status[data-checked='true'] {
+  color: #15803d;
 }
 
 /* Encoding map.
@@ -1291,24 +1362,31 @@ pre,
   outline: 2px solid var(--riscv-gold) !important;
   outline-offset: 2px;
 }
-.ext-tile:focus-visible {
+.ext-tile-primary:focus-visible {
   outline: none !important;
-  box-shadow: 0 0 0 2px var(--riscv-text-3) !important;
 }
 
-:root[data-theme='light'] .ext-tile:focus-visible {
+:root[data-theme='light'] .ext-tile:has(.ext-tile-primary:focus-visible) {
   box-shadow: 0 0 0 2px var(--riscv-border-2) !important;
 }
 
 /* 5. Mobile Responsive Detail Panel */
 @media (max-width: 1024px) {
+  .detail-panel-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 49;
+    background: rgba(7, 7, 14, 0.65);
+    backdrop-filter: blur(2px);
+  }
+
   /* On screens smaller than lg (1024px) */
   #detail-panel {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 75vh;
+    height: min(85dvh, 720px);
     z-index: 50;
     border-radius: 20px 20px 0 0;
     border-left: none;
@@ -1326,6 +1404,107 @@ pre,
 
   :root[data-theme='light'] #detail-panel {
     box-shadow: 0 -8px 32px rgba(45, 40, 80, 0.15);
+  }
+}
+
+@media (max-width: 767px) {
+  .riscv-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .riscv-toolbar-filters,
+  .riscv-toolbar-actions {
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    padding-bottom: 4px;
+  }
+
+  .riscv-toolbar-filter-track {
+    width: max-content;
+  }
+
+  .riscv-toolbar-actions {
+    justify-content: flex-start;
+    max-width: 100%;
+  }
+
+  .riscv-builder-control {
+    order: -2;
+  }
+
+  .compare-mode-toggle {
+    order: -1;
+  }
+
+  .riscv-tool-divider {
+    display: none;
+  }
+
+  .workspace-studio-header {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 8px !important;
+    padding: 8px 10px !important;
+  }
+
+  .workspace-studio-header-left {
+    display: grid !important;
+    grid-template-columns: auto 1fr;
+    gap: 8px !important;
+  }
+
+  .workspace-studio-back,
+  .workspace-studio-brand {
+    white-space: nowrap;
+  }
+
+  .workspace-studio-back {
+    padding-inline: 9px !important;
+  }
+
+  .workspace-studio-back > span,
+  .workspace-studio-escape-hint,
+  .workspace-studio-divider {
+    display: none;
+  }
+
+  .workspace-studio-brand > div:first-child {
+    width: 26px !important;
+    height: 26px !important;
+  }
+
+  .workspace-studio-brand span {
+    font-size: 13px !important;
+    white-space: nowrap;
+  }
+
+  .workspace-studio-stats {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-left: 0 !important;
+    overflow-x: auto;
+    padding-bottom: 3px;
+  }
+
+  .workspace-studio-actions {
+    width: 100%;
+    justify-content: flex-end;
+    overflow-x: auto;
+  }
+
+  .workspace-provenance-row {
+    align-items: flex-start !important;
+    flex-wrap: wrap;
+  }
+}
+
+@media (hover: none) {
+  .ext-tile-compare {
+    opacity: 1;
   }
 }
 
@@ -1406,7 +1585,7 @@ pre,
   backdrop-filter: blur(8px);
 
   /* backdrop-filter creates a stacking context, which traps every z-index
-     inside this toolbar. The builder's "Start from a ratified profile" menu
+     inside this toolbar. The builder's "Start from a supported profile" menu
      asks for z-index 50, but confined to a context that is itself z-auto and
      earlier in the DOM than the detail panel, so the panel painted over the
      open menu. Raising the whole toolbar fixes every popup it contains at
@@ -1414,6 +1593,75 @@ pre,
      a bottom sheet and should cover the toolbar. */
   position: relative;
   z-index: 30;
+}
+
+.riscv-toolbar-label-compact {
+  display: none;
+}
+
+.riscv-profile-select {
+  color-scheme: dark;
+  background: var(--riscv-plate);
+}
+
+.riscv-profile-select option {
+  color: var(--riscv-text);
+  background: var(--riscv-plate);
+}
+
+:root[data-theme='light'] .riscv-profile-select {
+  color-scheme: light;
+}
+
+/* Keep the header stable when Compare adds pin controls to every profile. On
+   desktop, the action cluster has a fixed footprint and the filters scroll in
+   the remaining space instead of forcing the toolbar onto another row. At
+   laptop widths, shorter visible labels keep all primary actions in reach. */
+@media (min-width: 1024px) {
+  .riscv-toolbar {
+    flex-wrap: nowrap;
+  }
+
+  .riscv-toolbar-filters {
+    flex: 1 1 0%;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+
+  .riscv-toolbar-filter-track {
+    width: max-content;
+    flex: 0 0 auto;
+  }
+
+  .riscv-toolbar-actions {
+    flex: 0 0 auto;
+    max-width: none;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1919px) {
+  .riscv-toolbar .riscv-toolbar-label-full,
+  .riscv-toolbar .riscv-builder-label-full {
+    display: none;
+  }
+
+  .riscv-toolbar .riscv-toolbar-label-compact,
+  .riscv-toolbar .riscv-builder-label-compact {
+    display: inline;
+  }
+
+  .riscv-toolbar .riscv-toolbar-label-compact {
+    line-height: 1.05;
+    text-align: center;
+  }
+
+  .riscv-toolbar-actions > button,
+  .riscv-toolbar .builder-mode-toggle {
+    gap: 6px;
+    padding-inline: 8px;
+  }
 }
 
 /* A tool opens a dialog and hands you back. It never advertises state, because
@@ -1522,7 +1770,7 @@ pre,
   white-space: nowrap;
 }
 
-/* Pin buttons — the compare affordance on instruction chips, profile buttons
+/* Pin buttons — the compare affordance on instruction chips, the profile dropdown,
    and tray chips.
    State lives here rather than in an inline style on purpose: these carried
    their pinned/unpinned colours inline, and an inline declaration outranks a

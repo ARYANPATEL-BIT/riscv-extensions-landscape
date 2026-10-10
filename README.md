@@ -1,12 +1,12 @@
 # RISC-V ISA Explorer
 
 An interactive reference for RISC-V extensions, profiles, and per-instruction
-encodings. Pick a base ISA or start from a ratified profile, add extensions, and
+encodings. Pick a base ISA or start from a supported profile, add extensions, and
 get a dependency-resolved configuration with a valid `-march` string.
 
-**[Open the live site](https://riscv.github.io/riscv-isa-explorer/)**
+**[Open the live site](https://tech.riscv.org/isa-explorer/)**
 
-[![The explorer showing the extension catalogue with Zba selected, its description, use case and instruction set alongside](docs/screenshot.jpg)](https://riscv.github.io/riscv-isa-explorer/)
+[![The explorer showing the extension catalogue with Zba selected, its description, use case and instruction set alongside](docs/screenshot.jpg)](https://tech.riscv.org/isa-explorer/)
 
 [![CI](https://github.com/riscv/riscv-isa-explorer/actions/workflows/ci.yml/badge.svg)](https://github.com/riscv/riscv-isa-explorer/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
@@ -19,8 +19,8 @@ get a dependency-resolved configuration with a valid `-march` string.
 - **Build a configuration.** Select extensions and dependencies resolve
   automatically, with conflicts blocked and a reason shown for every implied
   extension.
-- **Start from a profile.** RVA23, RVB23 and the other ratified profiles load as
-  a starting point rather than being rebuilt by hand.
+- **Start from a profile.** RVA23, RVB23, their frozen 23.1 minor profiles, and the
+  other supported profiles load as a starting point rather than being rebuilt by hand.
 - **Export** a `-march` string, a YAML configuration, or a `riscv-config`
   compatible file.
 - **Compare entries.** Pin extensions, instructions or profiles and read them
@@ -56,12 +56,6 @@ python3 -m http.server 8080 -d dist
 
 Then open `http://localhost:8080`.
 
-Docker, if you prefer:
-
-```bash
-docker compose up --build
-```
-
 ## Where the data comes from
 
 Four files carry the data, and they do not have the same authority. Worth
@@ -72,7 +66,7 @@ knowing before changing anything:
 | `src/riscv_extensions.json` | the extension catalogue, plus the instruction encodings routed into each extension | [riscv-unified-db](https://github.com/riscv/riscv-unified-db) for metadata and ratification state; `src/instr_dict.json` for encodings |
 | `src/instr_dict.json` | the instruction encodings themselves | **hand-maintained.** Checked against [riscv-opcodes](https://github.com/riscv/riscv-opcodes), but it carries entries upstream lacks and is never regenerated |
 | `src/isa-dependency-graph.json` | dependencies, conflicts and parameters, with a citation on every edge | [riscv-unified-db](https://github.com/riscv/riscv-unified-db) |
-| `src/profiles.js` | the ratified profiles | the profile specifications |
+| `src/profiles.js` | supported profiles | the profile specifications |
 
 Two things fall outside that table, because no upstream carries them. The
 **Zve\* embedded vector subsets** are derived from V by the EEW/FP rules in
@@ -116,8 +110,8 @@ npm run opcodes:check -- <path-to-riscv-opcodes>
 | instruction encodings | **by hand.** The `check-opcodes-drift` workflow, Mondays at 07:00 UTC, files an issue when upstream is ahead |
 
 `src/instr_dict.json` is hand-maintained on purpose and is not regenerated from
-riscv-opcodes. It carries entries upstream does not: the 56 `vlseg` segment
-loads, which riscv-opcodes does not express at all, and the MOP and C.MOP
+riscv-opcodes. It carries entries upstream does not: 252 expanded vector segment
+load/store forms, which riscv-opcodes does not express individually, and the MOP and C.MOP
 encodings expanded from upstream's three `_n` templates. A regenerate would
 delete them, so the drift check reports and leaves the decision to a person.
 
@@ -144,9 +138,10 @@ gaps to fill.
 npm test
 ```
 
-CI runs the tests, builds, then validates the generated `-march` strings against
-clang. Rows needing a newer clang than the job provides are skipped and reported
-rather than failed, so the check is a floor rather than full coverage. The suite covers dependency closure, graph integrity, profile
+CI runs the tests, builds, then validates generated `-march` strings with both
+the distro clang and clang 21. The modern job covers every profile and every
+ratified catalogue entry; its small `CLANG21_UNSUPPORTED` allowlist is checked
+for staleness on every run. The suite covers dependency closure, graph integrity, profile
 correctness, `riscv-config` conventions, export formats, documentation links, and
 a jsdom smoke test that fails if the page renders blank.
 
@@ -227,12 +222,8 @@ to regenerate: sync the catalogue and the map follows.
 
 ## Deployment
 
-Pushes to `main` build and publish to the `gh-pages` branch automatically. To
-publish by hand:
-
-```bash
-npm run deploy
-```
+Every push to `main` is built by CI and published to the `gh-pages` branch,
+which GitHub Pages serves. Nothing is published by hand.
 
 ## Contributing
 
