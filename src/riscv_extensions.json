@@ -24369,11 +24369,6 @@
                 }
               }
             },
-            "G": {
-              "bits": "6",
-              "type": "dynamic",
-              "reset": "dynamic"
-            },
             "H": {
               "bits": "7",
               "type": "dynamic",
