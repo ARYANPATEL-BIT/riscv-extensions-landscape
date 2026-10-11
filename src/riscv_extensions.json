@@ -6379,7 +6379,7 @@
       "desc": "Packed fixed-point SIMD arithmetic in the integer registers, aimed at DSP kernels on cores with no vector unit.",
       "use": "Packed SIMD / DSP-style operations",
       "discontinued": 0,
-      "url": "https://github.com/riscv/riscv-isa-manual",
+      "url": "https://github.com/riscv/riscv-isa-manual/blob/main/src/unpriv/zp.adoc",
       "instructions": {},
       "state": "development",
       "version": "0.6.0"
@@ -75979,7 +75979,7 @@
       "tags": [],
       "desc": "Proposed full-round AES-128 and AES-256 encrypt, decrypt, and key-schedule vector instructions.",
       "use": "Vector AES finite-field helpers",
-      "url": "https://github.com/riscv/riscv-isa-manual",
+      "url": "https://github.com/riscv/riscv-crypto/blob/main/doc/vector-allrounds/riscv-crypto-vector-zvknf.adoc",
       "instructions": {}
     },
     {
@@ -79824,7 +79824,7 @@
       "tags": [],
       "desc": "Holds memory-tagging tags in a virtually indexed table, with supervisor CSRs giving that table's base address.",
       "use": "Address-tagged translation behavior",
-      "url": "https://github.com/riscv/riscv-isa-manual",
+      "url": "https://github.com/riscv/riscv-memory-tagging/blob/main/src/mte_tag.adoc",
       "instructions": {}
     },
     {
@@ -80060,7 +80060,7 @@
       "tags": [],
       "desc": "Holds M-mode memory-tagging tags in a virtually indexed table located by the new mvitt base register.",
       "use": "Machine-level virtual-address tagging",
-      "url": "https://github.com/riscv/riscv-isa-manual",
+      "url": "https://github.com/riscv/riscv-memory-tagging/blob/main/src/mte_tag.adoc",
       "instructions": {}
     },
     {
@@ -81167,7 +81167,7 @@
       "tags": [],
       "desc": "Assigns IMSIC interrupt files and APLIC domains to individual supervisor domains for isolated delivery.",
       "use": "Soft-debug / diagnostics assist",
-      "url": "https://github.com/riscv/riscv-isa-manual",
+      "url": "https://github.com/riscv/riscv-smmtt/blob/main/chapter7.adoc",
       "instructions": {}
     }
   ],
@@ -85377,7 +85377,7 @@
       "tags": [],
       "desc": "Lets supervisor software switch a hart between the RVWMO and TSO memory models at run time, per process.",
       "use": "Supervisors opt into TSO behavior",
-      "url": "https://github.com/riscv/riscv-isa-manual",
+      "url": "https://github.com/riscv/riscv-ssdtso/blob/main/ssdtso.adoc",
       "instructions": {}
     },
     {
