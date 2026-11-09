@@ -1,7 +1,7 @@
 {
   "source": {
     "repo": "riscv/riscv-isa-manual",
-    "commit": "8fb3965fe4b501a6bfa00c34affffcdbdb2c552c"
+    "commit": "facc5459c11526977f70f58acb82a0b25dc4e73f"
   },
   "volumes": {
     "unprivileged": {
